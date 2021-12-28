@@ -20,7 +20,7 @@ class BaseOptions():
         self.parser.add_argument('--load_size_h', type=int, default=128, help='scale images to this size Height')
         self.parser.add_argument('--load_size_w', type=int, default=128, help='scale images to this size Width')
         self.parser.add_argument('--load_size_d', type=int, default=128, help='scale images to this size Depth')
-        self.parser.add_argument('--hor_flip', action='store_true', help='if specified, do not flip the images for data augmentation')
+        self.parser.add_argument('--no_hor_flip', action='store_true', help='if specified, do not flip the images for data augmentation')
         self.parser.add_argument('--display_winsize', type=int, default=256, help='display window size for both visdom and HTML')
 
 

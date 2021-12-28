@@ -5,14 +5,15 @@ from torch.nn.functional import grid_sample
 import os
 import nibabel as nib
 import numpy as np
+import random
 
-def get_transform(transformParams, arrType):
+def get_transform(transformParams, arrType, times):
     
     transform_list = []
     size = [transformParams["load_size_h"], transformParams["load_size_w"], transformParams["load_size_d"]]
     transform_list.append(transforms.Lambda(lambda arr: resize3D(arr, size, arrType)))
     transform_list.append(transforms.Lambda(lambda arr: unitNorm(arr)))
-    # if transformParams["hor_flip"]: transform_list.append(transforms.RandomHorizontalFlip())
+    if not transformParams["no_hor_flip"]: transform_list.append(transforms.Lambda(lambda arr: rotZPlane(arr, times)))
     transform_list.append(transforms.ToTensor())
     transform_list.append(transforms.Normalize((0.5,), (0.5,)))
     transform_list.append(transforms.Lambda(lambda tensor: addChannel(tensor)))
@@ -24,10 +25,10 @@ def create(opt, phase):
     transform = {"load_size_d": opt.load_size_d,
             "load_size_h": opt.load_size_h,
             "load_size_w": opt.load_size_w,
-            "hor_flip": opt.hor_flip}
+            "no_hor_flip": opt.no_hor_flip}
 
     if phase == "val":
-        transform["hor_flip"] = False
+        transform["no_hor_flip"] = True
 
 
     dataset = Dataset3D(opt.root_path, phase, transform)
@@ -46,7 +47,7 @@ def resize3D(arr, size, arrType):
     tensor = grid_sample(x, grid, align_corners=True)
     arr = tensor[0,0,:,:,:].numpy()
 
-    #As this does an interpolation the mask should stil have only 0's or 1's
+    #As this does an interpolation the mask should still have only 0's or 1's
     if arrType == "msk": 
         arr[arr<0.5] = 0.
         arr[arr>=0.5] = 1.
@@ -58,6 +59,8 @@ def unitNorm(arr):
 def addChannel(tensor):
     return tensor.unsqueeze(0)
 
+def rotZPlane(arr, times):
+    return np.rot90(arr, k=times, axes=(0,1)).copy()
 
 class Dataset3D(Dataset):
     
@@ -71,9 +74,10 @@ class Dataset3D(Dataset):
     def __getitem__(self, index):
         self.img = nib.load( os.path.join(self.files[index], "img.nii") ).get_fdata()
         self.msk = nib.load( os.path.join(self.files[index], "msk.nii") ).get_fdata()
-
-        imgTrans = get_transform(self.transform, "img")
-        mskTrans = get_transform(self.transform, "msk")
+        
+        times = random.randint(0,3) #for flipping
+        imgTrans = get_transform(self.transform, "img", times)
+        mskTrans = get_transform(self.transform, "msk", times)
 
         self.img = imgTrans(self.img)
         self.msk = mskTrans(self.msk)
