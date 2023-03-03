@@ -8,15 +8,18 @@ import numpy as np
 import random
 
 def get_transform(transformParams, arrType, times):
-    
+    #Here we applied our tranforms for prepocessing basewd on defined pytorch torchvision.transforms
+    #as we were not that happy with some of the buitin function as the rotation in toTensor
+    #As a Results we should have a isotropic tensor that might be rotate around LA and normalize 
+    #in the range of [-1,1] with an extra dimension for 
     transform_list = []
     size = [transformParams["load_size_h"], transformParams["load_size_w"], transformParams["load_size_d"]]
+    
     transform_list.append(transforms.Lambda(lambda arr: resize3D(arr, size, arrType)))
-    transform_list.append(transforms.Lambda(lambda arr: unitNorm(arr)))
     if not transformParams["no_hor_flip"]: transform_list.append(transforms.Lambda(lambda arr: rotZPlane(arr, times)))
-    transform_list.append(transforms.ToTensor())
-    transform_list.append(transforms.Normalize((0.5,), (0.5,)))
-    transform_list.append(transforms.Lambda(lambda tensor: addChannel(tensor)))
+    transform_list.append(transforms.Lambda(lambda arr: toTensor(arr)))
+    transform_list.append(transforms.Lambda(lambda tensor: normalize(tensor, (0.5,), (0.5,))))
+    transform_list.append(transforms.Lambda(lambda tensor: addDim(tensor)))
 
     return transforms.Compose(transform_list)
 
@@ -29,7 +32,6 @@ def create(opt, phase):
 
     if phase == "val":
         transform["no_hor_flip"] = True
-
 
     dataset = Dataset3D(opt.root_path, phase, transform)
     dataloader = DataLoader(dataset=dataset, batch_size=opt.batch_size, shuffle=True)
@@ -48,15 +50,33 @@ def resize3D(arr, size, arrType):
     arr = tensor[0,0,:,:,:].numpy()
 
     #As this does an interpolation the mask should still have only 0's or 1's
+    #This should be improved for multiclass segmentation
     if arrType == "msk": 
         arr[arr<0.5] = 0.
         arr[arr>=0.5] = 1.
     return arr
 
-def unitNorm(arr):
-    return (arr -np.min(arr)) / (np.max(arr)-np.min(arr))
+def toTensor(arr):
+    arr    = unitNorm(arr)
+    tensor = torch.as_tensor(arr).contiguous()
+    return tensor
 
-def addChannel(tensor):
+def unitNorm(arr):
+    return (arr - np.min(arr)) / (np.max(arr) - np.min(arr))
+
+def normalize(tensor, mean, std):
+    dtype = tensor.dtype
+    mean = torch.as_tensor(mean, dtype=dtype, device=tensor.device)
+    std = torch.as_tensor(std, dtype=dtype, device=tensor.device)
+    if (std == 0).any():
+        raise ValueError(f"std evaluated to zero after conversion to {dtype}, leading to division by zero.")
+    if mean.ndim == 1:
+        mean = mean.view(-1, 1, 1)
+    if std.ndim == 1:
+        std = std.view(-1, 1, 1)
+    return tensor.sub_(mean).div_(std)
+
+def addDim(tensor):
     return tensor.unsqueeze(0)
 
 def rotZPlane(arr, times):
@@ -70,15 +90,23 @@ class Dataset3D(Dataset):
         self.nSamples = len(self.files)
         self.transform = transform
 
-
     def __getitem__(self, index):
-        self.img = nib.load( os.path.join(self.files[index], "img.nii") ).get_fdata()
-        self.msk = nib.load( os.path.join(self.files[index], "msk.nii") ).get_fdata()
+        self.img = nib.load( os.path.join(self.files[index], "img.nii") )
+        self.img = np.asarray(self.img.dataobj).astype(float)
+        self.msk = nib.load( os.path.join(self.files[index], "msk.nii") )
+        self.msk = np.asarray(self.msk.dataobj)
         
         times = random.randint(0,3) #for flipping
         imgTrans = get_transform(self.transform, "img", times)
         mskTrans = get_transform(self.transform, "msk", times)
-
+        
+        # import matplotlib.pyplot as plt
+        # f, ax = plt.subplots(1,2)
+        # ax[0].imshow(np.squeeze(self.msk[:,:,50]))
+        # ax[1].imshow(np.squeeze(self.img[:,:,50]))
+        # plt.figure(), plt.imshow(np.squeeze(self.img.numpy()[:,:,:,50])),plt.show()
+        # plt.show()
+        
         self.img = imgTrans(self.img)
         self.msk = mskTrans(self.msk)
 

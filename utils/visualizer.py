@@ -6,13 +6,10 @@ import time
 from . import util, html
 from subprocess import Popen, PIPE
 
-
-
 if sys.version_info[0] == 2:
     VisdomExceptionBase = Exception
 else:
     VisdomExceptionBase = ConnectionError
-
 
 def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
     """Save images to the disk.

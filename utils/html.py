@@ -5,7 +5,6 @@ import os
 
 class HTML:
     """This HTML class allows us to save images and write texts into a single HTML file.
-
      It consists of functions such as <add_header> (add a text header to the HTML file),
      <add_images> (add a row of images to the HTML file), and <save> (save the HTML to the disk).
      It is based on Python library 'dominate', a Python library for creating and manipulating HTML documents using a DOM API.

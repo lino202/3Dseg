@@ -1,5 +1,6 @@
 import torch
 from . import networks
+from . import customLosses
 from torchsummary import summary
 from collections import OrderedDict
 from utils.util import getBaseMidApexImgs
@@ -15,6 +16,8 @@ class ModelInterface():
             opt (Option class)-- stores all the experiment flags;
         """
         self.opt = opt
+        if torch.cuda.is_available():
+            print("{:s} is going to be use as device".format(torch.cuda.get_device_name(torch.cuda.current_device())))
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.loss_names = ['train', 'val']
         self.visual_names = ['img', 'msk', 'pred']
@@ -28,15 +31,13 @@ class ModelInterface():
             if opt.loss == 'L1':
                 self.criterion = torch.nn.L1Loss()   
             elif opt.loss == 'Dice':
-                self.criterion = networks.DiceLoss()
+                self.criterion = customLosses.DiceLoss()
             else:
                 raise ValueError("Loss is not defined") 
 
             # initialize optimizers; schedulers will be automatically created by function <BaseModel.setup>.
             self.optimizer = torch.optim.Adam(self.net.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))            
             # self.optimizers.append(self.optimizer)
-
-
 
 
     def setup(self, opt):
@@ -56,7 +57,6 @@ class ModelInterface():
             summary(self.net, (1, opt.load_size_d, opt.load_size_h, opt.load_size_w))
         except:
             print(self.net)
-
 
     def get_current_visuals(self):
         """Return visualization images from 3D arrays. train.py will display these images with visdom, and save the images to a HTML"""
@@ -80,7 +80,6 @@ class ModelInterface():
         lr = self.optimizer.param_groups[0]['lr']
         print('learning rate %.7f -> %.7f' % (old_lr, lr))
 
-
     def save_network(self, epoch):
         """Save network to the disk.
 
@@ -92,8 +91,6 @@ class ModelInterface():
         net = self.net
         torch.save(net.state_dict(), save_path)
 
-
-
     def get_current_losses(self):
         """Return traning losses / errors. train.py will print out these errors on console, and save them to a file"""
         errors_ret = OrderedDict()
@@ -101,7 +98,6 @@ class ModelInterface():
             if isinstance(name, str):
                 errors_ret[name] = float(getattr(self, 'loss_' + name))  # float(...) works for both scalar tensor and float number
         return errors_ret
-
 
     def set_input(self, input):
         """Unpack input data from the dataloader
@@ -121,7 +117,6 @@ class ModelInterface():
             self.forward()
             self.loss_val = self.criterion(self.pred, self.msk) * self.opt.lambda_L1
 
-
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
         self.pred = self.net(self.img)
@@ -136,5 +131,5 @@ class ModelInterface():
         self.forward()                   # compute predictions Net(img)
         # Backprop
         self.optimizer.zero_grad()        # set Net's gradients to zero
-        self.backward()                   # calculate graidents
+        self.backward()                   # calculate gradients
         self.optimizer.step()             # udpate Net's weights

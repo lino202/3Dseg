@@ -1,0 +1,13 @@
+name: torchTopo
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - pytorch==1.12.1
+  - torchaudio==0.12.1
+  - torchvision==0.13.1
+  - cudatoolkit=11.3
+  - matplotlib
+  - nibabel
+  - dominate
+prefix: C:\Users\usuario\anaconda3\envs\torchTopo

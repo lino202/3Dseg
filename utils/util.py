@@ -66,15 +66,14 @@ def mkdir(path):
 
 
 def getBaseMidApexImgs(tensor, name):
-    nSlices = tensor.size()[2]
+    nSlices = tensor.size()[-1]
     baseIdx = nSlices - 3
     apexIdx = 2 
     midIdx = int((baseIdx - apexIdx)/2)
     if midIdx < 0: raise ValueError("Wrong midIdx") 
     
-    imgsDict = {name+"_base": tensor[:,:,baseIdx,:,:],
-                name+"_mid": tensor[:,:,midIdx,:,:],
-                name+"_apex": tensor[:,:,apexIdx,:,:]}
-    
+    imgsDict = {name + "_base": tensor[:,:,:,:,baseIdx],
+                name + "_mid":  tensor[:,:,:,:,midIdx],
+                name + "_apex": tensor[:,:,:,:,apexIdx]}
     
     return imgsDict
