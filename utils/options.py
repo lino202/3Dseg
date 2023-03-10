@@ -10,6 +10,8 @@ class BaseOptions():
         self.parser.add_argument('--checkpoints_dir', required=True, type=str, help='models are saved here')
         self.parser.add_argument('--phase',           required=True, type=str, help='train or test')
         #Model
+        self.parser.add_argument('--input_nc',        type=int,      default=1,       help='# of input channels: 3 for RGB and 1 for grayscale')
+        self.parser.add_argument('--output_nc',       type=int,      default=1,       help='# of output classes: 1 if binary and N for multi-class segmentation')
         self.parser.add_argument('--ngf',             type=int,      default=64,      help='# of gen filters in the last conv layer')
         self.parser.add_argument('--ndf',             type=int,      default=64,      help='# of discrim filters in the first conv layer')
         self.parser.add_argument('--norm',            type=str,      default='batch', help='instance normalization or batch normalization [instance | batch | none]')

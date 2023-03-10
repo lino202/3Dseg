@@ -19,5 +19,14 @@ git clone https://github.com/lino202/3Dseg
 cd 3Dseg
 ```
 
+### Training
+
+Explore data/create_dataset.py to get your data ready and before running init the visdom server
+if you would like to see the training proccess with 
+
+```bash
+python -m visdom.server
+```
+
 ## Acknowledgments
 Our code is inspired by [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix).

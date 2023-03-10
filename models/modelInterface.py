@@ -24,7 +24,7 @@ class ModelInterface():
         self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)
         
         # define network
-        self.net = networks.Unet3D(1, 1, 7, opt.ngf)
+        self.net = networks.Unet3D(opt.input_nc, opt.output_nc, 7, opt.ngf)
         self.net.to(self.device)
         if opt.phase == "train":
             # define loss function
