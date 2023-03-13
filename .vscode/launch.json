@@ -1,0 +1,115 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+
+        {
+            "name": "train MnMs",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/train.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/",
+                "--checkpoints_dir", "F:/Segmentation/Results/seg3D_MnMs/",
+                "--name",            "init",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "4",
+                "--nfl",             "32",
+                "--num_downs",       "6",
+                "--n_epochs",        "50",
+                "--n_epochs_decay",  "50",
+                "--loss",            "CE",
+                "--load_size_h",     "64",
+                "--load_size_w",     "64",
+                "--load_size_d",     "64",
+                "--save_epoch_freq", "4",
+                "--batch_size",      "3",
+            ] 
+        },
+
+
+        {
+            "name": "train MnMs 128",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/train.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128",
+                "--checkpoints_dir", "F:/Segmentation/Results/seg3D_MnMs/128x128",
+                "--name",            "init",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "4",
+                "--nfl",             "64",
+                "--num_downs",       "7",
+                "--n_epochs",        "50",
+                "--n_epochs_decay",  "50",
+                "--loss",            "CE",
+                "--load_size_h",     "128",
+                "--load_size_w",     "128",
+                "--load_size_d",     "128",
+                "--save_epoch_freq", "4",
+                "--batch_size",      "3",
+            ] 
+        },
+
+
+        {
+            "name": "train exvivo",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/train.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "F:/Segmentation/Data/seg3D_exvivo",
+                "--checkpoints_dir", "F:/Segmentation/Results/seg3D_exvivo/",
+                "--name",            "init",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "1",
+                "--nfl",             "64",
+                "--num_downs",       "7",
+                "--n_epochs",        "20",
+                "--n_epochs_decay",  "10",
+                "--loss",            "Dice",
+                "--load_size_h",     "128",
+                "--load_size_w",     "128",
+                "--load_size_d",     "128",
+                "--save_epoch_freq", "2",
+                "--print_iter",      "1",
+                "--batch_size",      "2",
+            ] 
+        },
+
+
+        {
+            "name": "preProccess MnMs",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/preprocess/preMnMs.py",
+            "console": "externalTerminal",
+            "args": [
+                "--trainPath",    "F:/Data/RM/MnM/OpenDataset/Training/Labeled",
+                "--testPath",     "F:/Data/RM/MnM/OpenDataset/Testing",
+                "--valPath",      "F:/Data/RM/MnM/OpenDataset/Validation",
+                "--trainResPath", "F:/Segmentation/Data/seg3D_MnMs/128x128/train",
+                "--testResPath",  "F:/Segmentation/Data/seg3D_MnMs/128x128/test",
+                "--valResPath",   "F:/Segmentation/Data/seg3D_MnMs/128x128/val",
+                "--plotPath",     "F:/Segmentation/Data/seg3D_MnMs/128x128/plots",
+                "--size",         "128","128","128"
+            ] 
+        },
+    ]
+}

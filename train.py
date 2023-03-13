@@ -2,7 +2,7 @@
 
 from collections import OrderedDict
 import time
-from data import create_dataset
+from data import create_dataloader
 from utils.options import TrainOptions
 from models.modelInterface import ModelInterface
 from utils.visualizer import Visualizer
@@ -11,13 +11,10 @@ import numpy as np
 def main():
     
     opt = TrainOptions().parser.parse_args()
-    train_dataset = create_dataset.create(opt, opt.phase)  # create a dataset given opt.dataset_mode and other options
-    train_dataset_size = len(train_dataset)                # get the number of images in the dataset.
-    print('The number of training volumes = {}'.format(train_dataset_size))
-
-    val_dataset = create_dataset.create(opt, 'val')  # create a dataset given opt.dataset_mode and other options
-    val_dataset_size = len(val_dataset)              # get the number of images in the dataset.
-    print('The number of validation volumes = {}'.format(val_dataset_size))
+    train_dataloader = create_dataloader.create(opt, opt.phase)     # create a dataloader given opt.dataset_mode and other options
+    print('Training with {} samples grouped in {} batches'.format(len(train_dataloader.dataset),len(train_dataloader)))
+    val_dataloader = create_dataloader.create(opt, 'val')  # create a dataset given opt.dataset_mode and other options
+    print('Validating with {} samples grouped in {} batches'.format(len(val_dataloader.dataset), len(val_dataloader)))
 
     model        = ModelInterface(opt)      # create a Model Interface
     model.setup(opt)                        # regular setup: load and print networks; create schedulers
@@ -34,14 +31,15 @@ def main():
         model.net.train()
         iteration = 0
         train_losses = []
-        for i, data in enumerate(train_dataset):  # inner loop within one epoch
+        for i, data in enumerate(train_dataloader):  # inner loop within one epoch
             iter_start_time = time.time()  # timer for computation per iteration
             model.set_input(data)         # unpack data from dataset and apply preprocessing
             model.optimize_parameters()   # calculate loss functions, get gradients, update network weights
 
             train_losses.append(model.loss_train.item())
             iteration += 1
-            print("Train iteration {:d} in {:.4f} s".format(iteration, time.time() - iter_start_time))
+            if iteration % opt.print_iter == 0:
+                print("Train iteration {:d} in {:.4f} s".format(iteration, time.time() - iter_start_time))
 
         train_visuals = model.get_current_visuals()
         visuals = OrderedDict()
@@ -51,14 +49,15 @@ def main():
         iteration = 0
         model.net.eval()
         val_losses = []
-        for i, data in enumerate(val_dataset):  # inner loop within one epoch
+        for i, data in enumerate(val_dataloader):  # inner loop within one epoch
             iter_start_time = time.time()  # timer for computation per iteration
             model.set_input(data)         # unpack data from dataset and apply preprocessing
             model.val()                     # calculate loss functions from validation dataset
 
             val_losses.append(model.loss_val.item())
             iteration += 1
-            print("Validation iteration {:d} in {:.4f} s".format(iteration, time.time() - iter_start_time))
+            if iteration % opt.print_iter == 0:
+                print("Validation iteration {:d} in {:.4f} s".format(iteration, time.time() - iter_start_time))
 
 
         # print training losses and save logging information to the disk

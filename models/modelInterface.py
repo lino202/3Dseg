@@ -24,14 +24,16 @@ class ModelInterface():
         self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)
         
         # define network
-        self.net = networks.Unet3D(opt.input_nc, opt.output_nc, 7, opt.ngf)
+        self.net = networks.Unet3D(opt.input_nc, opt.output_nc, opt.num_downs, opt.nfl)
         self.net.to(self.device)
         if opt.phase == "train":
             # define loss function
-            if opt.loss == 'L1':
-                self.criterion = torch.nn.L1Loss()   
-            elif opt.loss == 'Dice':
-                self.criterion = customLosses.DiceLoss()
+            if opt.loss == 'L1' and opt.output_nc == 1:
+                self.criterion = torch.nn.L1Loss()
+            elif opt.loss == 'CE':
+                self.criterion = torch.nn.CrossEntropyLoss()
+            elif opt.loss == 'Dice' and opt.output_nc == 1:
+                self.criterion = customLosses.BinaryDiceLoss()
             else:
                 raise ValueError("Loss is not defined") 
 
@@ -52,7 +54,7 @@ class ModelInterface():
         #     load_suffix = 'iter_%d' % opt.load_iter if opt.load_iter > 0 else opt.epoch
         #     self.load_networks(load_suffix)
         
-        #Print Network information
+        # Print Network information
         try:
             summary(self.net, (1, opt.load_size_d, opt.load_size_h, opt.load_size_w))
         except:
@@ -115,7 +117,7 @@ class ModelInterface():
         """
         with torch.no_grad():
             self.forward()
-            self.loss_val = self.criterion(self.pred, self.msk) * self.opt.lambda_L1
+            self.loss_val = self.criterion(self.pred, self.msk) * self.opt.lambda_loss
 
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
@@ -123,7 +125,7 @@ class ModelInterface():
 
     def backward(self):
         """Calculate loss"""
-        self.loss_train = self.criterion(self.pred, self.msk) * self.opt.lambda_L1
+        self.loss_train = self.criterion(self.pred, self.msk) * self.opt.lambda_loss
         self.loss_train.backward()
 
     def optimize_parameters(self):

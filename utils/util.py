@@ -66,14 +66,44 @@ def mkdir(path):
 
 
 def getBaseMidApexImgs(tensor, name):
+    ''' Here we collect three images per volume from the base, apex and middle regions.
+    The tensor-image outcome should be in the form of B,C=1,W,H where B=batch size, C=channels, W=width, H=height.
+    Also the values range should cover the interval [-1,1].
+    The ulterior function tensor2im take care of normalizing the results to [0,255] and use the first sample in the batch.
+    
+    Different Inputs shapes and ranges (B=batch size, C=channels, W=width, H=height, D=Depth)
+    Msk: shape B,W,H,D   ranges [0,1] Binary or [0,N] Multi-class
+    Img: shape B,1,W,H,D ranges [-1,1] (only single-channel volumes are used)
+    Pred:shape B,C,W,H,D ranges [-1,1] and C=1 (binary) or C=N (multi-class)
+    '''
+    #Here we detach the gradients calculation for the tensor
+    #The resulting tensor should be a B,1,W,H,D tensor with range [-1,1]
+    tensor  = tensor.detach()
+    if name == 'pred':
+        #Predict can have C=1 (Binary) or C=Number of classes (Multi-class)
+        if tensor.shape[1] > 1: #Multi-class
+            tensor = torch.argmax(torch.softmax(tensor,1),1)
+            tensor = ((tensor - tensor.min()) / (tensor.max() - tensor.min())) * 2 - 1
+            tensor = tensor[:,np.newaxis,:,:,:]
+    elif name == 'img':
+        pass #not need to change anything
+    elif name == 'msk':
+        tensor = ((tensor - tensor.min()) / (tensor.max() - tensor.min())) * 2 - 1
+        tensor = tensor[:,np.newaxis,:,:,:]
+    else: raise ValueError("Wrong sample tag")
+    
+    # We select the three slices to plot
+    # The naming of base and apex might be inverted, this relies on the orientation in depth of the images
+    # if this is from base-apex or from apex-base (as this only influence the naming in the plotting this is irrelevant)
     nSlices = tensor.size()[-1]
     baseIdx = nSlices - 3
     apexIdx = 2 
     midIdx = int((baseIdx - apexIdx)/2)
     if midIdx < 0: raise ValueError("Wrong midIdx") 
     
+    #Generate final image dict with final per image shape B,1,W,H
     imgsDict = {name + "_base": tensor[:,:,:,:,baseIdx],
                 name + "_mid":  tensor[:,:,:,:,midIdx],
                 name + "_apex": tensor[:,:,:,:,apexIdx]}
-    
+
     return imgsDict

@@ -8,18 +8,21 @@ import numpy as np
 import random
 
 def get_transform(transformParams, arrType, times):
-    #Here we applied our tranforms for prepocessing basewd on defined pytorch torchvision.transforms
-    #as we were not that happy with some of the buitin function as the rotation in toTensor
-    #As a Results we should have a isotropic tensor that might be rotate around LA and normalize 
-    #in the range of [-1,1] with an extra dimension for 
+    #Here we applied our tranforms for prepocessing
+    #We adjust some built in functions as they were not thought for 3D arrays, 
+    #e.g. there's a rotation in toTensor
+    #The resulting img is an isotropic tensor that might be rotate around LA and 
+    #normalize in the range of [-1,1] with an extra C=channels dimension 
+    #The resulting msk is just a tensor with no normalization and no added dimension as C=1
+    #is enough. The batch size is added in by the dataloader.
     transform_list = []
-    size = [transformParams["load_size_h"], transformParams["load_size_w"], transformParams["load_size_d"]]
     
+    size = (transformParams["load_size_h"], transformParams["load_size_w"], transformParams["load_size_d"])
     transform_list.append(transforms.Lambda(lambda arr: resize3D(arr, size, arrType)))
     if not transformParams["no_hor_flip"]: transform_list.append(transforms.Lambda(lambda arr: rotZPlane(arr, times)))
-    transform_list.append(transforms.Lambda(lambda arr: toTensor(arr)))
-    transform_list.append(transforms.Lambda(lambda tensor: normalize(tensor, (0.5,), (0.5,))))
-    transform_list.append(transforms.Lambda(lambda tensor: addDim(tensor)))
+    transform_list.append(transforms.Lambda(lambda arr: toTensor(arr, arrType)))
+    # if arrType != 'msk': transform_list.append(transforms.Lambda(lambda tensor: normalize(tensor, (0.5,), (0.5,))))
+    # transform_list.append(transforms.Lambda(lambda tensor: addDim(tensor)))
 
     return transforms.Compose(transform_list)
 
@@ -39,26 +42,34 @@ def create(opt, phase):
     return dataloader
 
 def resize3D(arr, size, arrType):    
-    x = torch.Tensor( np.reshape(arr, (1,1,arr.shape[0],arr.shape[1],arr.shape[2])))
-    h = torch.linspace(-1, 1, size[0])
-    w = torch.linspace(-1, 1, size[1])
-    d = torch.linspace(-1, 1, size[2])
-    meshz, meshy, meshx = torch.meshgrid((h, w, d))
-    grid = torch.stack((meshx, meshy, meshz), 3)
-    grid = grid.unsqueeze(0) # add batch dim
-    tensor = grid_sample(x, grid, align_corners=True)
-    arr = tensor[0,0,:,:,:].numpy()
+    if arr.shape != size:
+        x = torch.Tensor( np.reshape(arr, (1,1,arr.shape[0],arr.shape[1],arr.shape[2])))
+        h = torch.linspace(-1, 1, size[0])
+        w = torch.linspace(-1, 1, size[1])
+        d = torch.linspace(-1, 1, size[2])
+        meshz, meshy, meshx = torch.meshgrid((h, w, d), indexing='ij')
+        grid = torch.stack((meshx, meshy, meshz), 3)
+        grid = grid.unsqueeze(0) # add batch dim
+        tensor = grid_sample(x, grid, align_corners=True)
+        arr = tensor[0,0,:,:,:].numpy()
 
-    #As this does an interpolation the mask should still have only 0's or 1's
-    #This should be improved for multiclass segmentation
-    if arrType == "msk": 
-        arr[arr<0.5] = 0.
-        arr[arr>=0.5] = 1.
+        #As this does an interpolation the mask should still have only 0's or 1's
+        #This should be improved for multiclass segmentation, so for only have to 
+        #be use with binary segmentation
+        if arrType == "msk": 
+            arr[arr<0.5] = 0.
+            arr[arr>=0.5] = 1.
+
     return arr
 
-def toTensor(arr):
-    arr    = unitNorm(arr)
-    tensor = torch.as_tensor(arr).contiguous()
+def toTensor(arr, arrType):
+    if arrType != 'msk':
+        arr = unitNorm(arr)
+        tensor = torch.as_tensor(arr, dtype=torch.float32).contiguous() #default net parameters init is in torch.Float (32bytes) no torch.Double (64bytes)
+        tensor = normalize(tensor, (0.5,), (0.5,))
+        tensor = addDim(tensor)
+    else: 
+        tensor = torch.as_tensor(arr, dtype=torch.int64).contiguous() #dtype=torch.int64
     return tensor
 
 def unitNorm(arr):

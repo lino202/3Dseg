@@ -18,6 +18,7 @@ import torchio as tio
 import numpy as np
 from utils import getEXFromMask, cropSubject
 import pathlib
+import traceback
 
 def process(dataPath, size, plotPath, resPath=None, save=False):
 
@@ -33,49 +34,55 @@ def process(dataPath, size, plotPath, resPath=None, save=False):
         # If the short-axis image file exists, read the data and perform processing
         if (os.path.isfile(imgPath) and os.path.isfile(mskPath)):
 
-            # Get image and mask arrays
-            subject = tio.Subject(img=tio.ScalarImage(imgPath), msk=tio.LabelMap(mskPath))
-            edes = getEXFromMask(subject.msk.data.numpy(), sample)
+            try:
+                # Get image and mask arrays
+                subject = tio.Subject(img=tio.ScalarImage(imgPath), msk=tio.LabelMap(mskPath))
+                edes = getEXFromMask(subject.msk.data.numpy(), sample)
 
-            # Crop both 4D arrays
-            # This maintain real world coordinates xyz
-            subject = cropSubject(subject, edes)
-            
-            #Reshape for having isotropic voxels
-            #Compliant with real world xyz coordinates (modifies affine matrix). see Torchio/nibabel docs
-            sw = subject.img.shape[1] * subject.img.spacing[0] / size[0]   # there's an extra dim in the shape
-            sh = subject.img.shape[2] * subject.img.spacing[1] / size[1]
-            sd = subject.img.shape[3] * subject.img.spacing[2] / size[2]
-            trans = tio.Resample((sw, sh, sd), image_interpolation='linear', label_interpolation='nearest') #Try lanczos?
-            subject.img = trans(subject.img)
-            subject.msk = trans(subject.msk)
-            
-            #Separate ED and ES 3D arrays
-            results = {}
-            results["img_ED"] = subject.img.data.numpy()[edes[0],:,:,:]
-            results["msk_ED"] = subject.msk.data.numpy()[edes[0],:,:,:]
-            results["img_ES"] = subject.img.data.numpy()[edes[1],:,:,:]
-            results["msk_ES"] = subject.msk.data.numpy()[edes[1],:,:,:]
-            
-            # Save and/or plot 3D ED and ES arrays
-            if plotPath != None:
-                import matplotlib.pyplot as plt
-                f, ax = plt.subplots(2,2)
-                s = int(np.round(results["img_ED"].shape[-1]/2))
-                ax[0,0].imshow(results["img_ED"][:,:,s])
-                ax[0,1].imshow(results["msk_ED"][:,:,s])
-                ax[1,0].imshow(results["img_ES"][:,:,s])
-                ax[1,1].imshow(results["msk_ES"][:,:,s])
-                plt.savefig(os.path.join(plotPath, "{}_roi.png".format(sample)))
-                plt.close()
-            
-            if save:
-                samplePath = os.path.join(resPath, sample)
-                if not os.path.exists(samplePath):
-                    pathlib.Path(samplePath).mkdir(parents=True, exist_ok=True)
-                for key in results:
-                    tioImg = tio.ScalarImage(tensor=results[key][np.newaxis,:], affine=subject.img.affine)
-                    tioImg.save(os.path.join(samplePath, '{}_{}.nii'.format(sample, key)), squeeze=True)
+                # Crop both 4D arrays
+                # This maintain real world coordinates xyz
+                subject = cropSubject(subject, edes)
+                
+                #Reshape for having isotropic voxels
+                #Compliant with real world xyz coordinates (modifies affine matrix). see Torchio/nibabel docs
+                sw = subject.img.shape[1] * subject.img.spacing[0] / size[0]   # there's an extra dim in the shape
+                sh = subject.img.shape[2] * subject.img.spacing[1] / size[1]
+                sd = subject.img.shape[3] * subject.img.spacing[2] / size[2]
+                trans = tio.Resample((sw, sh, sd), image_interpolation='linear', label_interpolation='nearest') #Try lanczos?
+                subject.img = trans(subject.img)
+                subject.msk = trans(subject.msk)
+                
+                #Separate ED and ES 3D arrays
+                results = {}
+                results["img_ED"] = subject.img.data.numpy()[edes[0],:,:,:]
+                results["msk_ED"] = subject.msk.data.numpy()[edes[0],:,:,:]
+                results["img_ES"] = subject.img.data.numpy()[edes[1],:,:,:]
+                results["msk_ES"] = subject.msk.data.numpy()[edes[1],:,:,:]
+                
+                # Save and/or plot 3D ED and ES arrays
+                if plotPath != None:
+                    import matplotlib.pyplot as plt
+                    f, ax = plt.subplots(2,2)
+                    s = int(np.round(results["img_ED"].shape[-1]/2))
+                    ax[0,0].imshow(results["img_ED"][:,:,s])
+                    ax[0,1].imshow(results["msk_ED"][:,:,s])
+                    ax[1,0].imshow(results["img_ES"][:,:,s])
+                    ax[1,1].imshow(results["msk_ES"][:,:,s])
+                    plt.savefig(os.path.join(plotPath, "{}_roi.png".format(sample)))
+                    plt.close()
+                
+                if save:
+                    samplePath = os.path.join(resPath, sample)
+                    for key in results:
+                        tioImg   = tio.ScalarImage(tensor=results[key][np.newaxis,:], affine=subject.img.affine)
+                        moment   = key.split('_')[-1]
+                        dataType = key.split('_')[0]
+                        filePath = "{}_{}".format(samplePath, moment)
+                        if not os.path.exists(filePath): pathlib.Path(filePath).mkdir(parents=True, exist_ok=True)
+                        tioImg.save(os.path.join(filePath, '{}.nii'.format(dataType)), squeeze=True)
+            except Exception as e:
+                print("SAMPLE {} WAS NOT PROCESSED AS IT FINISHED WITH EXCEPTION {}".format(sample, traceback.format_exc()))
+                
         else:
             print('There is no image or mask volume file for sample {}'.format(sample))
 

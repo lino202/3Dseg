@@ -12,8 +12,8 @@ class BaseOptions():
         #Model
         self.parser.add_argument('--input_nc',        type=int,      default=1,       help='# of input channels: 3 for RGB and 1 for grayscale')
         self.parser.add_argument('--output_nc',       type=int,      default=1,       help='# of output classes: 1 if binary and N for multi-class segmentation')
-        self.parser.add_argument('--ngf',             type=int,      default=64,      help='# of gen filters in the last conv layer')
-        self.parser.add_argument('--ndf',             type=int,      default=64,      help='# of discrim filters in the first conv layer')
+        self.parser.add_argument('--nfl',             type=int,      default=64,      help='# of filters in the last conv layer')
+        self.parser.add_argument('--num_downs',       type=int,      default=7,       help='# of deep layers in the Unet architecture')
         self.parser.add_argument('--norm',            type=str,      default='batch', help='instance normalization or batch normalization [instance | batch | none]')
         self.parser.add_argument('--no_dropout',      action='store_true',            help='no dropout')
         # Dataset 
@@ -37,7 +37,7 @@ class TrainOptions():
         self.parser.add_argument('--display_env',     type=str, default='main',             help='visdom display environment name (default is "main")')
         self.parser.add_argument('--display_port',    type=int, default=8097,               help='visdom port of the web display')
         self.parser.add_argument('--save_epoch_freq', type=int, default=5,                  help='frequency of saving checkpoints at the end of epochs')
-        #self.parser.add_argument('--print_freq', type=int, default=100, help='frequency of showing training results on console')
+        self.parser.add_argument('--print_iter',      type=int, default=10,                 help='frequency of showing iteration info')
         #self.parser.add_argument('--display_freq', type=int, default=10, help='frequency of showing training results on screen')
 
         # network saving and loading parameters
@@ -47,7 +47,7 @@ class TrainOptions():
         self.parser.add_argument('--n_epochs',       type=int,   default=15,       help='number of epochs with the initial learning rate')
         self.parser.add_argument('--n_epochs_decay', type=int,   default=15,       help='number of epochs to linearly decay learning rate to zero')
         self.parser.add_argument('--beta1',          type=float, default=0.5,      help='momentum term of adam')
-        self.parser.add_argument('--lambda_L1',      type=float, default=100.0,    help='weight for loss')
+        self.parser.add_argument('--lambda_loss',    type=float, default=100.0,    help='weight for loss')
         self.parser.add_argument('--lr',             type=float, default=0.0002,   help='initial learning rate for adam')
         self.parser.add_argument('--lr_policy',      type=str,   default='linear', help='learning rate policy. [linear | step | plateau | cosine]')
         self.parser.add_argument('--lr_decay_iters', type=int,   default=50,       help='multiply by a gamma every lr_decay_iters iterations')
