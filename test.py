@@ -1,69 +1,165 @@
-"""General-purpose test script for image-to-image translation.
+"""General-purpose test script.
 
 Once you have trained your model with train.py, you can use this script to test the model.
-It will load a saved model from '--checkpoints_dir' and save the results to '--results_dir'.
-
-It first creates model and dataset given the option. It will hard-code some parameters.
-It then runs inference for '--num_test' images and save results to an HTML file.
-
-Example (You need to train models first or download pre-trained models from our website):
-    Test a CycleGAN model (both sides):
-        python test.py --dataroot ./datasets/maps --name maps_cyclegan --model cycle_gan
-
-    Test a CycleGAN model (one side only):
-        python test.py --dataroot datasets/horse2zebra/testA --name horse2zebra_pretrained --model test --no_dropout
-
-    The option '--model test' is used for generating CycleGAN results only for one side.
-    This option will automatically set '--dataset_mode single', which only loads the images from one set.
-    On the contrary, using '--model cycle_gan' requires loading and generating results in both directions,
-    which is sometimes unnecessary. The results will be saved at ./results/.
-    Use '--results_dir <directory_path_to_save_result>' to specify the results directory.
-
-    Test a pix2pix model:
-        python test.py --dataroot ./datasets/facades --name facades_pix2pix --model pix2pix --direction BtoA
-
-See options/base_options.py and options/test_options.py for more test options.
-See training and test tips at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/tips.md
-See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
+It will load a saved model from '--results_dir' and save the results there.
 """
 import os
-from options.test_options import TestOptions
-from data import create_dataset
-from models import create_model
-from util.visualizer import save_images
-from util import html
+from utils.options import TestOptions
+from utils.util import mkdirs, mkdir, getStatistics
+from data import create_dataloader
+from models.modelInterface import ModelInterface
+import monai
+import torch
+import torch.nn.functional as F
+import matplotlib.pyplot as plt
+import nibabel as nib
+import numpy as np
+import utils.topo as topo
+import pandas as pd
+import pickle
+import time
 
 
-if __name__ == '__main__':
-    opt = TestOptions().parse()  # get test options
-    # hard-code some parameters for test
-    opt.num_threads = 0   # test code only supports num_threads = 0
+# Set prior_CINE_MnMs: class 1 is LV; 2 is MY; 3 is RV
+labelmap_CINE_MnMs = ['bg', 'lv', 'myo', 'rv']
+prior_CINE_MnMs = {
+    (1,):   (1, 0),
+    (2,):   (1, 1), #Here maybe let open? (1,1) or close (1,0)
+    (3,):   (1, 0),
+    (1, 2): (1, 0),
+    (1, 3): (2, 0),
+    (2, 3): (1, 1)  #Here maybe let open? (1,1) or close (1,0)
+}
+
+
+
+
+
+def main():
+    
+    # Get test options
+    opt = TestOptions().parser.parse_args()
     opt.batch_size = 1    # test code only supports batch_size = 1
-    opt.serial_batches = True  # disable data shuffling; comment this line if results on randomly chosen images are needed.
-    opt.no_flip = True    # no flip; comment this line if results on flipped images are needed.
     opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
-    dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
-    model = create_model(opt)      # create a model given opt.model and other options
+    
+    #Add results folders for plots and volumes
+    plots_path     = os.path.join(opt.results_dir, opt.name, "plots")
+    vols_path     = os.path.join(opt.results_dir, opt.name, "volumes")
+    mkdirs([plots_path, vols_path])
+    
+    #Get dataloader
+    test_dataloader = create_dataloader.create(opt, opt.phase)  # create a dataloader with given options
+    nSamples        = len(test_dataloader.dataset)
+    print('Testing with {} samples grouped in {} batches'.format(nSamples, len(test_dataloader)))
+    
+    #Get trained model
+    model = ModelInterface(opt)    # create a Model Interface
     model.setup(opt)               # regular setup: load and print networks; create schedulers
-    # create a website
-    web_dir = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch))  # define the website directory
-    if opt.load_iter > 0:  # load_iter is 0 by default
-        web_dir = '{:s}_iter{:d}'.format(web_dir, opt.load_iter)
-    print('creating web directory', web_dir)
-    webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.name, opt.phase, opt.epoch))
-    # test with eval mode. This only affects layers like batchnorm and dropout.
-    # For [pix2pix]: we use batchnorm and dropout in the original pix2pix. You can experiment it with and without eval() mode.
-    # For [CycleGAN]: It should not affect CycleGAN as CycleGAN uses instancenorm without dropout.
-    if opt.eval:
-        model.eval()
-    for i, data in enumerate(dataset):
-        # if i >= opt.num_test:  # only apply our model to opt.num_test images.
-        #     break
+    model.net.eval()               # affects layers like batchnorm and dropout.
+    
+    gdsc = np.zeros((nSamples, opt.output_nc))
+    hd   = np.zeros((nSamples, opt.output_nc))
+    ts   = np.zeros(nSamples)
+    be   = np.zeros(nSamples)
+    print("Start testing ---------------------------------")
+    for i, data in enumerate(test_dataloader):
+        start_iter = time.time()
         model.set_input(data)  # unpack data from data loader
         model.test()           # run inference
-        visuals = model.get_current_visuals()  # get image results
-        img_path = model.get_image_paths()     # get image paths
-        if i % 5 == 0:  # save images to an HTML file
-            print('processing (%04d)-th image... %s' % (i, img_path))
-        save_images(webpage, visuals, img_path, aspect_ratio=opt.aspect_ratio, width=opt.display_winsize)
-    webpage.save()  # save the HTML
+        
+        if opt.ph: pass
+        
+        #Get img, name and affine. This serves to save plots and .nii
+        sample  = model.path[0].split('\\')[-1]
+        affine  = model.affine.numpy()[0,:,:]
+        img     = (model.img.to('cpu') + 1) / 2
+        
+        #one hot msk
+        one_hot = F.one_hot(model.msk.long(), num_classes=opt.output_nc)
+        msk     = one_hot.permute(0, 4, 1, 2, 3).type(model.msk.type())
+        msk     = msk.to('cpu')
+        
+        #Determine result and binarize (one-hot pred)
+        pred    = torch.softmax(model.pred, dim=1)
+        pred    = pred.argmax(dim=1)
+        one_hot = F.one_hot(pred.long(), num_classes=opt.output_nc)
+        pred    = one_hot.permute(0, 4, 1, 2, 3).type(pred.type())
+        pred    = pred.to('cpu')
+        
+        #Get gDSC, HD, BE and TS
+        #there is an error on gDSC implementation as results has not shape [BxC]
+        #For this reason we permute CxB and get background value in order to have the right values
+        #Also it does not work when tensor are on cuda, they already submitted a PR.
+        #TODO This should be checked or an issue should be raisen in https://github.com/Project-MONAI/MONAI
+        gdsc[i,:] = monai.metrics.compute_generalized_dice(torch.permute(pred, (1,0,2,3,4)), torch.permute(msk, (1,0,2,3,4)), include_background=True)
+        hd[i,:]   = monai.metrics.compute_hausdorff_distance(pred, msk, include_background=True)
+        be[i]     = topo.BEmetric(pred[0,:,:,:], msk[0,:,:,:], prior_CINE_MnMs)
+        if be[i] == 0.: ts[i] = 1
+        
+        #Reverse one-hot encoded in mask and pred and get numpy arrays and get rid of the batch dim
+        msk  = msk[0,:,:,:,:].argmax(dim=0).numpy().astype(float)
+        pred = pred[0,:,:,:,:].argmax(dim=0).numpy().astype(float)
+        img  = img[0,0,:,:,:].numpy().astype(float)
+        
+        #Save per volume results
+        #Save images, we disregard the first and last image in the stack as usually are completly background
+        nImgs = 5
+        f, ax = plt.subplots(3,nImgs)
+        sliceIdxs = np.linspace(0,img.shape[-1]-1,nImgs+2)
+        sliceIdxs = np.round(sliceIdxs[1:-1]).astype(int)
+        for j, s in enumerate(sliceIdxs):       
+            ax[0,j].imshow(img[:,:,s])
+            ax[1,j].imshow(msk[:,:,s])
+            ax[2,j].imshow(pred[:,:,s])
+        plt.savefig(os.path.join(plots_path, "{}.png".format(sample)))
+        plt.close()
+        
+        #Save .nii 
+        sample_vol_path = os.path.join(vols_path, sample)
+        mkdir(sample_vol_path)
+        predNifti = nib.Nifti1Image(pred, affine)
+        nib.save(predNifti, os.path.join(sample_vol_path, "pred.nii"))
+        
+        #Print info
+        print("Processed sample {}/{} took {} s".format(i+1, nSamples, time.time() - start_iter))
+     
+       
+    #Save general results
+    #Save per volumes parameters results  
+    print("Saving results -------------------------------")
+    resPath = os.path.join(opt.results_dir, opt.name)
+    res_params = np.vstack((gdsc.T, hd.T, be, ts))
+    res_dict = {}
+    for i, index_name in enumerate(opt.res_excel_indexs):
+        res_dict[index_name] = res_params[i,:]
+    with open(os.path.join(resPath, "{}.pickle".format(opt.res_params_name)), 'wb') as f:
+        pickle.dump(res_dict, f)
+    
+    #Save statiscal summary on excel with exp name
+    exp_name = os.path.join(resPath, 'baseline' if not opt.ph else 'ph')
+    
+    res_dataframe = []
+    for i, index_name in enumerate(opt.res_excel_indexs):
+        if 'ts' != index_name:
+            res_dataframe.append(getStatistics(res_params[i,:]))
+        else:
+            tmp = np.ones(9+1) * np.nan
+            tmp[-1] = np.sum(ts) / nSamples
+            res_dataframe.append(tmp)
+    
+    indexs  = ["{}_{}".format(exp_name, index) for index in opt.res_excel_indexs] 
+    columns = ['mean', 'std', 'min', 'max', 'median', 'lowQuart', 'upQuart', 'lowWhisker', 'upWhisker', 'perc']
+    df = pd.DataFrame(res_dataframe, index=indexs, columns=columns)
+    
+    if not os.path.exists(opt.res_excel):
+        df.to_excel(opt.res_excel, sheet_name='sheet1')
+    else:
+        with pd.ExcelWriter(opt.res_excel, engine="openpyxl", mode='a',if_sheet_exists="overlay") as writer:
+            startrow = writer.sheets['sheet1'].max_row
+            df.to_excel(writer, sheet_name='sheet1', startrow=startrow, header=False)
+    
+ 
+if __name__ == '__main__':
+    start = time.time()
+    main()
+    print("Total amount of time for processing {}".format(time.time() - start ))

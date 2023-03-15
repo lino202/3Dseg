@@ -11,9 +11,9 @@ import numpy as np
 def main():
     
     opt = TrainOptions().parser.parse_args()
-    train_dataloader = create_dataloader.create(opt, opt.phase)     # create a dataloader given opt.dataset_mode and other options
+    train_dataloader = create_dataloader.create(opt, opt.phase)     # create a dataloader with given options
     print('Training with {} samples grouped in {} batches'.format(len(train_dataloader.dataset),len(train_dataloader)))
-    val_dataloader = create_dataloader.create(opt, 'val')  # create a dataset given opt.dataset_mode and other options
+    val_dataloader = create_dataloader.create(opt, 'val')  # create a create a dataloader with given options
     print('Validating with {} samples grouped in {} batches'.format(len(val_dataloader.dataset), len(val_dataloader)))
 
     model        = ModelInterface(opt)      # create a Model Interface
@@ -46,8 +46,8 @@ def main():
         for k, v in train_visuals.items(): visuals[k+"_train"] = v 
 
         #Val--------------------------------------------------
-        iteration = 0
         model.net.eval()
+        iteration = 0
         val_losses = []
         for i, data in enumerate(val_dataloader):  # inner loop within one epoch
             iter_start_time = time.time()  # timer for computation per iteration

@@ -107,3 +107,17 @@ def getBaseMidApexImgs(tensor, name):
                 name + "_apex": tensor[:,:,:,:,apexIdx]}
 
     return imgsDict
+
+
+def getStatistics(data):
+    mean       = np.mean(data)
+    std        = np.std(data)
+    mymin      = np.min(data)
+    mymax      = np.max(data)
+    median     = np.median(data)
+    upQuart    = np.percentile(data, 75)
+    lowQuart   = np.percentile(data, 25)
+    iqr        = upQuart - lowQuart
+    upWhisker  = data[data<=upQuart+1.5*iqr].max()
+    lowWhisker = data[data>=lowQuart-1.5*iqr].min()
+    return [mean, std, mymin, mymax, median, lowQuart, upQuart, lowWhisker, upWhisker]

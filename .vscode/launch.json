@@ -20,7 +20,7 @@
             "console": "externalTerminal",
             "args": [
                 "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/",
-                "--checkpoints_dir", "F:/Segmentation/Results/seg3D_MnMs/",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs/",
                 "--name",            "init",
                 "--phase",           "train",
                 "--input_nc",        "1",
@@ -47,7 +47,7 @@
             "console": "externalTerminal",
             "args": [
                 "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128",
-                "--checkpoints_dir", "F:/Segmentation/Results/seg3D_MnMs/128x128",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs/128x128",
                 "--name",            "init",
                 "--phase",           "train",
                 "--input_nc",        "1",
@@ -61,7 +61,7 @@
                 "--load_size_w",     "128",
                 "--load_size_d",     "128",
                 "--save_epoch_freq", "4",
-                "--batch_size",      "3",
+                "--batch_size",      "1",
             ] 
         },
 
@@ -74,7 +74,7 @@
             "console": "externalTerminal",
             "args": [
                 "--root_path",       "F:/Segmentation/Data/seg3D_exvivo",
-                "--checkpoints_dir", "F:/Segmentation/Results/seg3D_exvivo/",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_exvivo/",
                 "--name",            "init",
                 "--phase",           "train",
                 "--input_nc",        "1",
@@ -101,15 +101,43 @@
             "program": "F:/Segmentation/Code/3Dseg/preprocess/preMnMs.py",
             "console": "externalTerminal",
             "args": [
-                "--trainPath",    "F:/Data/RM/MnM/OpenDataset/Training/Labeled",
+                // "--trainPath",    "F:/Data/RM/MnM/OpenDataset/Training/Labeled",
                 "--testPath",     "F:/Data/RM/MnM/OpenDataset/Testing",
-                "--valPath",      "F:/Data/RM/MnM/OpenDataset/Validation",
-                "--trainResPath", "F:/Segmentation/Data/seg3D_MnMs/128x128/train",
+                // "--valPath",      "F:/Data/RM/MnM/OpenDataset/Validation",
+                // "--trainResPath", "F:/Segmentation/Data/seg3D_MnMs/128x128/train",
                 "--testResPath",  "F:/Segmentation/Data/seg3D_MnMs/128x128/test",
-                "--valResPath",   "F:/Segmentation/Data/seg3D_MnMs/128x128/val",
+                // "--valResPath",   "F:/Segmentation/Data/seg3D_MnMs/128x128/val",
                 "--plotPath",     "F:/Segmentation/Data/seg3D_MnMs/128x128/plots",
                 "--size",         "128","128","128"
             ] 
         },
+
+
+        {
+            "name": "test MnMs 128",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/test.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs/128x128",
+                "--name",            "init",
+                "--phase",           "test",
+                "--input_nc",        "1",
+                "--output_nc",       "4",
+                "--nfl",             "64",
+                "--num_downs",       "7",
+                "--load_size_h",     "128",
+                "--load_size_w",     "128",
+                "--load_size_d",     "128",
+                "--load_filename",   "latest_net",  
+                // "--ph",              
+                "--res_excel",        "F:/Segmentation/Results/seg3D_MnMs/128x128/results.xlsx",
+                "--res_params_name",  "results_baseline",
+                "--res_excel_indexs", "gdsc_bg", "gdsc_lv", "gdsc_myo", "gdsc_rv", "hd_bg", "hd_lv", "hd_myo", "hd_rv", "be", "ts",
+            ] 
+        },
+
     ]
 }

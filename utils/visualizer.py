@@ -11,35 +11,6 @@ if sys.version_info[0] == 2:
 else:
     VisdomExceptionBase = ConnectionError
 
-def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
-    """Save images to the disk.
-
-    Parameters:
-        webpage (the HTML class) -- the HTML webpage class that stores these imaegs (see html.py for more details)
-        visuals (OrderedDict)    -- an ordered dictionary that stores (name, images (either tensor or numpy) ) pairs
-        image_path (str)         -- the string is used to create image paths
-        aspect_ratio (float)     -- the aspect ratio of saved images
-        width (int)              -- the images will be resized to width x width
-
-    This function will save images stored in 'visuals' to the HTML file specified by 'webpage'.
-    """
-    image_dir = webpage.get_image_dir()
-    short_path = ntpath.basename(image_path[0])
-    name = os.path.splitext(short_path)[0]
-
-    webpage.add_header(name)
-    ims, txts, links = [], [], []
-
-    for label, im_data in visuals.items():
-        im = util.tensor2im(im_data)
-        image_name = '%s_%s.png' % (name, label)
-        save_path = os.path.join(image_dir, image_name)
-        util.save_image(im, save_path, aspect_ratio=aspect_ratio)
-        ims.append(image_name)
-        txts.append(label)
-        links.append(image_name)
-    webpage.add_images(ims, txts, links, width=width)
-
 
 class Visualizer():
     """This class includes several functions that can display/save images and print/save logging information.
@@ -71,13 +42,13 @@ class Visualizer():
             if not self.vis.check_connection():
                 self.create_visdom_connections()
 
-        if self.use_html:  # create an HTML object at <checkpoints_dir>/web/; images will be saved under <checkpoints_dir>/web/images/
-            self.web_dir = os.path.join(opt.checkpoints_dir, opt.name, 'web')
+        if self.use_html:  # create an HTML object at <results_dir>/web/; images will be saved under <results_dir>/web/images/
+            self.web_dir = os.path.join(opt.results_dir, opt.name, 'web')
             self.img_dir = os.path.join(self.web_dir, 'images')
             print('create web directory %s...' % self.web_dir)
             util.mkdirs([self.web_dir, self.img_dir])
         # create a logging file to store training losses
-        self.log_name = os.path.join(opt.checkpoints_dir, opt.name, 'loss_log.txt')
+        self.log_name = os.path.join(opt.results_dir, opt.name, 'loss_log.txt')
         with open(self.log_name, "a") as log_file:
             now = time.strftime("%c")
             log_file.write('================ Training Loss (%s) ================\n' % now)

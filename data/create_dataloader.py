@@ -33,12 +33,15 @@ def create(opt, phase):
             "load_size_w": opt.load_size_w,
             "no_hor_flip": opt.no_hor_flip}
 
-    if phase == "val":
+    if phase == "val" or phase == "test":
         transform["no_hor_flip"] = True
 
     dataset = Dataset3D(opt.root_path, phase, transform)
-    dataloader = DataLoader(dataset=dataset, batch_size=opt.batch_size, shuffle=True)
-
+    if phase != "test":
+        dataloader = DataLoader(dataset=dataset, batch_size=opt.batch_size, shuffle=True)
+    else:
+        dataloader = DataLoader(dataset=dataset, batch_size=opt.batch_size, shuffle=False)
+    
     return dataloader
 
 def resize3D(arr, size, arrType):    
@@ -102,10 +105,11 @@ class Dataset3D(Dataset):
         self.transform = transform
 
     def __getitem__(self, index):
-        self.img = nib.load( os.path.join(self.files[index], "img.nii") )
-        self.img = np.asarray(self.img.dataobj).astype(float)
-        self.msk = nib.load( os.path.join(self.files[index], "msk.nii") )
-        self.msk = np.asarray(self.msk.dataobj)
+        self.img    = nib.load( os.path.join(self.files[index], "img.nii") )
+        self.affine = self.img.affine
+        self.img    = np.asarray(self.img.dataobj).astype(float)
+        self.msk    = nib.load( os.path.join(self.files[index], "msk.nii") )
+        self.msk    = np.asarray(self.msk.dataobj)
         
         times = random.randint(0,3) #for flipping
         imgTrans = get_transform(self.transform, "img", times)
@@ -121,7 +125,7 @@ class Dataset3D(Dataset):
         self.img = imgTrans(self.img)
         self.msk = mskTrans(self.msk)
 
-        return {"img": self.img, "msk": self.msk, "path": self.files[index]}
+        return {"img": self.img, "msk": self.msk, "path": self.files[index], "affine": self.affine}
 
 
     def __len__(self):

@@ -7,7 +7,7 @@ class BaseOptions():
         #Base
         self.parser.add_argument('--root_path',       required=True, type=str, help='path to data')       
         self.parser.add_argument('--name',            required=True, type=str, help='name of the experiment. It decides where to store samples and models')
-        self.parser.add_argument('--checkpoints_dir', required=True, type=str, help='models are saved here')
+        self.parser.add_argument('--results_dir', required=True, type=str, help='models are saved here')
         self.parser.add_argument('--phase',           required=True, type=str, help='train or test')
         #Model
         self.parser.add_argument('--input_nc',        type=int,      default=1,       help='# of input channels: 3 for RGB and 1 for grayscale')
@@ -30,7 +30,7 @@ class TrainOptions():
     def __init__(self):
         self.parser = BaseOptions().parser
         # visdom and HTML visualization parameters       
-        self.parser.add_argument('--no_html',         action='store_true',                  help='do not save intermediate training results to [opt.checkpoints_dir]/[opt.name]/web/')
+        self.parser.add_argument('--no_html',         action='store_true',                  help='do not save intermediate training results to [opt.results_dir]/[opt.name]/web/')
         self.parser.add_argument('--display_ncols',   type=int, default=3,                  help='if positive, display all images in a single visdom web panel with certain number of images per row.')
         self.parser.add_argument('--display_id',      type=int, default=1,                  help='window id of the web display')
         self.parser.add_argument('--display_server',  type=str, default="http://localhost", help='visdom server of the web display')
@@ -52,3 +52,14 @@ class TrainOptions():
         self.parser.add_argument('--lr_policy',      type=str,   default='linear', help='learning rate policy. [linear | step | plateau | cosine]')
         self.parser.add_argument('--lr_decay_iters', type=int,   default=50,       help='multiply by a gamma every lr_decay_iters iterations')
         self.parser.add_argument('--loss',           type=str,   default='Dice',   help='loss function [Dice | L1 ]')
+
+
+class TestOptions():
+
+    def __init__(self):
+        self.parser = BaseOptions().parser
+        self.parser.add_argument('--load_filename',   type=str,             help='file name of trained parameters')
+        self.parser.add_argument('--ph',              action='store_true',  help='use topo loss for adjusting results')
+        self.parser.add_argument('--res_excel',       type=str,             help='excel file where to save results')
+        self.parser.add_argument('--res_params_name', type=str,             help='name for the pickle file where per volume gsdc,hd,be and ts will be')
+        self.parser.add_argument('--res_excel_indexs',type=str, nargs='+',  help='indexes for saving params results in the excel file and saving labels to the results CAREFUL!')
