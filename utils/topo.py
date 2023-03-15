@@ -25,7 +25,7 @@ def get_roi(X, thresh=0.01):
     roi = [slice(None, None)] + [slice(c1, c2 + 1) for c1, c2 in zip(corner1, corner2)]
     return roi
 
-def getBarcodes(tensor, prior, max_dims, ph, construction, parallel=False):
+def getBarcodes(tensor, prior, max_dims, ph, construction, parallel=True):
     # Build class/combination-wise (c-wise) image tensor for prior
     tmp = []
     for c in prior.keys():
