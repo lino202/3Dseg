@@ -51,7 +51,7 @@ def getBarcodes(tensor, prior, max_dims, ph, construction, parallel=True):
     return bcodes_arr
 
 
-def BEmetric(pred, msk, prior, maxdim=2, construction='0'):
+def BEmetric(pred, msk, prior, parallel, maxdim=2, construction='0'):
     '''Performs Get Betti error as defined in the Byrne et al, paper.
     
     Arguments:
@@ -76,8 +76,8 @@ def BEmetric(pred, msk, prior, maxdim=2, construction='0'):
     ph = {'0': crip_wrapper, 'N': trip_wrapper}
     
     #Get barcodes
-    predBarcodes = getBarcodes(pred, prior, max_dims, ph, construction)
-    mskBarcodes  = getBarcodes(msk, prior, max_dims, ph, construction) 
+    predBarcodes = getBarcodes(pred, prior, max_dims, ph, construction, parallel)
+    mskBarcodes  = getBarcodes(msk, prior, max_dims, ph, construction, parallel) 
     #TODO pay attention to the mask barcodes in the myo it is horrible in MnMs
     #maybe we could make a dynamic modulation of the priors but we would need the mask
     #so at least for testing it would be nice and in the evaluation of new samples we can leave it 

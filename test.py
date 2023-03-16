@@ -18,6 +18,7 @@ import utils.topo as topo
 import pandas as pd
 import pickle
 import time
+import pathlib
 
 
 # Set prior_CINE_MnMs: class 1 is LV; 2 is MY; 3 is RV
@@ -43,7 +44,7 @@ def main():
     opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
     
     #Add results folders for plots and volumes
-    plots_path     = os.path.join(opt.results_dir, opt.name, "plots")
+    plots_path    = os.path.join(opt.results_dir, opt.name, "plots")
     vols_path     = os.path.join(opt.results_dir, opt.name, "volumes")
     mkdirs([plots_path, vols_path])
     
@@ -70,7 +71,7 @@ def main():
         if opt.ph: pass
         
         #Get img, name and affine. This serves to save plots and .nii
-        sample  = model.path[0].split('\\')[-1]
+        sample  = pathlib.PureWindowsPath(model.path[0]).as_posix().split('/')[-1]
         affine  = model.affine.numpy()[0,:,:]
         img     = (model.img.to('cpu') + 1) / 2
         
@@ -93,7 +94,7 @@ def main():
         #TODO This should be checked or an issue should be raisen in https://github.com/Project-MONAI/MONAI
         gdsc[i,:] = monai.metrics.compute_generalized_dice(torch.permute(pred, (1,0,2,3,4)), torch.permute(msk, (1,0,2,3,4)), include_background=True)
         hd[i,:]   = monai.metrics.compute_hausdorff_distance(pred, msk, include_background=True)
-        be[i]     = topo.BEmetric(pred[0,:,:,:], msk[0,:,:,:], prior_CINE_MnMs)
+        be[i]     = topo.BEmetric(pred[0,:,:,:], msk[0,:,:,:], prior_CINE_MnMs, opt.phParallel)
         if be[i] == 0.: ts[i] = 1
         
         #Reverse one-hot encoded in mask and pred and get numpy arrays and get rid of the batch dim
@@ -122,8 +123,7 @@ def main():
         
         #Print info
         print("Processed sample {}/{} took {} s".format(i+1, nSamples, time.time() - start_iter))
-     
-       
+    
     #Save general results
     #Save per volumes parameters results  
     print("Saving results -------------------------------")
