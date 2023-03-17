@@ -2,8 +2,8 @@
 
 #test MnMs 128
 python /home/maxi/Segmentation/Code/3Dseg/test.py \
---root_path        /home/maxi/Segmentation/Data/seg3D_MnMs/128x128 \
---results_dir      /home/maxi/Segmentation/Results/seg3D_MnMs/128x128 \
+--root_path        /home/maxi/Segmentation/Data/seg3D_MnMs/128x128_ED \
+--results_dir      /home/maxi/Segmentation/Results/seg3D_MnMs/128x128_ED \
 --name             init \
 --phase            test \
 --input_nc         1 \
@@ -13,6 +13,7 @@ python /home/maxi/Segmentation/Code/3Dseg/test.py \
 --load_size_h      128 \
 --load_size_w      128 \
 --load_size_d      128 \
+--phParallel       \
 --load_filename    latest_net \
 --res_excel        /home/maxi/Segmentation/Results/seg3D_MnMs/128x128/results.xlsx \
 --res_params_name  results_baseline \
