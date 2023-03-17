@@ -22,7 +22,7 @@ import pathlib
 
 
 # Set prior_CINE_MnMs: class 1 is LV; 2 is MY; 3 is RV
-labelmap_CINE_MnMs = ['bg', 'lv', 'myo', 'rv']
+# labelmap_CINE_MnMs = ['bg', 'lv', 'myo', 'rv']
 prior_CINE_MnMs = {
     (1,):   (1, 0, 0),
     (2,):   (1, 1, 0), #Here maybe let open? (1,1,0) or close (1,0,0)
@@ -31,10 +31,6 @@ prior_CINE_MnMs = {
     (1, 3): (2, 0, 0),
     (2, 3): (1, 1, 0)  #Here maybe let open? (1,1,0) or close (1,0,0)
 }
-
-
-
-
 
 def main():
     
@@ -58,6 +54,13 @@ def main():
     model.setup(opt)               # regular setup: load and print networks; create schedulers
     model.net.eval()               # affects layers like batchnorm and dropout.
     
+    # Get prior
+    prior = globals()[opt.priorName]
+    if opt.phThres < 0:
+        phThres = None
+    else: 
+        phThres = opt.phThres
+    
     gdsc = np.zeros((nSamples, opt.output_nc))
     hd   = np.zeros((nSamples, opt.output_nc))
     ts   = np.zeros(nSamples)
@@ -66,9 +69,25 @@ def main():
     for i, data in enumerate(test_dataloader):
         start_iter = time.time()
         model.set_input(data)  # unpack data from data loader
-        model.test()           # run inference
         
-        if opt.ph: pass
+        #Determine result pred and binarize (one-hot pred)
+        if opt.ph: 
+            # Run topological post-processing
+            model_TP = topo.multi_class_topological_post_processing(
+                inputs=model.img, model=model.net, prior=prior,
+                lr=1e-5, mse_lambda=1000,
+                opt=torch.optim.Adam, num_its=100, construction='0', thresh=phThres, parallel=opt.phParallel
+            )
+            pred = model_TP(model.img)
+        else:
+            model.test()           # run inference
+            pred = model.pred
+        
+        pred    = torch.softmax(pred, dim=1)
+        pred    = pred.argmax(dim=1)
+        one_hot = F.one_hot(pred.long(), num_classes=opt.output_nc)
+        pred    = one_hot.permute(0, 4, 1, 2, 3).type(pred.type())
+        pred    = pred.to('cpu')
         
         #Get img, name and affine. This serves to save plots and .nii
         sample  = pathlib.PureWindowsPath(model.path[0]).as_posix().split('/')[-1]
@@ -80,13 +99,6 @@ def main():
         msk     = one_hot.permute(0, 4, 1, 2, 3).type(model.msk.type())
         msk     = msk.to('cpu')
         
-        #Determine result and binarize (one-hot pred)
-        pred    = torch.softmax(model.pred, dim=1)
-        pred    = pred.argmax(dim=1)
-        one_hot = F.one_hot(pred.long(), num_classes=opt.output_nc)
-        pred    = one_hot.permute(0, 4, 1, 2, 3).type(pred.type())
-        pred    = pred.to('cpu')
-        
         #Get gDSC, HD, BE and TS
         #there is an error on gDSC implementation as results has not shape [BxC]
         #For this reason we permute CxB and get background value in order to have the right values
@@ -94,7 +106,7 @@ def main():
         #TODO This should be checked or an issue should be raisen in https://github.com/Project-MONAI/MONAI
         gdsc[i,:] = monai.metrics.compute_generalized_dice(torch.permute(pred, (1,0,2,3,4)), torch.permute(msk, (1,0,2,3,4)), include_background=True)
         hd[i,:]   = monai.metrics.compute_hausdorff_distance(pred, msk, include_background=True)
-        be[i]     = topo.BEmetric(pred[0,:,:,:], msk[0,:,:,:], prior_CINE_MnMs, opt.phParallel)
+        be[i]     = topo.BEmetric(pred[0,:,:,:], msk[0,:,:,:], prior, opt.phParallel)
         if be[i] == 0.: ts[i] = 1
         
         #Reverse one-hot encoded in mask and pred and get numpy arrays and get rid of the batch dim

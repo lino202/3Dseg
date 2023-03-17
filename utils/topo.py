@@ -186,7 +186,7 @@ def multi_class_topological_post_processing(
         tmp = []
         for c in prior.keys():
             if c.dim()== 1:
-                tmp.append(tensor[c].sum(0))
+                tmp.append(outputs_roi[c].sum(0))
             else:
                 raise ValueError("Wrong dim")
         combos = torch.stack(tmp)
