@@ -161,5 +161,34 @@
             ] 
         },
 
+
+        //PostProcess----------------------------------------------------
+
+        {
+            "name": "readPlotPickle",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
+            "console": "externalTerminal",
+            "args": [
+                "--filePathBaseline", "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/results_baseline.pickle",
+                "--filePathPH",       "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/results_baseline_ph_crop.pickle",
+                "--resPath",          "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/",
+            ] 
+        },
+
+        {
+            "name": "reAnalyseSample",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/postprocess/reAnalyseSample.py",
+            "console": "externalTerminal",
+            "args": [
+                "--predPath",   "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/volumes_ph",
+                "--mskPath",    "F:/Segmentation/Data/seg3D_MnMs/128x128_ED/test",
+                "--fileIdx",    "79",
+            ] 
+        },
+
     ]
 }
