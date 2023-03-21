@@ -45,37 +45,8 @@
 
         //TRAIN-------------------------------------------------
 
-
-
         {
             "name": "train MnMs",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/train.py",
-            "console": "externalTerminal",
-            "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs/",
-                "--name",            "init",
-                "--phase",           "train",
-                "--input_nc",        "1",
-                "--output_nc",       "4",
-                "--nfl",             "32",
-                "--num_downs",       "6",
-                "--n_epochs",        "50",
-                "--n_epochs_decay",  "50",
-                "--loss",            "CE",
-                "--load_size_h",     "64",
-                "--load_size_w",     "64",
-                "--load_size_d",     "64",
-                "--save_epoch_freq", "4",
-                "--batch_size",      "3",
-            ] 
-        },
-
-
-        {
-            "name": "train MnMs 128",
             "type": "python",
             "request": "launch",
             "program": "F:/Segmentation/Code/3Dseg/train.py",
@@ -125,6 +96,32 @@
                 "--save_epoch_freq", "2",
                 "--print_iter",      "1",
                 "--batch_size",      "2",
+            ] 
+        },
+
+        {
+            "name": "train emidec roi",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/train.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "F:/Segmentation/Data/seg3D_emidec/128x128/roi",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_emidec/roi",
+                "--name",            "50_50_CE_128_4_1_test1",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "1",
+                "--nfl",             "64",
+                "--num_downs",       "7",
+                "--n_epochs",        "50",
+                "--n_epochs_decay",  "50",
+                "--loss",            "Dice",
+                "--load_size_h",     "128",
+                "--load_size_w",     "128",
+                "--load_size_d",     "128",
+                "--save_epoch_freq", "5",
+                "--batch_size",      "1",
             ] 
         },
 
