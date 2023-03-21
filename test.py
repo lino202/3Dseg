@@ -32,6 +32,9 @@ prior_CINE_MnMs = {
     (2, 3): (1, 1, 0)  #Here maybe let open? (1,1,0) or close (1,0,0)
 }
 
+# Set prior_LGE: class 1 is entire LV as it is binary
+prior_LGE_roi = {(1,):   (1, 0, 0)}
+
 def main():
     
     # Get test options
@@ -83,21 +86,30 @@ def main():
             model.test()           # run inference
             pred = model.pred
         
-        pred    = torch.softmax(pred, dim=1)
-        pred    = pred.argmax(dim=1)
-        one_hot = F.one_hot(pred.long(), num_classes=opt.output_nc)
-        pred    = one_hot.permute(0, 4, 1, 2, 3).type(pred.type())
-        pred    = pred.to('cpu')
+        #Handle binary and multi-class segmentation
+        if opt.output_nc > 1:
+            pred    = torch.softmax(pred, dim=1)
+            pred    = pred.argmax(dim=1)
+            one_hot = F.one_hot(pred.long(), num_classes=opt.output_nc)
+            pred    = one_hot.permute(0, 4, 1, 2, 3).type(pred.type())
+            
+            one_hot = F.one_hot(model.msk.long(), num_classes=opt.output_nc)
+            msk     = one_hot.permute(0, 4, 1, 2, 3).type(model.msk.type())
+        else:  # TODO Not fully compliant yet
+            pred = (pred + 1) / 2
+            pred[pred<0.5] = 0
+            pred[pred>=0.5] = 1
+            pred = pred.long()
+            
+            msk = model.msk.long()
+            msk = msk.unsqueeze(0)
+        pred = pred.to('cpu')
+        msk  = msk.to('cpu')
         
         #Get img, name and affine. This serves to save plots and .nii
         sample  = pathlib.PureWindowsPath(model.path[0]).as_posix().split('/')[-1]
         affine  = model.affine.numpy()[0,:,:]
         img     = (model.img.to('cpu') + 1) / 2
-        
-        #one hot msk
-        one_hot = F.one_hot(model.msk.long(), num_classes=opt.output_nc)
-        msk     = one_hot.permute(0, 4, 1, 2, 3).type(model.msk.type())
-        msk     = msk.to('cpu')
         
         #Get gDSC, HD, BE and TS
         #there is an error on gDSC implementation as results has not shape [BxC]
