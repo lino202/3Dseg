@@ -32,8 +32,8 @@ prior_CINE_MnMs = {
     (2, 3): (1, 1, 0)  #Here maybe let open? (1,1,0) or close (1,0,0)
 }
 
-# Set prior_LGE: class 1 is entire LV as it is binary
-prior_LGE_roi = {(1,):   (1, 0, 0)}
+# Set prior_LGE: class 0 is entire LV as it is binary
+prior_LGE_roi = {(0,):   (1, 0, 0)}
 
 def main():
     
@@ -95,12 +95,12 @@ def main():
             
             one_hot = F.one_hot(model.msk.long(), num_classes=opt.output_nc)
             msk     = one_hot.permute(0, 4, 1, 2, 3).type(model.msk.type())
-        else:  # TODO Not fully compliant yet
+        else:
             pred = (pred + 1) / 2
             pred[pred<0.5] = 0
             pred[pred>=0.5] = 1
             pred = pred.long()
-            
+                
             msk = model.msk.long()
             msk = msk.unsqueeze(0)
         pred = pred.to('cpu')
@@ -122,9 +122,13 @@ def main():
         if be[i] == 0.: ts[i] = 1
         
         #Reverse one-hot encoded in mask and pred and get numpy arrays and get rid of the batch dim
-        msk  = msk[0,:,:,:,:].argmax(dim=0).numpy().astype(float)
-        pred = pred[0,:,:,:,:].argmax(dim=0).numpy().astype(float)
-        img  = img[0,0,:,:,:].numpy().astype(float)
+        if opt.output_nc > 1: 
+            msk  = msk[0,:,:,:,:].argmax(dim=0).numpy().astype(float)
+            pred = pred[0,:,:,:,:].argmax(dim=0).numpy().astype(float)   
+        else:
+            msk  = msk[0,0,:,:,:].numpy().astype(float)
+            pred = pred[0,0,:,:,:].numpy().astype(float)
+        img  = img[0,0,:,:,:].numpy().astype(float) 
         
         #Save per volume results
         #Save images, we disregard the first and last image in the stack as usually are completly background
@@ -133,9 +137,9 @@ def main():
         sliceIdxs = np.linspace(0,img.shape[-1]-1,nImgs+2)
         sliceIdxs = np.round(sliceIdxs[1:-1]).astype(int)
         for j, s in enumerate(sliceIdxs):       
-            ax[0,j].imshow(img[:,:,s])
-            ax[1,j].imshow(msk[:,:,s])
-            ax[2,j].imshow(pred[:,:,s])
+            ax[0,j].imshow(img[:,:,s], vmin=0, vmax=img.max())
+            ax[1,j].imshow(msk[:,:,s], vmin=0, vmax=opt.output_nc)
+            ax[2,j].imshow(pred[:,:,s], vmin=0, vmax=opt.output_nc)
         plt.savefig(os.path.join(plots_path, "{}.png".format(sample)))
         plt.close()
         
