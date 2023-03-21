@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python F:/Segmentation/Code/3Dseg/train.py \
+python /home/maxi/Segmentation/Code/3Dseg/train.py \
 --root_path       /home/maxi/Segmentation/Data/seg3D_emidec/128x128/roi \
 --results_dir     /home/maxi/Segmentation/Results/seg3D_emidec/roi \
 --name            50_50_CE_128_4_1_test1 \
@@ -16,4 +16,4 @@ python F:/Segmentation/Code/3Dseg/train.py \
 --load_size_w     128 \
 --load_size_d     128 \
 --save_epoch_freq 5 \
---batch_size      1 \
+--batch_size      1
