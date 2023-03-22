@@ -4,18 +4,22 @@ import nibabel as nib
 import numpy as np
 import torch
 import torch.nn.functional as F
-# import sys
+import sys
+sys.path.append(os.path.join('/'.join(sys.path[0].split("/")[:-1])))
+import utils.topo as topo
 import monai
 
+prior_LGE_roi = {(1,):   (1, 0, 0)} # here is 1 and no 0 as in test.py as this is analysed as two classes problem
 
 def main():
     parser = argparse.ArgumentParser(description="Options")
     parser.add_argument('--predPath', required=True, type=str)
     parser.add_argument('--mskPath', required=True, type=str)
-    parser.add_argument('--fileIdx', required=True, type=int)
+    parser.add_argument('--priorName', required=True, type=str)
     args = parser.parse_args()
     
-    samples = os.listdir(args.predPath) #[args.fileIdx]
+    samples = os.listdir(args.predPath)
+    prior = globals()[args.priorName]
     
     for i, sample in enumerate(samples):
         print("Sample: {} {}".format(i, sample))
@@ -35,11 +39,16 @@ def main():
         
         gdsc  = monai.metrics.compute_generalized_dice(torch.permute(pred, (1,0,2,3,4)), torch.permute(msk, (1,0,2,3,4)), include_background=True)
         hd    = monai.metrics.compute_hausdorff_distance(pred, msk, include_background=True)
-        # be    = topo.BEmetric(pred[0,:,:,:], msk[0,:,:,:], prior_CINE_MnMs)
-        # if be == 0.: ts[i] = 1
+        be    = topo.BEmetric(pred[0,:,:,:], msk[0,:,:,:], prior, parallel=False)
+        if be == 0.: 
+            ts = 1 
+        else: 
+            ts = 0
         
         print(gdsc)
         print(hd)
+        print(be)
+        print(ts)
 
 if __name__ == '__main__':
     main()

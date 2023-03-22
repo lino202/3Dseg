@@ -165,7 +165,7 @@
             "program": "F:/Segmentation/Code/3Dseg/test.py",
             "console": "externalTerminal",
             "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_emidec/128x128/roi",
+                "--root_path",       "F:/Segmentation/Data/seg3D_emidec/roi",
                 "--results_dir",     "F:/Segmentation/Results/seg3D_emidec/roi",
                 "--name",            "50_50_CE_128_4_1_test1",
                 "--phase",           "test",
@@ -176,7 +176,7 @@
                 "--load_size_h",     "128",
                 "--load_size_w",     "128",
                 "--load_size_d",     "128",
-                "--load_filename",   "60_net",  
+                "--load_filename",   "latest_net",  
                 // "--ph",
                 "--phThres",          "-1",
                 // "--phParallel",
@@ -197,9 +197,9 @@
             "program": "F:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
             "console": "externalTerminal",
             "args": [
-                "--filePathBaseline", "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/results_baseline.pickle",
-                "--filePathPH",       "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/results_baseline_ph_crop.pickle",
-                "--resPath",          "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/",
+                "--filePathBaseline", "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1/results_baseline.pickle",
+                "--filePathPH",       "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1/results_baseline.pickle",
+                "--resPath",          "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1",
             ] 
         },
 
@@ -210,9 +210,9 @@
             "program": "F:/Segmentation/Code/3Dseg/postprocess/reAnalyseSample.py",
             "console": "externalTerminal",
             "args": [
-                "--predPath",   "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/volumes_ph",
-                "--mskPath",    "F:/Segmentation/Data/seg3D_MnMs/128x128_ED/test",
-                "--fileIdx",    "79",
+                "--predPath",   "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1/volumes_baseline",
+                "--mskPath",    "F:/Segmentation/Data/seg3D_emidec/roi/test",
+                "--priorName",  "prior_LGE_roi",
             ] 
         },
 
