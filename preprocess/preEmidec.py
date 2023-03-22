@@ -63,7 +63,6 @@ def process(dataPath, size, samples, roi=False, plotPath=None, resPath=None, sav
                 transNorm = tio.ZNormalization()
                 subject.img = transNorm(subject.img)
                 
-                #Separate ED and ES 3D arrays
                 results = {}
                 results["img"] = subject.img.data.numpy()[0,:,:,:]
                 results["msk"] = subject.msk.data.numpy()[0,:,:,:]
@@ -142,8 +141,8 @@ def main():
             samplesdict = pickle.load(handle)
             
         trainSamples = samplesdict ["trainSamples"]
-        testSamples = samplesdict ["trainSamples"]
-        valSamples = samplesdict ["trainSamples"]
+        testSamples = samplesdict ["testSamples"]
+        valSamples = samplesdict ["valSamples"]
            
     
     print("Processing Training samples")
