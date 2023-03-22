@@ -167,10 +167,10 @@
             "args": [
                 "--root_path",       "F:/Segmentation/Data/seg3D_emidec/roi",
                 "--results_dir",     "F:/Segmentation/Results/seg3D_emidec/roi",
-                "--name",            "50_50_CE_128_4_1_test1",
+                "--name",            "50_50_CE_128_4_1_test1_multiclass",
                 "--phase",           "test",
                 "--input_nc",        "1",
-                "--output_nc",       "1",
+                "--output_nc",       "2",
                 "--nfl",             "64",
                 "--num_downs",       "7",
                 "--load_size_h",     "128",
@@ -178,12 +178,12 @@
                 "--load_size_d",     "128",
                 "--load_filename",   "latest_net",  
                 // "--ph",
-                "--phThres",          "-1",
+                "--phThres",          "0.5",
                 // "--phParallel",
                 "--priorName",        "prior_LGE_roi",            
                 "--res_excel",        "F:/Segmentation/Results/seg3D_emidec/roi/results.xlsx",
                 "--res_params_name",  "results_baseline",
-                "--res_excel_indexs", "gdsc", "hd", "be", "ts",
+                "--res_excel_indexs", "gdsc_bg", "gdsc_lv", "hd_bg", "hd_lv", "be", "ts",
             ] 
         },
 

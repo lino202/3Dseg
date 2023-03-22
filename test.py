@@ -86,24 +86,14 @@ def main():
             model.test()           # run inference
             pred = model.pred
         
-        #Handle binary and multi-class segmentation
-        if opt.output_nc > 1:
-            pred    = torch.softmax(pred, dim=1)
-            pred    = pred.argmax(dim=1)
-            one_hot = F.one_hot(pred.long(), num_classes=opt.output_nc)
-            pred    = one_hot.permute(0, 4, 1, 2, 3).type(pred.type())
-            
-            one_hot = F.one_hot(model.msk.long(), num_classes=opt.output_nc)
-            msk     = one_hot.permute(0, 4, 1, 2, 3).type(model.msk.type())
-        else:
-            pred = (pred + 1) / 2
-            pred[pred<0.5] = 0
-            pred[pred>=0.5] = 1
-            pred = pred.long()
-                
-            msk = model.msk.long()
-            msk = msk.unsqueeze(0)
+        pred    = torch.softmax(pred, dim=1)
+        pred    = pred.argmax(dim=1)
+        one_hot = F.one_hot(pred.long(), num_classes=opt.output_nc)
+        pred    = one_hot.permute(0, 4, 1, 2, 3).type(pred.type())
         pred = pred.to('cpu')
+        
+        one_hot = F.one_hot(model.msk.long(), num_classes=opt.output_nc)
+        msk     = one_hot.permute(0, 4, 1, 2, 3).type(model.msk.type())
         msk  = msk.to('cpu')
         
         #Get img, name and affine. This serves to save plots and .nii
@@ -122,12 +112,8 @@ def main():
         if be[i] == 0.: ts[i] = 1
         
         #Reverse one-hot encoded in mask and pred and get numpy arrays and get rid of the batch dim
-        if opt.output_nc > 1: 
-            msk  = msk[0,:,:,:,:].argmax(dim=0).numpy().astype(float)
-            pred = pred[0,:,:,:,:].argmax(dim=0).numpy().astype(float)   
-        else:
-            msk  = msk[0,0,:,:,:].numpy().astype(float)
-            pred = pred[0,0,:,:,:].numpy().astype(float)
+        msk  = msk[0,:,:,:,:].argmax(dim=0).numpy().astype(float)
+        pred = pred[0,:,:,:,:].argmax(dim=0).numpy().astype(float)   
         img  = img[0,0,:,:,:].numpy().astype(float) 
         
         #Save per volume results
@@ -138,8 +124,8 @@ def main():
         sliceIdxs = np.round(sliceIdxs[1:-1]).astype(int)
         for j, s in enumerate(sliceIdxs):       
             ax[0,j].imshow(img[:,:,s], vmin=0, vmax=img.max())
-            ax[1,j].imshow(msk[:,:,s], vmin=0, vmax=opt.output_nc)
-            ax[2,j].imshow(pred[:,:,s], vmin=0, vmax=opt.output_nc)
+            ax[1,j].imshow(msk[:,:,s], vmin=0, vmax=opt.output_nc-1)
+            ax[2,j].imshow(pred[:,:,s], vmin=0, vmax=opt.output_nc-1)
         plt.savefig(os.path.join(plots_path, "{}.png".format(sample)))
         plt.close()
         

@@ -9,7 +9,16 @@ sys.path.append(os.path.join('/'.join(sys.path[0].split("/")[:-1])))
 import utils.topo as topo
 import monai
 
-prior_LGE_roi = {(1,):   (1, 0, 0)} # here is 1 and no 0 as in test.py as this is analysed as two classes problem
+prior_CINE_MnMs = {
+    (1,):   (1, 0, 0),
+    (2,):   (1, 1, 0), #Here maybe let open? (1,1,0) or close (1,0,0)
+    (3,):   (1, 0, 0),
+    (1, 2): (1, 0, 0),
+    (1, 3): (2, 0, 0),
+    (2, 3): (1, 1, 0)  #Here maybe let open? (1,1,0) or close (1,0,0)
+}
+
+prior_LGE_roi = {(1,):   (1, 0, 0)}
 
 def main():
     parser = argparse.ArgumentParser(description="Options")
