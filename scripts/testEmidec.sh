@@ -13,10 +13,10 @@ python /home/maxi/Segmentation/Code/3Dseg/test.py \
 --load_size_w     128 \
 --load_size_d     128 \
 --load_filename   latest_net \
-# --ph            \
---phThres         0.5 \ 
---phParallel      \  
---priorName        prior_LGE_roi \           
---res_excel        /home/maxi/Segmentation/Results/seg3D_emidec/roi/results.xlsx
---res_params_name  results_baseline
+--phThres         0.5 \
+--ph              \
+--phParallel      \
+--priorName        prior_LGE_roi \
+--res_excel        /home/maxi/Segmentation/Results/seg3D_emidec/roi/results.xlsx \
+--res_params_name  results_ph \
 --res_excel_indexs gdsc hd be ts
