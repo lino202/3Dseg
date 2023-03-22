@@ -32,8 +32,8 @@ prior_CINE_MnMs = {
     (2, 3): (1, 1, 0)  #Here maybe let open? (1,1,0) or close (1,0,0)
 }
 
-# Set prior_LGE: class 0 is entire LV as it is binary
-prior_LGE_roi = {(0,):   (1, 0, 0)}
+# Set prior_LGE: class 1 is entire LV as it is binary
+prior_LGE_roi = {(1,):   (1, 0, 0)}
 
 def main():
     
