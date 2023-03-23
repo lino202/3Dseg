@@ -18,7 +18,7 @@ prior_CINE_MnMs = {
     (2, 3): (1, 1, 0)  #Here maybe let open? (1,1,0) or close (1,0,0)
 }
 
-prior_LGE_roi = {(1,):   (1, 0, 0)}
+prior_roi = {(1,):   (1, 0, 0)}
 
 def main():
     parser = argparse.ArgumentParser(description="Options")

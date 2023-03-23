@@ -33,7 +33,25 @@ prior_CINE_MnMs = {
 }
 
 # Set prior_LGE: class 1 is entire LV as it is binary
-prior_LGE_roi = {(1,):   (1, 0, 0)}
+prior_roi = {(1,):   (1, 0, 0)}
+
+# Set prior_LGE: N normal, P patological
+prior_LGE_emidec = {
+    "priorN" : {
+        (1,):   (1, 0, 0),
+        (2,):   (1, 1, 0),
+        (1, 2): (1, 0, 0),
+    },
+
+    "priorP" : {
+        (1,):   (1, 0, 0),
+        (2,):   (1, 1, 0),
+        (3,):   (1, 0, 0),
+        (1, 2): (1, 0, 0),
+        (1, 3): (1, 0, 0),
+        (2, 3): (1, 1, 0)
+    }
+}
 
 def main():
     
@@ -58,7 +76,7 @@ def main():
     model.net.eval()               # affects layers like batchnorm and dropout.
     
     # Get prior
-    prior = globals()[opt.priorName]
+    generalPrior = globals()[opt.priorName]
     if opt.phThres < 0:
         phThres = None
     else: 
@@ -72,6 +90,16 @@ def main():
     for i, data in enumerate(test_dataloader):
         start_iter = time.time()
         model.set_input(data)  # unpack data from data loader
+        sample  = pathlib.PureWindowsPath(model.path[0]).as_posix().split('/')[-1]
+        
+        if 'emidec' in opt.priorName:
+            if 'P' in sample: 
+                prior = generalPrior["priorP"]
+            elif 'N' in sample:
+                prior = generalPrior["priorN"]
+            else: raise ValueError("Wrong prior name, should be normal or pato")
+        else:
+            prior = generalPrior
         
         #Determine result pred and binarize (one-hot pred)
         if opt.ph: 
@@ -97,7 +125,6 @@ def main():
         msk  = msk.to('cpu')
         
         #Get img, name and affine. This serves to save plots and .nii
-        sample  = pathlib.PureWindowsPath(model.path[0]).as_posix().split('/')[-1]
         affine  = model.affine.numpy()[0,:,:]
         img     = (model.img.to('cpu') + 1) / 2
         

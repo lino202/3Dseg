@@ -16,7 +16,7 @@ python /home/maxi/Segmentation/Code/3Dseg/test.py \
 --phThres         0.5 \
 --ph              \
 --phParallel      \
---priorName        prior_LGE_roi \
+--priorName        prior_roi \
 --res_excel        /home/maxi/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1_all4crop/results.xlsx \
 --res_params_name  results_ph \
 --res_excel_indexs gdsc_bg gdsc_lv hd_bg hd_lv be ts

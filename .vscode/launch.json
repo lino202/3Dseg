@@ -210,10 +210,39 @@
                 // "--ph",
                 "--phThres",          "0.5",
                 // "--phParallel",
-                "--priorName",        "prior_LGE_roi",            
+                "--priorName",        "prior_roi",            
                 "--res_excel",        "F:/Segmentation/Results/seg3D_emidec/roi/results.xlsx",
                 "--res_params_name",  "results_baseline",
                 "--res_excel_indexs", "gdsc_bg", "gdsc_lv", "hd_bg", "hd_lv", "be", "ts",
+            ] 
+        },
+
+        {
+            "name": "test Emidec",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/test.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "F:/Segmentation/Data/seg3D_emidec/cropped",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_emidec/cropped",
+                "--name",            "50_50_CE_128_4_1_test1_multiclass",
+                "--phase",           "test",
+                "--input_nc",        "1",
+                "--output_nc",       "4",
+                "--nfl",             "64",
+                "--num_downs",       "7",
+                "--load_size_h",     "128",
+                "--load_size_w",     "128",
+                "--load_size_d",     "128",
+                "--load_filename",   "latest_net",  
+                // "--ph",
+                "--phThres",          "0.5",
+                // "--phParallel",
+                "--priorName",        "prior_LGE_emidec",            
+                "--res_excel",        "F:/Segmentation/Results/seg3D_emidec/cropped/results.xlsx",
+                "--res_params_name",  "results_baseline",
+                "--res_excel_indexs", "gdsc_bg", "gdsc_lv", "gdsc_myo", "gdsc_mi", "hd_bg", "hd_lv", "hd_myo", "hd_mi", "be", "ts",
             ] 
         },
 
@@ -242,7 +271,7 @@
             "args": [
                 "--predPath",   "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1/volumes_baseline",
                 "--mskPath",    "F:/Segmentation/Data/seg3D_emidec/roi/test",
-                "--priorName",  "prior_LGE_roi",
+                "--priorName",  "prior_roi",
             ] 
         },
 
