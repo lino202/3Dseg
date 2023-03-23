@@ -55,7 +55,7 @@ def fitgaussian(data):
     p, success = optimize.leastsq(errorfunction, params)
     return p
 
-def getROI(imgArr, plot=False):
+def getROICINE(imgArr, plot=False):
     h1 = getH13D(imgArr)
     h1Sum = np.sum(h1, axis=2)
     a = np.array([0,0])
@@ -98,3 +98,17 @@ def getROI(imgArr, plot=False):
         h1Sum[gaussFit<0.05] = 0
 
     return x, y, width_x*2, width_y*2 
+
+
+def getROIMsk(arr):
+    idxs = arr.nonzero()
+    idxs = np.array(idxs)
+    roi_min = np.min(idxs,1)
+    roi_max = np.max(idxs,1)
+    roi_max += 20
+    roi_min -= 20
+    idxstmp = np.array(arr.shape) - 1 < roi_max
+    roi_max[idxstmp] = (np.array(arr.shape) - 1)[idxstmp]
+    idxstmp = np.zeros(len(arr.shape)) > roi_min
+    roi_min[idxstmp] = np.zeros(len(arr.shape))[idxstmp]
+    return roi_min, roi_max

@@ -3,7 +3,11 @@ Initially neither slicer neither itk-snap read the files correctly
 Also only the training data gt is available so we randomly separate all the files
 
 Also we cannot crop Roi in here with cine so we gen LV mask sets in order to train
-a Roi detection network
+a Roi detection network. So the code work in two stages the first is to generate the sets
+for train, test and val for a Roi segmentation network. Then as the samples distribution was save,
+all the predictions computed by the Roi segmentation network are use for cropping and finally getting
+the train, test and val for training. The last label of no-reflow is together with the myocardial
+infarction one for simplicity in the topology prior determination.
 '''
 
 import os
@@ -16,6 +20,7 @@ import pathlib
 import traceback
 import random
 import pickle
+from utilsPre import cropSubjectPred
 
 
 def getIdxs4Datasets(nPato, nHe):
@@ -34,7 +39,7 @@ def getIdxs4Datasets(nPato, nHe):
     
     return trainPatoIdxs, testPatoIdxs, valPatoIdxs, trainHeIdxs, testHeIdxs, valHeIdxs
 
-def process(dataPath, size, samples, roi=False, plotPath=None, resPath=None, save=False):
+def process(dataPath, size, samples, roi=False, plotPath=None, resPath=None, roiPredPath=None, save=False):
 
     print('There are {} samples in total'.format(len(samples)))
     
@@ -51,12 +56,23 @@ def process(dataPath, size, samples, roi=False, plotPath=None, resPath=None, sav
                 # Get image and mask arrays
                 subject = tio.Subject(img=tio.ScalarImage(imgPath), msk=tio.LabelMap(mskPath))
                 
-                #Reshape for having isotropic voxels
+                # Crop if rois are available
+                if not roi and roiPredPath != None:
+                    #The prediction need to be in the same space than img and msk
+                    pred    = tio.ScalarImage(os.path.join(roiPredPath, sample, "pred.nii"))
+                    sw = pred.shape[1] * pred.spacing[0] / subject.img.shape[1]
+                    sh = pred.shape[2] * pred.spacing[1] / subject.img.shape[2]
+                    sd = pred.shape[3] * pred.spacing[2] / subject.img.shape[3]
+                    trans = tio.Resample((sw, sh, sd))
+                    pred = trans(pred)
+                    subject = cropSubjectPred(subject, pred)
+                
+                #Reshape for having isotropic number of voxels
                 #Compliant with real world xyz coordinates (modifies affine matrix). see Torchio/nibabel docs
                 sw = subject.img.shape[1] * subject.img.spacing[0] / size[0]   # there's an extra dim in the shape
                 sh = subject.img.shape[2] * subject.img.spacing[1] / size[1]
                 sd = subject.img.shape[3] * subject.img.spacing[2] / size[2]
-                trans = tio.Resample((sw, sh, sd), image_interpolation='linear', label_interpolation='nearest') #Try lanczos?
+                trans = tio.Resample((sw, sh, sd))
                 subject.img = trans(subject.img)
                 subject.msk = trans(subject.msk)
                 
@@ -69,6 +85,8 @@ def process(dataPath, size, samples, roi=False, plotPath=None, resPath=None, sav
                 
                 if roi:
                     results["msk"][results["msk"]>0] = 1 
+                else:
+                    results["msk"][results["msk"]>3] = 3 
                 
                 # Save and/or plot 3D ED and ES arrays
                 if plotPath != None:
@@ -97,6 +115,7 @@ def main():
     parser.add_argument('--rootPath',    type=str)
     parser.add_argument('--resPath',     type=str)
     parser.add_argument('--plotPath',     type=str)
+    parser.add_argument('--roiPredPath',type=str)
     parser.add_argument('--samplesDistPath',type=str)
     parser.add_argument('--roi',         action='store_true')
     parser.add_argument('--size',        type=int, required=True, nargs=3)
@@ -108,7 +127,7 @@ def main():
         plotPath = None
     
     #Get samples distribution
-    if args.samplesDistPath == '0':
+    if not hasattr(args, 'samplesDistPath'):
         samplesPato = sorted([x for x in os.listdir(args.rootPath) if not '.txt' in x and 'P' in x])
         samplesHe = sorted([x for x in os.listdir(args.rootPath) if not '.txt' in x and 'N' in x])
         print('There are {} healthy samples in total'.format(len(samplesHe)))
@@ -148,17 +167,17 @@ def main():
     print("Processing Training samples")
     resPathTrain = os.path.join(args.resPath , "train")
     if not os.path.exists(resPathTrain): pathlib.Path(resPathTrain).mkdir(parents=True, exist_ok=True)
-    process(args.rootPath, args.size, trainSamples, args.roi, plotPath=plotPath,  resPath=resPathTrain, save=True)
+    process(args.rootPath, args.size, trainSamples, args.roi, plotPath=plotPath,  resPath=resPathTrain, roiPredPath=args.roiPredPath, save=True)
     
     print("Processing Testing samples")
     resPathTest = os.path.join(args.resPath , "test")
     if not os.path.exists(resPathTest): pathlib.Path(resPathTest).mkdir(parents=True, exist_ok=True)
-    process(args.rootPath, args.size, testSamples, args.roi, plotPath=plotPath, resPath=resPathTest, save=True)
+    process(args.rootPath, args.size, testSamples, args.roi, plotPath=plotPath, resPath=resPathTest, roiPredPath=args.roiPredPath, save=True)
     
     print("Processing Validation samples")
     resPathVal = os.path.join(args.resPath , "val")
     if not os.path.exists(resPathVal): pathlib.Path(resPathVal).mkdir(parents=True, exist_ok=True)
-    process(args.rootPath, args.size, valSamples, args.roi, plotPath=plotPath, resPath=resPathVal, save=True)
+    process(args.rootPath, args.size, valSamples, args.roi, plotPath=plotPath, resPath=resPathVal, roiPredPath=args.roiPredPath, save=True)
 
     
 if __name__ == '__main__':

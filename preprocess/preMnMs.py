@@ -16,7 +16,7 @@ import argparse
 import time
 import torchio as tio
 import numpy as np
-from utils import getEXFromMask, cropSubject
+from utilsPre import getEXFromMask, cropSubjectCINE
 import pathlib
 import traceback
 
@@ -41,7 +41,7 @@ def process(dataPath, size, plotPath, resPath=None, save=False):
 
                 # Crop both 4D arrays
                 # This maintain real world coordinates xyz
-                subject = cropSubject(subject, edes)
+                subject = cropSubjectCINE(subject, edes)
                 
                 #Reshape for having isotropic voxels
                 #Compliant with real world xyz coordinates (modifies affine matrix). see Torchio/nibabel docs

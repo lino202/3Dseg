@@ -34,11 +34,41 @@
             "console": "externalTerminal",
             "args": [
                 "--rootPath",        "F:/Data/RM/Emidec/training",
-                "--resPath",         "F:/Segmentation/Data/seg3D_emidec/roi",
-                "--plotPath",        "F:/Segmentation/Data/seg3D_emidec/roi/plots",
-                "--roi",
+                "--resPath",         "F:/Segmentation/Data/seg3D_emidec/cropped",
+                "--plotPath",        "F:/Segmentation/Data/seg3D_emidec/cropped/plots",
+                "--roiPredPath",     "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1_all4crop/volumes",
+                // "--roi",
                 "--size",            "128","128","128",
-                "--samplesDistPath", "0",
+                "--samplesDistPath", "F:/Segmentation/Data/seg3D_emidec/roi/samples_distribution.pickle",
+                
+            ] 
+        },
+
+
+        {
+            "name": "exploreTopoEmidec",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoEmidec.py",
+            "console": "externalTerminal",
+            "args": [
+                "--rootPath",  "F:/Data/RM/Emidec/training",
+                "--resPath",   "F:/Data/RM/Emidec",
+                "--resName",   "emidec_topology",
+            ] 
+        },
+
+
+        {
+            "name": "exploreTopoProcessed",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoProcessed.py",
+            "console": "externalTerminal",
+            "args": [
+                "--rootPath",  "F:/Segmentation/Data/seg3D_emidec/cropped/all",
+                "--resPath",   "F:/Segmentation/Data/seg3D_emidec/cropped",
+                "--resName",   "emidec_topology_processed",
             ] 
         },
 
