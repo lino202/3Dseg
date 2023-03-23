@@ -110,6 +110,9 @@ def getBaseMidApexImgs(tensor, name):
 
 
 def getStatistics(data):
+    #Filter nans and inf
+    data = data[~np.isnan(data)]
+    data = data[~np.isinf(data)]
     mean       = np.mean(data)
     std        = np.std(data)
     mymin      = np.min(data)
