@@ -98,9 +98,9 @@
             "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoExvivoProcessed.py",
             "console": "externalTerminal",
             "args": [
-                "--rootPath",  "F:/Segmentation/Data/seg3D_exvivo/noph_checked/all",
-                "--resPath",   "F:/Segmentation/Data/seg3D_exvivo/noph_checked",
-                "--resName",   "exvivo_topology_nophchecked",
+                "--rootPath",  "F:/Segmentation/Data/seg3D_exvivo/ph_checked/all",
+                "--resPath",   "F:/Segmentation/Data/seg3D_exvivo/ph_checked",
+                "--resName",   "exvivo_topology_phchecked",
             ] 
         },
 
