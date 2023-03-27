@@ -60,10 +60,10 @@
 
 
         {
-            "name": "exploreTopoProcessed",
+            "name": "exploreTopoEmidecProcessed",
             "type": "python",
             "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoProcessed.py",
+            "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoEmidecProcessed.py",
             "console": "externalTerminal",
             "args": [
                 "--rootPath",  "F:/Segmentation/Data/seg3D_emidec/cropped/all",
@@ -88,6 +88,19 @@
                 "--valResPath",   "F:/Segmentation/Data/seg3D_exvivo/val",
                 "--plotPath",     "F:/Segmentation/Data/seg3D_exvivo/plots",
                 "--size",         "128","128","128"
+            ] 
+        },
+
+        {
+            "name": "exploreTopoExvivoProcessed",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoExvivoProcessed.py",
+            "console": "externalTerminal",
+            "args": [
+                "--rootPath",  "F:/Segmentation/Data/seg3D_exvivo/noph_checked/all",
+                "--resPath",   "F:/Segmentation/Data/seg3D_exvivo/noph_checked",
+                "--resName",   "exvivo_topology_nophchecked",
             ] 
         },
 
