@@ -18,7 +18,7 @@ def get_transform(transformParams, arrType, times):
     transform_list = []
     
     size = (transformParams["load_size_h"], transformParams["load_size_w"], transformParams["load_size_d"])
-    transform_list.append(transforms.Lambda(lambda arr: resize3D(arr, size, arrType)))
+    # transform_list.append(transforms.Lambda(lambda arr: resize3D(arr, size, arrType)))
     if not transformParams["no_hor_flip"]: transform_list.append(transforms.Lambda(lambda arr: rotZPlane(arr, times)))
     transform_list.append(transforms.Lambda(lambda arr: toTensor(arr, arrType)))
     # if arrType != 'msk': transform_list.append(transforms.Lambda(lambda tensor: normalize(tensor, (0.5,), (0.5,))))

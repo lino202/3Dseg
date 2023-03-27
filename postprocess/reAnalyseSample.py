@@ -20,11 +20,27 @@ prior_CINE_MnMs = {
 
 prior_roi = {(1,):   (1, 0, 0)}
 
+priorN_emidec = {
+    (1,):   (1, 0, 0),
+    (2,):   (1, 1, 0),
+    (1, 2): (1, 0, 0),
+}
+
+priorP_emidec = {
+    (1,):   (1, 0, 0),
+    (2,):   (1, 1, 0),
+    (3,):   (1, 0, 0),
+    (1, 2): (1, 0, 0),
+    (1, 3): (1, 0, 0),
+    (2, 3): (1, 1, 0)
+}
+
 def main():
     parser = argparse.ArgumentParser(description="Options")
     parser.add_argument('--predPath', required=True, type=str)
     parser.add_argument('--mskPath', required=True, type=str)
     parser.add_argument('--priorName', required=True, type=str)
+    parser.add_argument('--nclasses', required=True, type=int)
     args = parser.parse_args()
     
     samples = os.listdir(args.predPath)
@@ -35,15 +51,16 @@ def main():
     
         msk  = nib.load(os.path.join(args.mskPath, sample, "msk.nii"))
         msk = np.asarray(msk.dataobj)
+        print(np.unique(msk))
         msk = torch.tensor(msk[np.newaxis,:])
-        nclasses = int(msk.max().numpy()) + 1
-        one_hot = F.one_hot(msk.long(), num_classes=nclasses)
+        one_hot = F.one_hot(msk.long(), num_classes=args.nclasses)
         msk    = one_hot.permute(0, 4, 1, 2, 3).type(msk.type())
         
         pred = nib.load(os.path.join(args.predPath, sample, "pred.nii"))
         pred = np.asarray(pred.dataobj).astype(int)
+        print(np.unique(pred))
         pred = torch.tensor(pred[np.newaxis,:])
-        one_hot = F.one_hot(pred.long(), num_classes=nclasses)
+        one_hot = F.one_hot(pred.long(), num_classes=args.nclasses)
         pred    = one_hot.permute(0, 4, 1, 2, 3).type(pred.type())
         
         gdsc  = monai.metrics.compute_generalized_dice(torch.permute(pred, (1,0,2,3,4)), torch.permute(msk, (1,0,2,3,4)), include_background=True)

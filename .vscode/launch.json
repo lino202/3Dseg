@@ -73,6 +73,26 @@
         },
 
 
+        {
+            "name": "preProccess ExVivo",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/preprocess/preExVivo.py",
+            "console": "externalTerminal",
+            "args": [
+                "--trainPath",    "F:/Data/RM/DWI/Nifti_MA_LE_ST/train",
+                "--testPath",     "F:/Data/RM/DWI/Nifti_MA_LE_ST/test",
+                "--valPath",      "F:/Data/RM/DWI/Nifti_MA_LE_ST/val",
+                "--trainResPath", "F:/Segmentation/Data/seg3D_exvivo/train",
+                "--testResPath",  "F:/Segmentation/Data/seg3D_exvivo/test",
+                "--valResPath",   "F:/Segmentation/Data/seg3D_exvivo/val",
+                "--plotPath",     "F:/Segmentation/Data/seg3D_exvivo/plots",
+                "--size",         "128","128","128"
+            ] 
+        },
+
+
+
         //TRAIN-------------------------------------------------
 
         {
@@ -110,16 +130,16 @@
             "console": "externalTerminal",
             "args": [
                 "--root_path",       "F:/Segmentation/Data/seg3D_exvivo",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_exvivo/",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_exvivo",
                 "--name",            "init",
                 "--phase",           "train",
                 "--input_nc",        "1",
-                "--output_nc",       "1",
+                "--output_nc",       "2",
                 "--nfl",             "64",
                 "--num_downs",       "7",
-                "--n_epochs",        "20",
-                "--n_epochs_decay",  "10",
-                "--loss",            "Dice",
+                "--n_epochs",        "50",
+                "--n_epochs_decay",  "50",
+                "--loss",            "CE",
                 "--load_size_h",     "128",
                 "--load_size_w",     "128",
                 "--load_size_d",     "128",
@@ -256,9 +276,9 @@
             "program": "F:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
             "console": "externalTerminal",
             "args": [
-                "--filePathBaseline", "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1/results_baseline.pickle",
-                "--filePathPH",       "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1/results_baseline.pickle",
-                "--resPath",          "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1",
+                "--filePathBaseline", "F:/Segmentation/Results/seg3D_emidec/cropped/50_50_CE_128_4_1_test1_multiclass/results_baseline_P.pickle",
+                "--filePathPH",       "F:/Segmentation/Results/seg3D_emidec/cropped/50_50_CE_128_4_1_test1_multiclass/results_ph_P.pickle",
+                "--resPath",          "F:/Segmentation/Results/seg3D_emidec/cropped/50_50_CE_128_4_1_test1_multiclass",
             ] 
         },
 
@@ -269,9 +289,10 @@
             "program": "F:/Segmentation/Code/3Dseg/postprocess/reAnalyseSample.py",
             "console": "externalTerminal",
             "args": [
-                "--predPath",   "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1/volumes_baseline",
-                "--mskPath",    "F:/Segmentation/Data/seg3D_emidec/roi/test",
-                "--priorName",  "prior_roi",
+                "--predPath",   "F:/Segmentation/Results/seg3D_emidec/cropped/50_50_CE_128_4_1_test1_multiclass/volumes_ph_N",
+                "--mskPath",    "F:/Segmentation/Data/seg3D_emidec/cropped_test_N/test",
+                "--priorName",  "priorN_emidec",
+                "--nclasses",   "4",
             ] 
         },
 
