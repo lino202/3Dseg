@@ -98,8 +98,8 @@
             "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoExvivoProcessed.py",
             "console": "externalTerminal",
             "args": [
-                "--rootPath",  "F:/Segmentation/Data/seg3D_exvivo/ph_checked/all",
-                "--resPath",   "F:/Segmentation/Data/seg3D_exvivo/ph_checked",
+                "--rootPath",  "F:/Segmentation/Data/seg3D_exvivo/noph_checked/all",
+                "--resPath",   "F:/Segmentation/Data/seg3D_exvivo/noph_checked",
                 "--resName",   "exvivo_topology_phchecked",
             ] 
         },
@@ -142,9 +142,9 @@
             "program": "F:/Segmentation/Code/3Dseg/train.py",
             "console": "externalTerminal",
             "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_exvivo",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_exvivo",
-                "--name",            "init",
+                "--root_path",       "F:/Segmentation/Data/seg3D_exvivo/noph_checked_onlymine",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_exvivo/noph_checked_onlymine",
+                "--name",            "50_50_CE_128_2_1",
                 "--phase",           "train",
                 "--input_nc",        "1",
                 "--output_nc",       "2",
@@ -158,7 +158,7 @@
                 "--load_size_d",     "128",
                 "--save_epoch_freq", "2",
                 "--print_iter",      "1",
-                "--batch_size",      "2",
+                "--batch_size",      "1",
             ] 
         },
 
@@ -289,9 +289,9 @@
             "program": "F:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
             "console": "externalTerminal",
             "args": [
-                "--filePathBaseline", "F:/Segmentation/Results/seg3D_emidec/cropped/50_50_CE_128_4_1_test1_multiclass/results_baseline_P.pickle",
-                "--filePathPH",       "F:/Segmentation/Results/seg3D_emidec/cropped/50_50_CE_128_4_1_test1_multiclass/results_ph_P.pickle",
-                "--resPath",          "F:/Segmentation/Results/seg3D_emidec/cropped/50_50_CE_128_4_1_test1_multiclass",
+                "--filePathBaseline", "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_2_1/results_baseline.pickle",
+                "--filePathPH",       "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_2_1/results_ph.pickle",
+                "--resPath",          "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_2_1",
             ] 
         },
 
