@@ -134,7 +134,36 @@
             ] 
         },
 
+        {
+            "name": "train MnMs GAN",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/trainGAN.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128_ED",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs_GAN/128x128_ED",
+                "--name",            "50_50_CE_128_2_1",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "1",
+                "--nfl",             "64",
+                "--num_downs",       "7",
+                "--n_epochs",        "100",
+                "--n_epochs_decay",  "100",
+                // "--loss",            "CE",
+                "--gan",
+                "--gan_mode",        "lsgan",
+                "--load_size_h",     "128",
+                "--load_size_w",     "128",
+                "--load_size_d",     "128",
+                "--save_epoch_freq", "10",
+                "--print_iter",      "10",
+                "--batch_size",      "1",
+            ] 
+        },
 
+        
         {
             "name": "train exvivo",
             "type": "python",
@@ -162,6 +191,39 @@
             ] 
         },
 
+
+        {
+            "name": "train exvivo GAN",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/trainGAN.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "F:/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_exvivo_GAN/ph_checked_onlyStandfor_GAN",
+                "--name",            "50_50_CE_128_2_1",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "1",
+                "--nfl",             "64",
+                "--num_downs",       "7",
+                "--n_epochs",        "50",
+                "--n_epochs_decay",  "50",
+                // "--loss",            "CE",
+                "--gan",
+                "--gan_mode",        "lsgan",
+                "--load_size_h",     "128",
+                "--load_size_w",     "128",
+                "--load_size_d",     "128",
+                "--save_epoch_freq", "10",
+                "--print_iter",      "1",
+                "--batch_size",      "1",
+            ] 
+        },
+
+
+
+
         {
             "name": "train emidec roi",
             "type": "python",
@@ -187,6 +249,8 @@
                 "--batch_size",      "1",
             ] 
         },
+
+
 
 
         //TEST----------------------------------------------------

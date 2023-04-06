@@ -6,7 +6,7 @@ from collections import OrderedDict
 from utils.util import getBaseMidApexImgs
 import os 
 
-class ModelInterface():
+class ModelUnet3D():
     """ Interface for model Unet3D"""
     
     def __init__(self, opt):
@@ -68,10 +68,9 @@ class ModelInterface():
             load_filename (str) -- trained model file name
         """
         load_path = os.path.join(self.save_dir, "{}.pth".format(load_filename))
-        net = getattr(self, 'net')
         print('Loading the model from {}'.format(load_path))
         state_dict = torch.load(load_path, map_location=self.device)
-        net.load_state_dict(state_dict)
+        self.net.load_state_dict(state_dict)
 
 
     def get_current_visuals(self):

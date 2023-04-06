@@ -7,7 +7,7 @@ import nibabel as nib
 import numpy as np
 import random
 
-def get_transform(transformParams, arrType, times):
+def get_transform(transformParams, arrType, times, isgan):
     #Here we applied our tranforms for prepocessing
     #We adjust some built in functions as they were not thought for 3D arrays, 
     #e.g. there's a rotation in toTensor
@@ -17,10 +17,10 @@ def get_transform(transformParams, arrType, times):
     #is enough. The batch size is added in by the dataloader.
     transform_list = []
     
-    size = (transformParams["load_size_h"], transformParams["load_size_w"], transformParams["load_size_d"])
+    # size = (transformParams["load_size_h"], transformParams["load_size_w"], transformParams["load_size_d"])
     # transform_list.append(transforms.Lambda(lambda arr: resize3D(arr, size, arrType)))
     if not transformParams["no_hor_flip"]: transform_list.append(transforms.Lambda(lambda arr: rotZPlane(arr, times)))
-    transform_list.append(transforms.Lambda(lambda arr: toTensor(arr, arrType)))
+    transform_list.append(transforms.Lambda(lambda arr: customToTensor(arr, arrType, isgan)))
     # if arrType != 'msk': transform_list.append(transforms.Lambda(lambda tensor: normalize(tensor, (0.5,), (0.5,))))
     # transform_list.append(transforms.Lambda(lambda tensor: addDim(tensor)))
 
@@ -32,11 +32,11 @@ def create(opt, phase):
             "load_size_h": opt.load_size_h,
             "load_size_w": opt.load_size_w,
             "no_hor_flip": opt.no_hor_flip}
-
+    
     if phase == "val" or phase == "test":
         transform["no_hor_flip"] = True
 
-    dataset = Dataset3D(opt.root_path, phase, transform)
+    dataset = Dataset3D(opt.root_path, phase, transform, opt.gan)
     if phase != "test":
         dataloader = DataLoader(dataset=dataset, batch_size=opt.batch_size, shuffle=True)
     else:
@@ -44,35 +44,20 @@ def create(opt, phase):
     
     return dataloader
 
-def resize3D(arr, size, arrType):    
-    if arr.shape != size:
-        x = torch.Tensor( np.reshape(arr, (1,1,arr.shape[0],arr.shape[1],arr.shape[2])))
-        h = torch.linspace(-1, 1, size[0])
-        w = torch.linspace(-1, 1, size[1])
-        d = torch.linspace(-1, 1, size[2])
-        meshz, meshy, meshx = torch.meshgrid((h, w, d), indexing='ij')
-        grid = torch.stack((meshx, meshy, meshz), 3)
-        grid = grid.unsqueeze(0) # add batch dim
-        tensor = grid_sample(x, grid, align_corners=True)
-        arr = tensor[0,0,:,:,:].numpy()
-
-        #As this does an interpolation the mask should still have only 0's or 1's
-        #This should be improved for multiclass segmentation, so for only have to 
-        #be use with binary segmentation
-        if arrType == "msk": 
-            arr[arr<0.5] = 0.
-            arr[arr>=0.5] = 1.
-
-    return arr
-
-def toTensor(arr, arrType):
+def customToTensor(arr, arrType, isgan):
     if arrType != 'msk':
         arr = unitNorm(arr)
         tensor = torch.as_tensor(arr, dtype=torch.float32).contiguous() #default net parameters init is in torch.Float (32bytes) no torch.Double (64bytes)
         tensor = normalize(tensor, (0.5,), (0.5,))
         tensor = addDim(tensor)
-    else: 
-        tensor = torch.as_tensor(arr, dtype=torch.int64).contiguous() #dtype=torch.int64
+    else:
+        if isgan: #get msk in the range [-1,1]
+            arr = unitNorm(arr) #between [0,1]
+            arr = (arr * 2) - 1
+            tensor = torch.as_tensor(arr, dtype=torch.float32).contiguous()
+            tensor = addDim(tensor)
+        else:
+            tensor = torch.as_tensor(arr, dtype=torch.int64).contiguous()
     return tensor
 
 def unitNorm(arr):
@@ -98,11 +83,12 @@ def rotZPlane(arr, times):
 
 class Dataset3D(Dataset):
     
-    def __init__(self, rootPath, phase, transform):
-        self.dataPath = os.path.join(rootPath, phase)
-        self.files = [os.path.join(self.dataPath, x) for x in os.listdir(self.dataPath)]
-        self.nSamples = len(self.files)
+    def __init__(self, rootPath, phase, transform, isgan):
+        self.dataPath  = os.path.join(rootPath, phase)
+        self.files     = [os.path.join(self.dataPath, x) for x in os.listdir(self.dataPath)]
+        self.nSamples  = len(self.files)
         self.transform = transform
+        self.isgan     = isgan
 
     def __getitem__(self, index):
         self.img    = nib.load( os.path.join(self.files[index], "img.nii") )
@@ -112,8 +98,8 @@ class Dataset3D(Dataset):
         self.msk    = np.asarray(self.msk.dataobj)
         
         times = random.randint(0,3) #for flipping
-        imgTrans = get_transform(self.transform, "img", times)
-        mskTrans = get_transform(self.transform, "msk", times)
+        imgTrans = get_transform(self.transform, "img", times, self.isgan)
+        mskTrans = get_transform(self.transform, "msk", times, self.isgan)
         
         # import matplotlib.pyplot as plt
         # f, ax = plt.subplots(1,2)

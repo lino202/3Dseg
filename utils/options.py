@@ -52,7 +52,8 @@ class TrainOptions():
         self.parser.add_argument('--lr_policy',      type=str,   default='linear', help='learning rate policy. [linear | step | plateau | cosine]')
         self.parser.add_argument('--lr_decay_iters', type=int,   default=50,       help='multiply by a gamma every lr_decay_iters iterations')
         self.parser.add_argument('--loss',           type=str,   default='Dice',   help='loss function [Dice | L1 ]')
-
+        self.parser.add_argument('--gan_mode',       type=str,   default='lsgan',  help='the type of GAN objective. [vanilla| lsgan | wgangp]. vanilla GAN loss is the cross-entropy objective used in the original GAN paper.')
+        self.parser.add_argument('--gan',            action='store_true',          help='perform GAN training')
 
 class TestOptions():
 

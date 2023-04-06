@@ -85,7 +85,7 @@ def getBaseMidApexImgs(tensor, name):
             tensor = torch.argmax(torch.softmax(tensor,1),1)
             tensor = ((tensor - tensor.min()) / (tensor.max() - tensor.min())) * 2 - 1
             tensor = tensor[:,np.newaxis,:,:,:]
-    elif name == 'img':
+    elif name == 'img' or name == 'real_A' or name == 'real_B' or name == 'fake_B':
         pass #not need to change anything
     elif name == 'msk':
         tensor = ((tensor - tensor.min()) / (tensor.max() - tensor.min())) * 2 - 1
