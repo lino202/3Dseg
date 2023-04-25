@@ -16,5 +16,5 @@ python /home/maxi/Segmentation/Code/3Dseg/trainGAN.py \
 --load_size_h     128 \
 --load_size_w     128 \
 --load_size_d     128 \
---save_epoch_freq 25 \
+--save_epoch_freq 220 \
 --batch_size      1 \
