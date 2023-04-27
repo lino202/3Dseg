@@ -65,5 +65,5 @@ class TestOptions():
         self.parser.add_argument('--phParallel',      action='store_true',  help='use parallel calculation of PH')
         self.parser.add_argument('--res_excel',       type=str,             help='excel file where to save results')
         self.parser.add_argument('--res_params_name', type=str,             help='name for the pickle file where per volume gsdc,hd,be and ts will be')
-        self.parser.add_argument('--phThres',         type=float,             help='threshold for cutting a roi in ph post-ptocessing')
+        self.parser.add_argument('--phThres',         type=float,           help='threshold for cutting a roi in ph post-ptocessing')
         self.parser.add_argument('--res_excel_indexs',type=str, nargs='+',  help='indexes for saving params results in the excel file and saving labels to the results CAREFUL!')

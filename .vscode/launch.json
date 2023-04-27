@@ -98,9 +98,24 @@
             "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoExvivoProcessed.py",
             "console": "externalTerminal",
             "args": [
-                "--rootPath",  "F:/Segmentation/Data/seg3D_exvivo/noph_checked/all",
-                "--resPath",   "F:/Segmentation/Data/seg3D_exvivo/noph_checked",
-                "--resName",   "exvivo_topology_phchecked",
+                "--rootPath",  "F:/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor/train_plus_deform",
+                "--resPath",   "F:/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor",
+                "--resName",   "exvivo_topology_phchecked_deform",
+            ] 
+        },
+
+
+        {
+            "name": "deform",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/preprocess/deform.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--rootPath",  "F:/Segmentation/Data/seg3D_emidec/cropped/train",
+                "--resPath",   "F:/Segmentation/Data/seg3D_emidec/cropped/train_plus_deform",
+                "--plotPath",  "F:/Segmentation/Data/seg3D_emidec/cropped/plot_deform",
             ] 
         },
 
@@ -340,6 +355,29 @@
                 "--res_excel",        "F:/Segmentation/Results/seg3D_emidec/cropped/50_50_CE_128_4_1_test1_multiclass/results.xlsx",
                 "--res_params_name",  "results_baseline",
                 "--res_excel_indexs", "gdsc_bg", "gdsc_lv", "gdsc_myo", "gdsc_mi", "hd_bg", "hd_lv", "hd_myo", "hd_mi", "be", "ts",
+            ] 
+        },
+
+
+        {
+            "name": "pred GANs",
+            "type": "python",
+            "request": "launch",
+            "program": "F:/Segmentation/Code/3Dseg/predGAN.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128_ED/train_plus_deform",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs_GAN/128x128_ED",
+                "--name",            "100_100_GAN_128",
+                "--phase",           "pred",
+                "--input_nc",        "1",
+                "--output_nc",       "1",
+                "--nfl",             "64",
+                "--num_downs",       "7",
+                "--load_size_h",     "128",
+                "--load_size_w",     "128",
+                "--load_size_d",     "128",
+                "--load_filename",   "latest_net_G",  
             ] 
         },
 

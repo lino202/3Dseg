@@ -27,36 +27,47 @@ def get_transform(transformParams, arrType, times, isgan):
     return transforms.Compose(transform_list)
 
 def create(opt, phase):
+    ''' We create the dataset and dataloader, relying on the phase
+    Four phases are available:
+        train = img and msk are generated with shuffle and flip around Z if desired
+        val   = the same as train wihout and flip
+        test  = the same as train without shuffle and flip
+        pred  = we do not have the ground truth so no msk is generated'''
 
     transform = {"load_size_d": opt.load_size_d,
             "load_size_h": opt.load_size_h,
             "load_size_w": opt.load_size_w,
             "no_hor_flip": opt.no_hor_flip}
     
-    if phase == "val" or phase == "test":
+    if phase != "train":
         transform["no_hor_flip"] = True
 
-    dataset = Dataset3D(opt.root_path, phase, transform, opt.gan)
-    if phase != "test":
-        dataloader = DataLoader(dataset=dataset, batch_size=opt.batch_size, shuffle=True)
+    if phase == "pred":
+        dataset = Dataset3DPred(opt.root_path, transform, opt.niiName, opt.gan)
     else:
-        dataloader = DataLoader(dataset=dataset, batch_size=opt.batch_size, shuffle=False)
+        dataset = Dataset3D(opt.root_path, phase, transform, opt.gan)
     
+    if phase == "train" or phase == "val":
+        dataloader = DataLoader(dataset=dataset, batch_size=opt.batch_size, shuffle=True)
+    elif phase == "test" or phase == "pred":
+        dataloader = DataLoader(dataset=dataset, batch_size=opt.batch_size, shuffle=False)
+    else:
+        raise ValueError("Wrong Phase: {}".format(phase))
     return dataloader
 
 def customToTensor(arr, arrType, isgan):
-    if arrType != 'msk':
+    if arrType != 'msk': 
         arr = unitNorm(arr)
         tensor = torch.as_tensor(arr, dtype=torch.float32).contiguous() #default net parameters init is in torch.Float (32bytes) no torch.Double (64bytes)
         tensor = normalize(tensor, (0.5,), (0.5,))
         tensor = addDim(tensor)
     else:
-        if isgan: #get msk in the range [-1,1]
+        if isgan: #get msk in the range [-1,1] for using as net input (GAN and pred GAN)
             arr = unitNorm(arr) #between [0,1]
             arr = (arr * 2) - 1
             tensor = torch.as_tensor(arr, dtype=torch.float32).contiguous()
             tensor = addDim(tensor)
-        else:
+        else: #Use msk as ground truth
             tensor = torch.as_tensor(arr, dtype=torch.int64).contiguous()
     return tensor
 
@@ -112,6 +123,35 @@ class Dataset3D(Dataset):
         self.msk = mskTrans(self.msk)
 
         return {"img": self.img, "msk": self.msk, "path": self.files[index], "affine": self.affine}
+
+
+    def __len__(self):
+        return self.nSamples
+    
+    
+class Dataset3DPred(Dataset):
+    ''' Prediction is use when only the net input is available and we are not going to 
+    use the ground truth, this input can be the msk or img depending if we use the GANs
+    generator or not (normal approach)'''
+    
+    def __init__(self, rootPath, transform, niiName, isgan):
+        self.dataPath  = os.path.join(rootPath)
+        self.files     = [os.path.join(self.dataPath, x) for x in os.listdir(self.dataPath)]
+        self.nSamples  = len(self.files)
+        self.transform = transform
+        self.niiName   = niiName
+        self.isgan     = isgan
+
+    def __getitem__(self, index):
+        self.img    = nib.load( os.path.join(self.files[index], "{}.nii".format(self.niiName)) )
+        self.affine = self.img.affine
+        self.img    = np.asarray(self.img.dataobj).astype(float)
+   
+        times = random.randint(0,3) #for flipping
+        imgTrans = get_transform(self.transform, self.niiName, times, self.isgan)
+        self.img = imgTrans(self.img)
+
+        return {"img": self.img, "path": self.files[index], "affine": self.affine}
 
 
     def __len__(self):
