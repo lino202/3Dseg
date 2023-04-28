@@ -98,7 +98,7 @@
             "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoExvivoProcessed.py",
             "console": "externalTerminal",
             "args": [
-                "--rootPath",  "F:/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor/train_plus_deform",
+                "--rootPath",  "F:/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor/train_deform",
                 "--resPath",   "F:/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor",
                 "--resName",   "exvivo_topology_phchecked_deform",
             ] 
@@ -278,9 +278,9 @@
             "program": "F:/Segmentation/Code/3Dseg/test.py",
             "console": "externalTerminal",
             "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs/128x128",
-                "--name",            "init",
+                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128_ED",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs/128x128_ED",
+                "--name",            "50_50_CE_128_1_deform",
                 "--phase",           "test",
                 "--input_nc",        "1",
                 "--output_nc",       "4",
@@ -290,11 +290,11 @@
                 "--load_size_w",     "128",
                 "--load_size_d",     "128",
                 "--load_filename",   "latest_net",  
-                "--ph",
-                "--phThres",          "-1",
+                // "--ph",
+                "--phThres",          "0.5",
                 // "--phParallel",
                 "--priorName",        "prior_CINE_MnMs",            
-                "--res_excel",        "F:/Segmentation/Results/seg3D_MnMs/128x128/results.xlsx",
+                "--res_excel",        "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_1_deform/results.xlsx",
                 "--res_params_name",  "results_baseline",
                 "--res_excel_indexs", "gdsc_bg", "gdsc_lv", "gdsc_myo", "gdsc_rv", "hd_bg", "hd_lv", "hd_myo", "hd_rv", "be", "ts",
             ] 

@@ -59,6 +59,7 @@ def main():
     opt = TestOptions().parser.parse_args()
     opt.batch_size = 1    # test code only supports batch_size = 1
     opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
+    opt.gan        = False # Vox2Vox cannot be tested as it is only trained.
     
     #Add results folders for plots and volumes
     plots_path    = os.path.join(opt.results_dir, opt.name, "plots")
@@ -135,7 +136,7 @@ def main():
         #TODO This should be checked or an issue should be raisen in https://github.com/Project-MONAI/MONAI
         gdsc[i,:] = monai.metrics.compute_generalized_dice(torch.permute(pred, (1,0,2,3,4)), torch.permute(msk, (1,0,2,3,4)), include_background=True)
         hd[i,:]   = monai.metrics.compute_hausdorff_distance(pred, msk, include_background=True)
-        be[i]     = topo.BEmetric(pred[0,:,:,:], msk[0,:,:,:], prior, opt.phParallel)
+        be[i]     = topo.BEmetric(pred[0,:,:,:,:], msk[0,:,:,:,:], prior, opt.phParallel)
         if be[i] == 0.: ts[i] = 1
         
         #Reverse one-hot encoded in mask and pred and get numpy arrays and get rid of the batch dim
