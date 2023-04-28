@@ -3,7 +3,7 @@
 python /home/maxi/Segmentation/Code/3Dseg/train.py \
 --root_path       /home/maxi/Segmentation/Data/seg3D_MnMs/128x128_ED \
 --results_dir     /home/maxi/Segmentation/Results/seg3D_MnMs/128x128_ED \
---name            50_50_CE_128_4_1_test1 \
+--name            50_50_CE_128_1_deform \
 --phase           train \
 --input_nc        1 \
 --output_nc       4 \
@@ -15,5 +15,5 @@ python /home/maxi/Segmentation/Code/3Dseg/train.py \
 --load_size_h     128 \
 --load_size_w     128 \
 --load_size_d     128 \
---save_epoch_freq 4 \
+--save_epoch_freq 25 \
 --batch_size      1 \
