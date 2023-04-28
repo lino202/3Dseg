@@ -4,7 +4,7 @@ from collections import OrderedDict
 import time
 from data import create_dataloader
 from utils.options import TrainOptions
-from models.modelInterface import ModelInterface
+from models.model_unet import ModelUnet3D
 from utils.visualizer import Visualizer
 import numpy as np
 
@@ -16,7 +16,7 @@ def main():
     val_dataloader = create_dataloader.create(opt, 'val')  # create a create a dataloader with given options
     print('Validating with {} samples grouped in {} batches'.format(len(val_dataloader.dataset), len(val_dataloader)))
 
-    model        = ModelInterface(opt)      # create a Model Interface
+    model        = ModelUnet3D(opt)         # create a Model
     model.setup(opt)                        # regular setup: load and print networks; create schedulers
     visualizer   = Visualizer(opt)          # create a visualizer that display/save images and plots
     total_iters  = 0

@@ -7,7 +7,7 @@ import os
 from utils.options import TestOptions
 from utils.util import mkdirs, mkdir, getStatistics
 from data import create_dataloader
-from models.modelInterface import ModelInterface
+from models.model_unet import ModelUnet3D
 import monai
 import torch
 import torch.nn.functional as F
@@ -71,7 +71,7 @@ def main():
     print('Testing with {} samples grouped in {} batches'.format(nSamples, len(test_dataloader)))
     
     #Get trained model
-    model = ModelInterface(opt)    # create a Model Interface
+    model = ModelUnet3D(opt)       # create a Model
     model.setup(opt)               # regular setup: load and print networks; create schedulers
     model.net.eval()               # affects layers like batchnorm and dropout.
     

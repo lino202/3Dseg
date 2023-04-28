@@ -15,7 +15,7 @@ def main():
     print('Training with {} samples grouped in {} batches'.format(len(train_dataloader.dataset),len(train_dataloader)))   
     if not opt.gan: raise ValueError("Using the train GAN script with no gan option")
 
-    model        = model_vox2vox.ModelVox2Vox(opt)      # create a Model Interface
+    model        = model_vox2vox.ModelVox2Vox(opt)      # create a Model
     model.setup(opt)                        # regular setup: load and print networks; create schedulers
     visualizer   = Visualizer(opt)          # create a visualizer that display/save images and plots
     total_iters  = 0

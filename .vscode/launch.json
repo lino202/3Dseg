@@ -130,9 +130,9 @@
             "program": "F:/Segmentation/Code/3Dseg/train.py",
             "console": "externalTerminal",
             "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs/128x128",
-                "--name",            "init",
+                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128_ED",
+                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs/128x128_ED",
+                "--name",            "deform",
                 "--phase",           "train",
                 "--input_nc",        "1",
                 "--output_nc",       "4",
@@ -144,7 +144,7 @@
                 "--load_size_h",     "128",
                 "--load_size_w",     "128",
                 "--load_size_d",     "128",
-                "--save_epoch_freq", "4",
+                "--save_epoch_freq", "25",
                 "--batch_size",      "1",
             ] 
         },
