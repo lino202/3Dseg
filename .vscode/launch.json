@@ -391,9 +391,19 @@
             "program": "F:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
             "console": "externalTerminal",
             "args": [
-                "--filePathBaseline", "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_2_1/results_baseline.pickle",
-                "--filePathPH",       "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_2_1/results_ph.pickle",
-                "--resPath",          "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_2_1",
+                "--filePaths", 
+                "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_4_1_test1/results_baseline.pickle",
+                "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_4_1_test1/results_baseline_ph_crop.pickle",
+                "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_1_deform/results_baseline.pickle",
+                "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_1_deform/results_ph.pickle",
+                
+                "--classes",       
+                "baseline",
+                "ph",
+                "gan_baseline",
+                "gan_ph",
+                
+                "--resPath",          "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_1_deform/",
             ] 
         },
 
