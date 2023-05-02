@@ -404,7 +404,7 @@
             "program": "F:/Segmentation/Code/3Dseg/postprocess/reAnalyseSample.py",
             "console": "externalTerminal",
             "args": [
-                "--predPath",   "F:/Segmentation/Results/seg3D_emidec/cropped/50_50_CE_128_4_1_test1_multiclass/volumes_ph_N",
+                "--predPath",   "F:/Segmentation/Results/seg3D_emidec/cropped/volumes",
                 "--mskPath",    "F:/Segmentation/Data/seg3D_emidec/cropped_test_N/test",
                 "--priorName",  "priorN_emidec",
                 "--nclasses",   "4",

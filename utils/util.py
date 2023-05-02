@@ -113,6 +113,8 @@ def getStatistics(data):
     #Filter nans and inf
     data = data[~np.isnan(data)]
     data = data[~np.isinf(data)]
+    if data.size == 0:
+        return [np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf]
     mean       = np.mean(data)
     std        = np.std(data)
     mymin      = np.min(data)
