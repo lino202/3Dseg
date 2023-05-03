@@ -392,10 +392,10 @@
             "console": "externalTerminal",
             "args": [
                 "--filePaths", 
-                "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_4_1_test1/results_baseline.pickle",
-                "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_4_1_test1/results_baseline_ph_crop.pickle",
-                "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_1_deform/results_baseline.pickle",
-                "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_1_deform/results_ph.pickle",
+                "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_2_1/results_baseline.pickle",
+                "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_2_1/results_ph.pickle",
+                "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_1_deform/results_baseline.pickle",
+                "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_1_deform/results_ph.pickle",
                 
                 "--classes",       
                 "baseline",
@@ -403,7 +403,7 @@
                 "gan_baseline",
                 "gan_ph",
                 
-                "--resPath",          "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_1_deform/",
+                "--resPath",          "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_1_deform",
             ] 
         },
 
