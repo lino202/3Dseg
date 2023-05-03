@@ -1,9 +1,9 @@
 #!/bin/bash
 
 python /home/maxi/Segmentation/Code/3Dseg/train.py \
---root_path       /home/maxi/Segmentation/Data/seg3D_exvivo/noph_checked \
---results_dir     /home/maxi/Segmentation/Results/seg3D_exvivo/noph_checked \
---name            50_50_CE_128_2_1 \
+--root_path       /home/maxi/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor \
+--results_dir     /home/maxi/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor \
+--name            50_50_CE_128_1_deform \
 --phase           train \
 --input_nc        1 \
 --output_nc       2 \
@@ -15,6 +15,6 @@ python /home/maxi/Segmentation/Code/3Dseg/train.py \
 --load_size_h     128 \
 --load_size_w     128 \
 --load_size_d     128 \
---save_epoch_freq 5 \
+--save_epoch_freq 25 \
 --batch_size      1 \
 --print_iter      2 \
