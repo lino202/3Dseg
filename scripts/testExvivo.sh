@@ -1,9 +1,9 @@
 #!/bin/bash
 
 python /home/maxi/Segmentation/Code/3Dseg/test.py \
---root_path       /home/maxi/Segmentation/Data/seg3D_exvivo/noph_checked_onlymine \
---results_dir     /home/maxi/Segmentation/Results/seg3D_exvivo/noph_checked_onlymine \
---name            50_50_CE_128_2_1 \
+--root_path       /home/maxi/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor \
+--results_dir     /home/maxi/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor \
+--name            50_50_CE_128_1_deform \
 --phase           test \
 --input_nc        1 \
 --output_nc       2 \
@@ -17,6 +17,6 @@ python /home/maxi/Segmentation/Code/3Dseg/test.py \
 --ph              \
 --phParallel      \
 --priorName        prior_roi \
---res_excel        /home/maxi/Segmentation/Results/seg3D_exvivo/results.xlsx \
+--res_excel        /home/maxi/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_1_deform/results.xlsx \
 --res_params_name  results_ph \
 --res_excel_indexs gdsc_bg gdsc_myo hd_bg hd_myo be ts
