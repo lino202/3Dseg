@@ -26,6 +26,8 @@ def get_roi(X, thresh=0.01):
     return roi
 
 def getBarcodes(tensor, prior, max_dims, ph, construction, parallel=True):
+    #tensor must be ont-hot encoded
+
     # Build class/combination-wise (c-wise) image tensor for prior
     tmp = []
     for c in prior.keys():
@@ -36,7 +38,7 @@ def getBarcodes(tensor, prior, max_dims, ph, construction, parallel=True):
     combos = torch.stack(tmp)
 
     # Invert probababilistic fields for consistency with cubical ripser sub-level set persistence
-    combos = 1 - combos #TODO check here the max may not be 1 in the vol and then we might have to change this
+    combos = 1 - combos
 
     # Get barcodes using cripser in parallel without autograd            
     combos_arr = combos.detach().cpu().numpy().astype(np.float64)

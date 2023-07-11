@@ -7,419 +7,160 @@
 
 
         //PREPROCESS-------------------------------------------
+        {
+            "name": "getSpacingsShapes",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/getSpacingsShapes.py",
+            "console": "externalTerminal",
+            "args": [
+                "--filePath",    "D:/Segmentation/Data_paper2/LGE/baseline/images",
+                "--resPath",     "D:/Segmentation/Data_paper2/LGE",
+            ]
+        },
 
         {
             "name": "preProccess MnMs",
             "type": "python",
             "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/preprocess/preMnMs.py",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/preMnMs.py",
             "console": "externalTerminal",
             "args": [
-                // "--trainPath",    "F:/Data/RM/MnM/OpenDataset/Training/Labeled",
-                "--testPath",     "F:/Data/RM/MnM/OpenDataset/Testing",
-                // "--valPath",      "F:/Data/RM/MnM/OpenDataset/Validation",
-                // "--trainResPath", "F:/Segmentation/Data/seg3D_MnMs/128x128/train",
-                "--testResPath",  "F:/Segmentation/Data/seg3D_MnMs/128x128/test",
-                // "--valResPath",   "F:/Segmentation/Data/seg3D_MnMs/128x128/val",
-                "--plotPath",     "F:/Segmentation/Data/seg3D_MnMs/128x128/plots",
-                "--size",         "128","128","128"
-            ] 
+                "--filePath",      "D:/Data/RM/MnM/OpenDataset/all",
+                "--resPath",       "D:/Segmentation/Data_paper2/MnM",
+                "--spacAfterCrop", "D:/Segmentation/Data_paper2/MnM/shapes_spacing_after_resampling.pickle",
+                "--initCrop", "5"
+            ]
         },
-
-        {
-            "name": "preProccess Emidec",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/preprocess/preEmidec.py",
-            "console": "externalTerminal",
-            "args": [
-                "--rootPath",        "F:/Data/RM/Emidec/training",
-                "--resPath",         "F:/Segmentation/Data/seg3D_emidec/cropped",
-                "--plotPath",        "F:/Segmentation/Data/seg3D_emidec/cropped/plots",
-                "--roiPredPath",     "F:/Segmentation/Results/seg3D_emidec/roi/50_50_CE_128_4_1_test1_all4crop/volumes",
-                // "--roi",
-                "--size",            "128","128","128",
-                "--samplesDistPath", "F:/Segmentation/Data/seg3D_emidec/roi/samples_distribution.pickle",
-                
-            ] 
-        },
-
-
-        {
-            "name": "exploreTopoEmidec",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoEmidec.py",
-            "console": "externalTerminal",
-            "args": [
-                "--rootPath",  "F:/Data/RM/Emidec/training",
-                "--resPath",   "F:/Data/RM/Emidec",
-                "--resName",   "emidec_topology",
-            ] 
-        },
-
-
-        {
-            "name": "exploreTopoEmidecProcessed",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoEmidecProcessed.py",
-            "console": "externalTerminal",
-            "args": [
-                "--rootPath",  "F:/Segmentation/Data/seg3D_emidec/cropped/all",
-                "--resPath",   "F:/Segmentation/Data/seg3D_emidec/cropped",
-                "--resName",   "emidec_topology_processed",
-            ] 
-        },
-
 
         {
             "name": "preProccess ExVivo",
             "type": "python",
             "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/preprocess/preExVivo.py",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/preExVivo.py",
             "console": "externalTerminal",
             "args": [
-                "--trainPath",    "F:/Data/RM/DWI/Nifti_MA_LE_ST/train",
-                "--testPath",     "F:/Data/RM/DWI/Nifti_MA_LE_ST/test",
-                "--valPath",      "F:/Data/RM/DWI/Nifti_MA_LE_ST/val",
-                "--trainResPath", "F:/Segmentation/Data/seg3D_exvivo/train",
-                "--testResPath",  "F:/Segmentation/Data/seg3D_exvivo/test",
-                "--valResPath",   "F:/Segmentation/Data/seg3D_exvivo/val",
-                "--plotPath",     "F:/Segmentation/Data/seg3D_exvivo/plots",
-                "--size",         "128","128","128"
+                "--filePath",      "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/all",
+                "--resPath",       "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor",
+            ]
+        },
+
+        {
+            "name": "preProccess Myosaiq",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/preCroppedLGE.py",
+            "console": "externalTerminal",
+            "args": [
+                "--filePath",      "D:/Data/RM/Myosaiq/database/training/all/images",
+                "--resPath",       "D:/Segmentation/Data_paper2/Myosaiq",
+                "--spacAfterCrop", "D:/Segmentation/Data_paper2/Myosaiq/shapes_spacing_after_resampling.pickle",
+                "--maxLabel", "4",
+                "--size", "80", "80", "24"
             ] 
         },
 
         {
-            "name": "exploreTopoExvivoProcessed",
+            "name": "cropEmidec",
             "type": "python",
             "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/preprocess/exploreTopoExvivoProcessed.py",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/cropEmidec.py",
             "console": "externalTerminal",
             "args": [
-                "--rootPath",  "F:/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor/train_deform",
-                "--resPath",   "F:/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor",
-                "--resName",   "exvivo_topology_phchecked_deform",
+                "--filePath",      "D:/Segmentation/Data_paper2/Emidec/original_pato",
+                "--resPath",       "D:/Segmentation/Data_paper2/Emidec/crop",
+            ]
+        },
+
+        {
+            "name": "preProccess croppedLGE",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/preCroppedLGE.py",
+            "console": "externalTerminal",
+            "args": [
+                "--filePath",      "D:/Segmentation/Data_paper2/LGE/baseline/images",
+                "--resPath",       "D:/Segmentation/Data_paper2/LGE",
+                "--spacAfterCrop", "D:/Segmentation/Data_paper2/LGE/shapes_spacing_after_resampling.pickle",
+                "--maxLabel", "3",
+                "--size", "80", "80", "24"
             ] 
         },
 
-
+        //TOPO-------------------------------------------
         {
-            "name": "deform",
+            "name": "exploreTopo MnMs",
             "type": "python",
             "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/preprocess/deform.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "--rootPath",  "F:/Segmentation/Data/seg3D_emidec/cropped/train",
-                "--resPath",   "F:/Segmentation/Data/seg3D_emidec/cropped/train_plus_deform",
-                "--plotPath",  "F:/Segmentation/Data/seg3D_emidec/cropped/plot_deform",
-            ] 
-        },
-
-
-
-        //TRAIN-------------------------------------------------
-
-        {
-            "name": "train MnMs",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/train.py",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/exploreTopo.py",
             "console": "externalTerminal",
             "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128_ED",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs/128x128_ED",
-                "--name",            "deform",
-                "--phase",           "train",
-                "--input_nc",        "1",
-                "--output_nc",       "4",
-                "--nfl",             "64",
-                "--num_downs",       "7",
-                "--n_epochs",        "50",
-                "--n_epochs_decay",  "50",
-                "--loss",            "CE",
-                "--load_size_h",     "128",
-                "--load_size_w",     "128",
-                "--load_size_d",     "128",
-                "--save_epoch_freq", "25",
-                "--batch_size",      "1",
+                "--dataPath", "D:/Segmentation/Data_paper2/MnM/vols_preprocessed",
+                "--resPath",  "D:/Segmentation/Data_paper2/MnM/topo",
+                "--resName",  "topology_MnM_phconst0",
+                "--phType",   "0",  //N or 0
+                "--labels",   "lv", "myo", "rv", "lv-myo", "lv-rv",  "myo-rv"
             ] 
         },
 
         {
-            "name": "train MnMs GAN",
+            "name": "exploreTopo Exvivo",
             "type": "python",
             "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/trainGAN.py",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/exploreTopo.py",
             "console": "externalTerminal",
             "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128_ED",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs_GAN/128x128_ED",
-                "--name",            "50_50_CE_128_2_1",
-                "--phase",           "train",
-                "--input_nc",        "1",
-                "--output_nc",       "1",
-                "--nfl",             "64",
-                "--num_downs",       "7",
-                "--n_epochs",        "100",
-                "--n_epochs_decay",  "100",
-                // "--loss",            "CE",
-                "--gan",
-                "--gan_mode",        "lsgan",
-                "--load_size_h",     "128",
-                "--load_size_w",     "128",
-                "--load_size_d",     "128",
-                "--save_epoch_freq", "10",
-                "--print_iter",      "10",
-                "--batch_size",      "1",
-            ] 
+                "--dataPath", "D:/Segmentation/Data_paper2/Exvivo/ph_checked_onlyStandfor/vols_preprocessed",
+                "--resPath",  "D:/Segmentation/Data_paper2/Exvivo/ph_checked_onlyStandfor/topo",
+                "--resName",  "topology_Exvivo_phchecked_phconst0",
+                "--phType",   "0",  //N or 0
+                "--labels",   "myo",
+            ]
         },
 
-        
         {
-            "name": "train exvivo",
+            "name": "exploreTopo LGE",
             "type": "python",
             "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/train.py",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/exploreTopo.py",
             "console": "externalTerminal",
             "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_exvivo/noph_checked_onlymine",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_exvivo/noph_checked_onlymine",
-                "--name",            "50_50_CE_128_2_1",
-                "--phase",           "train",
-                "--input_nc",        "1",
-                "--output_nc",       "2",
-                "--nfl",             "64",
-                "--num_downs",       "7",
-                "--n_epochs",        "50",
-                "--n_epochs_decay",  "50",
-                "--loss",            "CE",
-                "--load_size_h",     "128",
-                "--load_size_w",     "128",
-                "--load_size_d",     "128",
-                "--save_epoch_freq", "2",
-                "--print_iter",      "1",
-                "--batch_size",      "1",
-            ] 
+                "--dataPath", "D:/Segmentation/Data_paper2/LGE/vols_preprocessed",
+                "--resPath",  "D:/Segmentation/Data_paper2/LGE/topo",
+                "--resName",  "topology_LGE_phconst0",
+                "--phType",   "0",  //N or 0
+                "--labels",   "lv", "myo", "mi", "lv-myo", "lv-mi", "myo-mi",
+            ]
+        },
+
+        //CV-------------------------------------------
+        {
+            "name": "getCVDistribution",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVDistribution.py",
+            "console": "externalTerminal",
+            "args": [
+                "--filePath",      "D:/Segmentation/Data_paper2/MnM/vols_preprocessed",
+                "--resPath",       "D:/Segmentation/Data_paper2/MnM",
+                // "--dataTypes",     "mvo", "mi", //LGE
+                "--dataTypes",     "normal", //MnM and Exvivo
+                "--NFOLD",     "5" //LGE and MnM
+                // "--NFOLD",     "7" //Exvivo
+            ]
         },
 
 
         {
-            "name": "train exvivo GAN",
+            "name": "getCVSymlinks",
             "type": "python",
             "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/trainGAN.py",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVSymlinks.py",
             "console": "externalTerminal",
             "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_exvivo/ph_checked_onlyStandfor",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_exvivo_GAN/ph_checked_onlyStandfor_GAN",
-                "--name",            "50_50_CE_128_2_1",
-                "--phase",           "train",
-                "--input_nc",        "1",
-                "--output_nc",       "1",
-                "--nfl",             "64",
-                "--num_downs",       "7",
-                "--n_epochs",        "50",
-                "--n_epochs_decay",  "50",
-                // "--loss",            "CE",
-                "--gan",
-                "--gan_mode",        "lsgan",
-                "--load_size_h",     "128",
-                "--load_size_w",     "128",
-                "--load_size_d",     "128",
-                "--save_epoch_freq", "10",
-                "--print_iter",      "1",
-                "--batch_size",      "1",
-            ] 
-        },
-
-
-
-
-        {
-            "name": "train emidec roi",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/train.py",
-            "console": "externalTerminal",
-            "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_emidec/128x128/roi",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_emidec/roi",
-                "--name",            "50_50_CE_128_4_1_test1",
-                "--phase",           "train",
-                "--input_nc",        "1",
-                "--output_nc",       "1",
-                "--nfl",             "64",
-                "--num_downs",       "7",
-                "--n_epochs",        "50",
-                "--n_epochs_decay",  "50",
-                "--loss",            "Dice",
-                "--load_size_h",     "128",
-                "--load_size_w",     "128",
-                "--load_size_d",     "128",
-                "--save_epoch_freq", "5",
-                "--batch_size",      "1",
-            ] 
-        },
-
-
-
-
-        //TEST----------------------------------------------------
-
-
-        {
-            "name": "test MnMs 128",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/test.py",
-            "console": "externalTerminal",
-            "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128_ED",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs/128x128_ED",
-                "--name",            "50_50_CE_128_1_deform",
-                "--phase",           "test",
-                "--input_nc",        "1",
-                "--output_nc",       "4",
-                "--nfl",             "64",
-                "--num_downs",       "7",
-                "--load_size_h",     "128",
-                "--load_size_w",     "128",
-                "--load_size_d",     "128",
-                "--load_filename",   "latest_net",  
-                // "--ph",
-                "--phThres",          "0.5",
-                // "--phParallel",
-                "--priorName",        "prior_CINE_MnMs",            
-                "--res_excel",        "F:/Segmentation/Results/seg3D_MnMs/128x128_ED/50_50_CE_128_1_deform/results.xlsx",
-                "--res_params_name",  "results_baseline",
-                "--res_excel_indexs", "gdsc_bg", "gdsc_lv", "gdsc_myo", "gdsc_rv", "hd_bg", "hd_lv", "hd_myo", "hd_rv", "be", "ts",
-            ] 
-        },
-
-        {
-            "name": "test Emidec ROI",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/test.py",
-            "console": "externalTerminal",
-            "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_emidec/roi",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_emidec/roi",
-                "--name",            "50_50_CE_128_4_1_test1_multiclass",
-                "--phase",           "test",
-                "--input_nc",        "1",
-                "--output_nc",       "2",
-                "--nfl",             "64",
-                "--num_downs",       "7",
-                "--load_size_h",     "128",
-                "--load_size_w",     "128",
-                "--load_size_d",     "128",
-                "--load_filename",   "latest_net",  
-                // "--ph",
-                "--phThres",          "0.5",
-                // "--phParallel",
-                "--priorName",        "prior_roi",            
-                "--res_excel",        "F:/Segmentation/Results/seg3D_emidec/roi/results.xlsx",
-                "--res_params_name",  "results_baseline",
-                "--res_excel_indexs", "gdsc_bg", "gdsc_lv", "hd_bg", "hd_lv", "be", "ts",
-            ] 
-        },
-
-        {
-            "name": "test Emidec",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/test.py",
-            "console": "externalTerminal",
-            "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_emidec/cropped",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_emidec/cropped",
-                "--name",            "50_50_CE_128_4_1_test1_multiclass",
-                "--phase",           "test",
-                "--input_nc",        "1",
-                "--output_nc",       "4",
-                "--nfl",             "64",
-                "--num_downs",       "7",
-                "--load_size_h",     "128",
-                "--load_size_w",     "128",
-                "--load_size_d",     "128",
-                "--load_filename",   "latest_net",  
-                // "--ph",
-                "--phThres",          "0.5",
-                // "--phParallel",
-                "--priorName",        "prior_LGE_emidec",            
-                "--res_excel",        "F:/Segmentation/Results/seg3D_emidec/cropped/50_50_CE_128_4_1_test1_multiclass/results.xlsx",
-                "--res_params_name",  "results_baseline",
-                "--res_excel_indexs", "gdsc_bg", "gdsc_lv", "gdsc_myo", "gdsc_mi", "hd_bg", "hd_lv", "hd_myo", "hd_mi", "be", "ts",
-            ] 
-        },
-
-
-        {
-            "name": "pred GANs",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/predGAN.py",
-            "console": "externalTerminal",
-            "args": [
-                "--root_path",       "F:/Segmentation/Data/seg3D_MnMs/128x128_ED/train_plus_deform",
-                "--results_dir",     "F:/Segmentation/Results/seg3D_MnMs_GAN/128x128_ED",
-                "--name",            "100_100_GAN_128",
-                "--phase",           "pred",
-                "--input_nc",        "1",
-                "--output_nc",       "1",
-                "--nfl",             "64",
-                "--num_downs",       "7",
-                "--load_size_h",     "128",
-                "--load_size_w",     "128",
-                "--load_size_d",     "128",
-                "--load_filename",   "latest_net_G",  
-            ] 
-        },
-
-
-        //PostProcess----------------------------------------------------
-
-        {
-            "name": "readPlotPickle",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
-            "console": "externalTerminal",
-            "args": [
-                "--filePaths", 
-                "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_2_1/results_baseline.pickle",
-                "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_2_1/results_ph.pickle",
-                "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_1_deform/results_baseline.pickle",
-                "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_1_deform/results_ph.pickle",
-                
-                "--classes",       
-                "baseline",
-                "ph",
-                "gan_baseline",
-                "gan_ph",
-                
-                "--resPath",          "F:/Segmentation/Results/seg3D_exvivo/ph_checked_onlyStandfor/50_50_CE_128_1_deform",
-            ] 
-        },
-
-        {
-            "name": "reAnalyseSample",
-            "type": "python",
-            "request": "launch",
-            "program": "F:/Segmentation/Code/3Dseg/postprocess/reAnalyseSample.py",
-            "console": "externalTerminal",
-            "args": [
-                "--predPath",   "F:/Segmentation/Results/seg3D_emidec/cropped/volumes",
-                "--mskPath",    "F:/Segmentation/Data/seg3D_emidec/cropped_test_N/test",
-                "--priorName",  "priorN_emidec",
-                "--nclasses",   "4",
-            ] 
-        },
-
+                "--filePath",      "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/cv_7Fold.pickle",
+                "--resPath",       "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/CV",
+            ]
+        }
     ]
 }

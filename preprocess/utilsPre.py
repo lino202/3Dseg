@@ -123,23 +123,17 @@ def cropSubjectPred(subject, pred):
     return transSubject
 
 
-def cropSubjectCINE(subject, edes):
+def cropSubjectCINE(subject, edes, widthHeight, plotPath=None):
     ''' This code takes a subject from torchio and perform cropping on both with a cardiac ROI''' 
     imgArr = subject.img.data.numpy()
     mskArr = subject.msk.data.numpy()
-    roi = getROI(imgArr)
-    
-    #Adjuts roi with mask
-    mskArrCropED = crop(mskArr[edes[0],:,:,:], roi)
-    while not np.count_nonzero(mskArr[edes[0],:,:,:]) == np.count_nonzero(mskArrCropED):
-        print ("Changing ROI, control this sample with slicer")
-        roi = roi + np.array([0,0,10,10])
-        mskArrCropED = crop(mskArr[edes[0],:,:,:], roi)    
-    roi = roi + np.array([0,0,20,20])
+    roi = getROICINE(imgArr, plotPath=plotPath) 
+    roi = list(roi)
+    roi[-2:] = widthHeight
 
     #Get mask crop for torchio function and targets
     #For now we are cropping x-y axis and not z
-    #Maybe the roi (z axis) can be extracted from movement in the coronal plane
+    #The crop mask is used as we do not crop with the same center
     cropMask = np.zeros(subject.img.shape[-3:])
     xmin, xmax = int(roi[0] - roi[2]), int(roi[0] + roi[2])
     ymin, ymax = int(roi[1] - roi[3]), int(roi[1] + roi[3])
@@ -152,6 +146,10 @@ def cropSubjectCINE(subject, edes):
     trans = tio.CropOrPad((xmax-xmin, ymax-ymin, subject.img.shape[3]), mask_name='cropMask')
     subject['cropMask'] = tio.LabelMap(tensor=cropMask[np.newaxis,:],affine=subject.msk.affine)
     transSubject = trans(subject)
+    transSubject.remove_image('cropMask')
+
+    if not np.count_nonzero(mskArr[edes[0],:,:,:]) == np.count_nonzero(transSubject.msk.data[edes[0],:,:,:]):
+        raise ValueError("Cutting the actual mask, method is not working")
 
     return transSubject
 

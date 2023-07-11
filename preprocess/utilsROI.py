@@ -55,47 +55,50 @@ def fitgaussian(data):
     p, success = optimize.leastsq(errorfunction, params)
     return p
 
-def getROICINE(imgArr, plot=False):
+def getROICINE(imgArr, plotPath=None):
     h1 = getH13D(imgArr)
     h1Sum = np.sum(h1, axis=2)
-    a = np.array([0,0])
+    # a = np.array([0,0])
 
-    while True:
-        if plot:
-            import matplotlib.pyplot as plt
-            plt.figure(),plt.subplot(131),plt.imshow(h1Sum, cmap='gray')
-            plt.subplot(132),plt.imshow(h1[:,:,6], cmap='gray')
-            plt.subplot(133),plt.imshow(imgArr[:,:,6,0], cmap='gray'), plt.show()
-            plt.figure(),plt.imshow(h1Sum, cmap='gray')
+    # while True:
+    if plotPath:
+        import matplotlib.pyplot as plt
+        # plt.figure(),plt.subplot(131),plt.imshow(h1Sum, cmap='gray')
+        # plt.subplot(132),plt.imshow(h1[:,:,6], cmap='gray')
+        # plt.subplot(133),plt.imshow(imgArr[:,:,6,0], cmap='gray'), plt.show()
+        plt.figure(),plt.imshow(h1Sum, cmap='gray')
 
-        params = fitgaussian(h1Sum)
-        fit = gaussian(*params)
-        gaussFit = fit(*np.indices(h1Sum.shape))
+    params = fitgaussian(h1Sum)
+    fit = gaussian(*params)
+    gaussFit = fit(*np.indices(h1Sum.shape))
+    
+    if plotPath:
+        plt.contour(gaussFit, cmap=plt.cm.copper)
+        ax = plt.gca()
+        plt.savefig(plotPath)
+        plt.close()    
+    
+    (height, x, y, width_x, width_y) = params
+
+    # if plotPath:
+    #     plt.text(0.05, 0.03, """
+    #     x : %.1f
+    #     y : %.1f
+    #     width_x : %.1f
+    #     width_y : %.1f""" %(x, y, width_x, width_y),
+    #             fontsize=16, horizontalalignment='left',
+    #             verticalalignment='bottom', transform=ax.transAxes, color='w')
+    #     plt.show()
+
+    # b = np.array([x,y])
+    # # print("Center is : {}".format(b))
+    # if  np.linalg.norm(a-b) < 1:
+    #     break
+    # else:
+    #     a = x, y
         
-        if plot:
-            plt.contour(gaussFit, cmap=plt.cm.copper)
-            ax = plt.gca()
-        (height, x, y, width_x, width_y) = params
-
-        if plot:
-            plt.text(0.05, 0.03, """
-            x : %.1f
-            y : %.1f
-            width_x : %.1f
-            width_y : %.1f""" %(x, y, width_x, width_y),
-                    fontsize=16, horizontalalignment='left',
-                    verticalalignment='bottom', transform=ax.transAxes, color='w')
-            plt.show()
-
-        b = np.array([x,y])
-#         print("Center is : {}".format(b))
-        if  np.linalg.norm(a-b) < 1:
-            break
-        else:
-            a = x, y
-            
-        gaussFit = gaussFit / height
-        h1Sum[gaussFit<0.05] = 0
+    # gaussFit = gaussFit / height
+    # h1Sum[gaussFit<0.05] = 0
 
     return x, y, width_x*2, width_y*2 
 

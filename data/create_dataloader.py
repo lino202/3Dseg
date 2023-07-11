@@ -1,7 +1,6 @@
 import torch 
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
-from torch.nn.functional import grid_sample
 import os
 import nibabel as nib
 import numpy as np
