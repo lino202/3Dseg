@@ -27,6 +27,11 @@ Using th 10th percentile for axis 2 and mean for others:
 Min [80. 80. 24.] Median [80. 80. 24.] Max [80. 80. 24.] shapes
 Min [1.5625 1.5625 5.    ] Median [1.5625 1.5625 5.    ] Max [1.5625 1.5625 5.    ] spacings
 Total duration of processing: 259.20196056365967 s
+
+OR
+This allows more complex net without modifying conv3d too much
+Min [96. 96. 24.] Median [96. 96. 24.] Max [96. 96. 24.] shapes
+Min [1.5625 1.5625 5.    ] Median [1.5625 1.5625 5.    ] Max [1.5625 1.5625 5.    ] spacings
 '''
 
 import os

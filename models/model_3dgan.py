@@ -1,13 +1,13 @@
 import torch
 from . import networks
-from . import customLosses
 from torchsummary import summary
 from collections import OrderedDict
 from utils.util import getBaseMidApexImgs
 import os 
+import numpy as np
 
-class ModelVox2Vox():
-    """ Interface for model Vox2Vox"""
+class Model3DGAN():
+    """ Interface for model 3DGAN"""
     
     def __init__(self, opt):
         """Initialize the model interface.
@@ -21,16 +21,30 @@ class ModelVox2Vox():
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.save_dir = os.path.join(opt.results_dir, opt.name)
         self.visual_names = ['real_A', 'real_B', 'fake_B']
+
+        #Get Norm
+        if opt.norm == 'batch':
+            norm_layer = torch.nn.BatchNorm3d
+        elif opt.norm == 'instance':
+            norm_layer = torch.nn.InstanceNorm3d
+        else: raise ValueError("Wrong Normalization layer, use 'instance' or 'batch'")
         
         # define network
-        self.netG = networks.Unet3D(opt.input_nc, opt.output_nc, opt.num_downs, opt.nfl)
+        if opt.patch_size[0] != opt.patch_size[1]: raise ValueError("Height and Width are not the same")
+        is2D       = np.zeros(5 + opt.num_downs - 5).astype(bool)
+        n2DLayers  = int(np.abs(np.floor(np.log(opt.patch_size[0])/np.log(2)) - np.floor(np.log(opt.patch_size[2])/np.log(2))))
+        is2D[:n2DLayers] = True
+        
+        self.netG = networks.Unet3D(opt.input_nc, opt.output_nc, opt.num_downs, is2D, opt.nfl, norm_layer=norm_layer)
         self.netG.to(self.device)
         if opt.phase == "train":
             self.loss_names = ['G_GAN', 'G_L1', 'D_real', 'D_fake']
             self.model_names = ['G', 'D']
             
-            self.netD = networks.NLayerDiscriminator(opt.input_nc + opt.output_nc)
-            # self.netD = networks.NLayerDiscriminator(opt.input_nc)
+            if opt.patch_size[0] == opt.patch_size[2]: 
+                self.netD = networks.NLayerDiscriminatorIsotropic(opt.input_nc + opt.output_nc, n_layers=opt.n_layers_D, norm_layer=norm_layer)
+            else:
+                self.netD = networks.NLayerDiscriminatorAnisotropic(opt.input_nc + opt.output_nc, n_layers=opt.n_layers_D, norm_layer=norm_layer)
             self.netD.to(self.device)
             
             # define loss functions
@@ -59,11 +73,11 @@ class ModelVox2Vox():
         
         # Print Network information
         try:
-            summary(self.netG, (1, opt.load_size_d, opt.load_size_h, opt.load_size_w))
+            summary(self.netG, (1, opt.patch_size[0], opt.patch_size[1], opt.patch_size[2]))
+            summary(self.netD, (2, opt.patch_size[0], opt.patch_size[1], opt.patch_size[2]))
         except:
             print(self.netG)
-        print(self.netD)
-
+            print(self.netD)
 
     def load_network(self, load_filename):
         """Load network from the disk.
@@ -87,6 +101,7 @@ class ModelVox2Vox():
                 for name in imgsDict.keys():
                     visual_ret[name] = imgsDict[name]
         return visual_ret
+
 
     def update_learning_rate(self):
         """Update learning rates for all the networks; called at the end of every epoch"""
@@ -122,26 +137,16 @@ class ModelVox2Vox():
                 errors_ret[name] = float(getattr(self, 'loss_' + name))  # float(...) works for both scalar tensor and float number
         return errors_ret
 
-    #TODO here only train, val or test are admitted 
-    #when we want to test a new example a dummy, really simple script 
-    #should be used.
+    #here only train, val or test are admitted, use predGAN otherwise
     def set_input(self, input): 
         """Unpack input data from the dataloader
         Parameters:
             input (dict): include the data itself and its path name.
         """
-        #As the dataloader is common for the normal training we need to change two things:
-        #The real_A -> msk, realB -> img
-        #Also the msk is not in the range [-1,1] as not preprocessing normalization is applied (implemented in customToTensor)
         self.real_A = input['msk'].to(self.device)
         self.real_B = input['img'].to(self.device)
         self.path   = input['path']
         self.affine = input['affine']
-
-    # def val(self):
-    #     """There's no validation for GANs
-    #     """
-    #     pass
 
     def test(self):
         """Forward function used in test time.
@@ -150,7 +155,6 @@ class ModelVox2Vox():
         """
         with torch.no_grad(): 
             self.forward()
-            # self.compute_visuals()
 
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""

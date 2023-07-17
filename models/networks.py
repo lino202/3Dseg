@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import functools
 from torch.optim import lr_scheduler
 
 ###############################################################################
@@ -39,7 +38,7 @@ def get_scheduler(optimizer, opt):
 class Unet3D(nn.Module):
     """Create a Unet 3D"""
 
-    def __init__(self, input_nc, output_nc, num_downs, nfl=64, norm_layer=nn.InstanceNorm3d, use_dropout=False):
+    def __init__(self, input_nc, output_nc, num_downs, is2D, nfl=64, norm_layer=nn.InstanceNorm3d, use_dropout=False):
         """Construct a Unet generator
         Parameters:
             input_nc (int)  -- the number of channels in input images
@@ -54,16 +53,16 @@ class Unet3D(nn.Module):
         """
         super(Unet3D, self).__init__()
         # construct unet structure
-        unet_block = UnetSkipConnectionBlock(nfl * 8, nfl * 8, False, input_nc=None, submodule=None, norm_layer=norm_layer, innermost=True)  # add the innermost layer
+        unet_block = UnetSkipConnectionBlock(nfl * 8, nfl * 8, is2D[-1], input_nc=None, submodule=None, norm_layer=norm_layer, innermost=True)  # add the innermost layer
         
-        # for i in range(num_downs - 5):          # add intermediate layers with nfl * 8 filters
-        #     unet_block = UnetSkipConnectionBlock(nfl * 8, nfl * 8, False, input_nc=None, submodule=unet_block, norm_layer=norm_layer, use_dropout=use_dropout)
-        
+        for i in range(num_downs - 5):          # add intermediate layers with nfl * 8 filters
+            unet_block = UnetSkipConnectionBlock(nfl * 8, nfl * 8, is2D[4+i], input_nc=None, submodule=unet_block, norm_layer=norm_layer, use_dropout=use_dropout)
+
         # gradually reduce the number of filters from nfl * 8 to nfl
-        unet_block = UnetSkipConnectionBlock(nfl * 4,   nfl * 8, False, input_nc=None,     submodule=unet_block, norm_layer=norm_layer)
-        unet_block = UnetSkipConnectionBlock(nfl * 2,   nfl * 4, True, input_nc=None,     submodule=unet_block, norm_layer=norm_layer)
-        unet_block = UnetSkipConnectionBlock(nfl,       nfl * 2, True, input_nc=None,     submodule=unet_block, norm_layer=norm_layer)
-        self.model = UnetSkipConnectionBlock(output_nc, nfl,     True, input_nc=input_nc, submodule=unet_block, outermost=True, norm_layer=norm_layer)  # add the outermost layer
+        unet_block = UnetSkipConnectionBlock(nfl * 4,   nfl * 8, is2D[3], input_nc=None,     submodule=unet_block, norm_layer=norm_layer)
+        unet_block = UnetSkipConnectionBlock(nfl * 2,   nfl * 4, is2D[2], input_nc=None,     submodule=unet_block, norm_layer=norm_layer)
+        unet_block = UnetSkipConnectionBlock(nfl,       nfl * 2, is2D[1], input_nc=None,     submodule=unet_block, norm_layer=norm_layer)
+        self.model = UnetSkipConnectionBlock(output_nc, nfl,     is2D[0], input_nc=input_nc, submodule=unet_block, outermost=True, norm_layer=norm_layer)  # add the outermost layer
 
     def forward(self, input):
         """Standard forward"""
@@ -77,7 +76,7 @@ class UnetSkipConnectionBlock(nn.Module):
     """
 
     def __init__(self, outer_nc, inner_nc, is2D, input_nc=None,
-                 submodule=None, outermost=False, innermost=False, norm_layer=nn.BatchNorm3d, use_dropout=False):
+                 submodule=None, outermost=False, innermost=False, norm_layer=nn.InstanceNorm3d, use_dropout=False):
         """Construct a Unet submodule with skip connections.
 
         Parameters:
@@ -92,10 +91,7 @@ class UnetSkipConnectionBlock(nn.Module):
         """
         super(UnetSkipConnectionBlock, self).__init__()
         self.outermost = outermost
-        if type(norm_layer) == functools.partial:
-            use_bias = norm_layer.func == nn.InstanceNorm3d
-        else:
-            use_bias = norm_layer == nn.InstanceNorm3d
+        use_bias = norm_layer == nn.InstanceNorm3d
         if input_nc is None:
             input_nc = outer_nc
             
@@ -142,10 +138,10 @@ class UnetSkipConnectionBlock(nn.Module):
         else:   # add skip connections
             return torch.cat([x, self.model(x)], 1)
 
-class NLayerDiscriminator(nn.Module):
+class NLayerDiscriminatorIsotropic(nn.Module):
     """Defines a PatchGAN discriminator"""
 
-    def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.BatchNorm3d):
+    def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.InstanceNorm3d):
         """Construct a PatchGAN discriminator
 
         Parameters:
@@ -154,11 +150,8 @@ class NLayerDiscriminator(nn.Module):
             n_layers (int)  -- the number of conv layers in the discriminator
             norm_layer      -- normalization layer
         """
-        super(NLayerDiscriminator, self).__init__()
-        if type(norm_layer) == functools.partial:  # no need to use bias as BatchNorm2d has affine parameters
-            use_bias = norm_layer.func == nn.InstanceNorm2d
-        else:
-            use_bias = norm_layer == nn.InstanceNorm2d
+        super(NLayerDiscriminatorIsotropic, self).__init__()
+        use_bias = norm_layer == nn.InstanceNorm3d
 
         kw = 4
         padw = 1
@@ -174,6 +167,55 @@ class NLayerDiscriminator(nn.Module):
                 nn.LeakyReLU(0.2, True)
             ]
 
+        nf_mult_prev = nf_mult
+        nf_mult = min(2 ** n_layers, 8)
+        sequence += [
+            nn.Conv3d(ndf * nf_mult_prev, ndf * nf_mult, kernel_size=kw, stride=1, padding=padw, bias=use_bias),
+            norm_layer(ndf * nf_mult),
+            nn.LeakyReLU(0.2, True)
+        ]
+
+        sequence += [nn.Conv3d(ndf * nf_mult, 1, kernel_size=kw, stride=1, padding=padw)]  # output 1 channel prediction map
+        self.model = nn.Sequential(*sequence)
+
+    def forward(self, input):
+        """Standard forward."""
+        return self.model(input)
+    
+
+class NLayerDiscriminatorAnisotropic(nn.Module):
+    """Defines a PatchGAN discriminator"""
+
+    def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.InstanceNorm3d):
+        """Construct a PatchGAN discriminator
+
+        Parameters:
+            input_nc (int)  -- the number of channels in input images
+            ndf (int)       -- the number of filters in the last conv layer
+            n_layers (int)  -- the number of conv layers in the discriminator
+            norm_layer      -- normalization layer
+        """
+        super(NLayerDiscriminatorAnisotropic, self).__init__()
+        use_bias = norm_layer == nn.InstanceNorm3d
+
+        kw     = (4,4,1)
+        padw   = (1,1,0)
+        stride = (2,2,1)
+        sequence = [nn.Conv3d(input_nc, ndf, kernel_size=kw, stride=stride, padding=padw), nn.LeakyReLU(0.2, True)]
+        nf_mult = 1
+        nf_mult_prev = 1
+        for n in range(1, n_layers):  # gradually increase the number of filters
+            nf_mult_prev = nf_mult
+            nf_mult = min(2 ** n, 8)
+            sequence += [
+                nn.Conv3d(ndf * nf_mult_prev, ndf * nf_mult, kernel_size=kw, stride=stride, padding=padw, bias=use_bias),
+                norm_layer(ndf * nf_mult),
+                nn.LeakyReLU(0.2, True)
+            ]
+
+        kw     = 4
+        padw   = 1
+        stride = 2
         nf_mult_prev = nf_mult
         nf_mult = min(2 ** n_layers, 8)
         sequence += [

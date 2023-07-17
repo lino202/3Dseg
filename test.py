@@ -59,7 +59,7 @@ def main():
     opt = TestOptions().parser.parse_args()
     opt.batch_size = 1    # test code only supports batch_size = 1
     opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
-    opt.gan        = False # Vox2Vox cannot be tested as it is only trained.
+    opt.gan        = False # 3DGAN cannot be used without a ground truth.
     
     #Add results folders for plots and volumes
     plots_path    = os.path.join(opt.results_dir, opt.name, "plots")

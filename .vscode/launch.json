@@ -80,10 +80,10 @@
             "console": "externalTerminal",
             "args": [
                 "--filePath",      "D:/Segmentation/Data_paper2/LGE/baseline/images",
-                "--resPath",       "D:/Segmentation/Data_paper2/LGE",
+                "--resPath",       "D:/Segmentation/Data_paper2/LGE/96x96x24",
                 "--spacAfterCrop", "D:/Segmentation/Data_paper2/LGE/shapes_spacing_after_resampling.pickle",
                 "--maxLabel", "3",
-                "--size", "80", "80", "24"
+                "--size", "96", "96", "24"
             ] 
         },
 
@@ -125,10 +125,10 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/exploreTopo.py",
             "console": "externalTerminal",
             "args": [
-                "--dataPath", "D:/Segmentation/Data_paper2/LGE/vols_preprocessed",
-                "--resPath",  "D:/Segmentation/Data_paper2/LGE/topo",
-                "--resName",  "topology_LGE_phconst0",
-                "--phType",   "0",  //N or 0
+                "--dataPath", "D:/Segmentation/Data_paper2/LGE/96x96x24/vols_preprocessed",
+                "--resPath",  "D:/Segmentation/Data_paper2/LGE/96x96x24/topo",
+                "--resName",  "topology_LGE_phconstN",
+                "--phType",   "N",  //N or 0
                 "--labels",   "lv", "myo", "mi", "lv-myo", "lv-mi", "myo-mi",
             ]
         },
@@ -141,10 +141,10 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVDistribution.py",
             "console": "externalTerminal",
             "args": [
-                "--filePath",      "D:/Segmentation/Data_paper2/MnM/vols_preprocessed",
-                "--resPath",       "D:/Segmentation/Data_paper2/MnM",
-                // "--dataTypes",     "mvo", "mi", //LGE
-                "--dataTypes",     "normal", //MnM and Exvivo
+                "--filePath",      "D:/Segmentation/Data_paper2/LGE/vols_preprocessed",
+                "--resPath",       "D:/Segmentation/Data_paper2/LGE",
+                "--dataTypes",     "mvo", //"mi", //LGE
+                // "--dataTypes",     "normal", //MnM and Exvivo
                 "--NFOLD",     "5" //LGE and MnM
                 // "--NFOLD",     "7" //Exvivo
             ]
@@ -158,9 +158,184 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVSymlinks.py",
             "console": "externalTerminal",
             "args": [
-                "--filePath",      "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/cv_7Fold.pickle",
-                "--resPath",       "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/CV",
+                "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/LGE/cv_5Fold.pickle",
+                "--rootPath",          "D:/Segmentation/Data_paper2/LGE/96x96x24",
+                "--resPath",           "D:/Segmentation/Data_paper2/LGE/96x96x24/CV_mvo",
             ]
-        }
+        },
+
+        //TRAIN-------------------------------------------
+        {
+            "name": "train Exvivo",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/train.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/CV/fold_1",
+                "--results_dir",     "D:/Segmentation/Results_paper2/Exvivo",
+                "--name",            "fold_1",
+                "--display_env",     "ex_vivo_fold_1",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "2",
+                "--nfl",             "64",
+                "--num_downs",       "5",
+                "--lr",              "0.01",
+                "--n_epochs",        "1",
+                "--n_epochs_decay",  "249",
+                "--loss",            "CE",
+                "--patch_size",      "128", "128", "128",
+                "--batch_size",      "3",
+                "--norm",            "instance",
+                "--dataaug",
+            ] 
+        },
+
+        {
+            "name": "train Exvivo GAN",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/trainGAN.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/CV/fold_0",
+                "--results_dir",     "D:/Segmentation/Results_paper2/Exvivo_GAN",
+                "--name",            "fold_0",
+                "--display_env",     "exvivo_gan_fold_0",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "1",
+                "--nfl",             "64",
+                "--num_downs",       "5",
+                "--n_layers_D",      "2",
+                "--lr",              "0.0002",
+                "--n_epochs",        "125",
+                "--n_epochs_decay",  "125",
+                "--loss",            "CE",
+                "--gan",
+                "--gan_mode",        "lsgan",
+                "--patch_size",      "128", "128", "128",
+                "--batch_size",      "3",
+                "--norm",            "instance",
+                "--dataaug",
+            ] 
+        },
+
+        {
+            "name": "train MnM",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/train.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "D:/Segmentation/Data_paper2/MnM/CV/fold_0",
+                "--results_dir",     "D:/Segmentation/Results_paper2/MnM",
+                "--name",            "fold_0",
+                "--display_env",     "mnm_fold_0",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "4",
+                "--nfl",             "64",
+                "--num_downs",       "5",
+                "--lr",              "0.01",
+                "--n_epochs",        "1",
+                "--n_epochs_decay",  "249",
+                "--loss",            "CE",
+                "--patch_size",      "160", "160", "20",
+                "--batch_size",      "4",
+                "--norm",            "instance",
+                "--dataaug",
+            ] 
+        },
+
+        {
+            "name": "train MnM GAN",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/trainGAN.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "D:/Segmentation/Data_paper2/MnM/CV/fold_0",
+                "--results_dir",     "D:/Segmentation/Results_paper2/MnM_GAN",
+                "--name",            "fold_0",
+                "--display_env",     "mnm_gan_fold_0",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "1",
+                "--nfl",             "64",
+                "--num_downs",       "5",
+                "--n_layers_D",      "3",
+                "--lr",              "0.0002",
+                "--n_epochs",        "125",
+                "--n_epochs_decay",  "125",
+                "--loss",            "CE",
+                "--gan",
+                "--gan_mode",        "lsgan",
+                "--patch_size",      "160", "160", "20",
+                "--batch_size",      "4",
+                "--norm",            "instance",
+                "--dataaug",
+            ] 
+        },
+
+
+        {
+            "name": "train LGE",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/train.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "D:/Segmentation/Data_paper2/LGE/96x96x24/CV_mi/fold_0",
+                "--results_dir",     "D:/Segmentation/Results_paper2/LGE/96x96x24_mi",
+                "--name",            "fold_0",
+                "--display_env",     "lge_mi_fold_0",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "4",
+                "--nfl",             "64",
+                "--num_downs",       "5",
+                "--lr",              "0.01",
+                "--n_epochs",        "1",
+                "--n_epochs_decay",  "249",
+                "--loss",            "CE",
+                "--patch_size",      "96", "96", "24",
+                "--batch_size",      "4",
+                "--norm",            "instance",
+                "--dataaug",
+            ] 
+        },
+
+        {
+            "name": "train LGE GAN",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/trainGAN.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "D:/Segmentation/Data_paper2/LGE/96x96x24/CV_mi/fold_0",
+                "--results_dir",     "D:/Segmentation/Results_paper2/LGE_GAN/96x96x24_mi",
+                "--name",            "fold_0",
+                "--display_env",     "lge_mi_gan_fold_0",
+                "--phase",           "train",
+                "--input_nc",        "1",
+                "--output_nc",       "1",
+                "--nfl",             "64",
+                "--num_downs",       "5",
+                "--n_layers_D",      "2",
+                "--lr",              "0.0002",
+                "--n_epochs",        "125",
+                "--n_epochs_decay",  "125",
+                "--loss",            "CE",
+                "--gan",
+                "--gan_mode",        "lsgan",
+                "--patch_size",      "96", "96", "24",
+                "--batch_size",      "4",
+                "--norm",            "instance",
+                "--dataaug",
+            ]
+        },
+
     ]
 }

@@ -15,7 +15,6 @@ def main():
     opt            = TestOptions().parser.parse_args()
     opt.batch_size = 1    # test code only supports batch_size = 1
     opt.gan        = True
-    opt.niiName    = "msk"
 
     plots_path = os.path.join(opt.results_dir, opt.name, "plots")
     mkdir(plots_path)

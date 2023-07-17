@@ -1,10 +1,10 @@
 import torch
 from . import networks
-from . import customLosses
 from torchsummary import summary
 from collections import OrderedDict
 from utils.util import getBaseMidApexImgs
-import os 
+import os
+import numpy as np
 
 class ModelUnet3D():
     """ Interface for model Unet3D"""
@@ -21,9 +21,21 @@ class ModelUnet3D():
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.save_dir = os.path.join(opt.results_dir, opt.name)
         self.visual_names = ['img', 'msk', 'pred']
+
+        #Get Norm
+        if opt.norm == 'batch':
+            norm_layer = torch.nn.BatchNorm3d
+        elif opt.norm == 'instance':
+            norm_layer = torch.nn.InstanceNorm3d
+        else: raise ValueError("Wrong Normalization layer, use 'instance' or 'batch'")
         
         # define network
-        self.net = networks.Unet3D(opt.input_nc, opt.output_nc, opt.num_downs, opt.nfl)
+        if opt.patch_size[0] != opt.patch_size[1]: raise ValueError("Height and Width are not the same")
+        is2D       = np.zeros(5 + opt.num_downs - 5).astype(bool)
+        n2DLayers  = int(np.abs(np.floor(np.log(opt.patch_size[0])/np.log(2)) - np.floor(np.log(opt.patch_size[2])/np.log(2))))
+        is2D[:n2DLayers] = True
+        
+        self.net = networks.Unet3D(opt.input_nc, opt.output_nc, opt.num_downs, is2D, opt.nfl, norm_layer=norm_layer)
         self.net.to(self.device)
         if opt.phase == "train":
             self.loss_names = ['train', 'val']
@@ -32,8 +44,6 @@ class ModelUnet3D():
                 self.criterion = torch.nn.L1Loss()
             elif opt.loss == 'CE':
                 self.criterion = torch.nn.CrossEntropyLoss()
-            elif opt.loss == 'Dice' and opt.output_nc == 1:
-                self.criterion = customLosses.BinaryDiceLoss()
             else:
                 raise ValueError("Loss is not defined") 
 
@@ -57,7 +67,7 @@ class ModelUnet3D():
         
         # Print Network information
         try:
-            summary(self.net, (1, opt.load_size_d, opt.load_size_h, opt.load_size_w))
+            summary(self.net, (1, opt.patch_size[0], opt.patch_size[1], opt.patch_size[2]))
         except:
             print(self.net)
 
@@ -116,9 +126,7 @@ class ModelUnet3D():
                 errors_ret[name] = float(getattr(self, 'loss_' + name))  # float(...) works for both scalar tensor and float number
         return errors_ret
 
-    #TODO here only train, val or test are admitted 
-    #when we want to test a new example a dummy, really simple script 
-    #should be used.
+    #here only train, val or test are admitted, prediction may use the esemble from CV
     def set_input(self, input): 
         """Unpack input data from the dataloader
         Parameters:

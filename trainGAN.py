@@ -1,24 +1,28 @@
-"""General-purpose training script """
+"""General-purpose GAN training script """
 
+import os 
+import sys
 from collections import OrderedDict
 import time
 from data import create_dataloader
 from utils.options import TrainOptions
-from models import model_vox2vox
+from models.model_3dgan import Model3DGAN
 from utils.visualizer import Visualizer
-import numpy as np
+from utils.util import Logger, mkdir, saveLossPlot
 
 def main():
-    
+    start = time.time()
     opt = TrainOptions().parser.parse_args()
+    mkdir(os.path.join(opt.results_dir, opt.name))
+    sys.stdout = Logger(os.path.join(opt.results_dir, opt.name, "output.out"))
+
     train_dataloader = create_dataloader.create(opt, opt.phase)     # create a dataloader with given options
     print('Training with {} samples grouped in {} batches'.format(len(train_dataloader.dataset),len(train_dataloader)))   
     if not opt.gan: raise ValueError("Using the train GAN script with no gan option")
 
-    model        = model_vox2vox.ModelVox2Vox(opt)      # create a Model
+    model        = Model3DGAN(opt)      # create a Model
     model.setup(opt)                        # regular setup: load and print networks; create schedulers
     visualizer   = Visualizer(opt)          # create a visualizer that display/save images and plots
-    total_iters  = 0
 
     for epoch in range(opt.epoch_count, opt.n_epochs + opt.n_epochs_decay + 1):    # outer loop for different epochs;
         epoch_start_time = time.time()  # timer for entire epoch
@@ -68,8 +72,10 @@ def main():
 
     print('Saving the model at the end of all epochs, epoch %d' % (epoch))
     model.save_networks('latest')
+    saveLossPlot(visualizer.vis, opt.results_dir, opt.name, opt.display_env, model.loss_names)
+
+    print("Total training time was {} s".format(time.time() - start))
+
 
 if __name__ == '__main__':
-    start = time.time()
     main()
-    print("Total training time was {} s".format(time.time() - start))

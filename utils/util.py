@@ -2,6 +2,16 @@ import numpy as np
 import torch 
 import os 
 from PIL import Image
+import pandas as pd
+import json
+import sys
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+font = {'family' : "Times New Roman",
+        'weight' : 'normal',
+        'size'   : 15}
+plt.rc('font', **font)
 
 def tensor2im(input_image, imtype=np.uint8):
     """"Converts a Tensor array into a numpy image array.
@@ -126,3 +136,54 @@ def getStatistics(data):
     upWhisker  = data[data<=upQuart+1.5*iqr].max()
     lowWhisker = data[data>=lowQuart-1.5*iqr].min()
     return [mean, std, mymin, mymax, median, lowQuart, upQuart, lowWhisker, upWhisker]
+
+
+def visLosses2DF(viz, env_name, feature_name, lossNames):
+    """ Helper to return a dict with env_base_name_* : pd.Dataframe
+    :param viz: visdom instance
+    :param env_name: the environment name
+    :param feature_name: the feature to pull from the environment
+    :returns: a df
+    """
+    # parse all envs
+    losses = {}
+    json_blobs = json.loads(viz.get_window_data(win=None, env=env_name))
+    print("found {} matching envs for {}".format(len(json_blobs), env_name))
+    for window, value in json_blobs.items():       # over all windows in that env
+        if 'title' in list(value.keys()):
+            if value['title'] == feature_name:
+                x = value['content']['data'][0]['x']
+                losses['Epochs'] = x
+                for i, loss in enumerate(value['content']['data']):
+                    losses[lossNames[i]] = loss['y']
+    
+    df = pd.DataFrame(losses)
+    return pd.melt(df, ['Epochs'])
+
+def saveLossPlot(viz, results_dir, name, display_env, loss_names):
+    plotName = "{} loss over time".format(name)
+    df = visLosses2DF(viz, display_env, plotName, loss_names)
+    ax = sns.lineplot(x='Epochs', y='value', hue='variable', data=df)
+    ax.set(ylabel="Losses")
+    ax.grid()
+    plt.title(plotName)
+    plt.savefig(os.path.join(results_dir, name, "losses.png"), bbox_inches='tight', dpi=400)
+    plt.savefig(os.path.join(results_dir, name, "losses.pdf"), bbox_inches='tight')
+
+
+'''This is not the best way to do this, maybe use logging
+we cannot open the file while running but we have the console!'''
+class Logger(object):
+    def __init__(self, resPath):
+        self.terminal = sys.stdout
+        self.log = open(resPath, "w")
+   
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)  
+
+    def flush(self):
+        # this flush method is needed for python 3 compatibility.
+        # this handles the flush command by doing nothing.
+        # you might want to specify some extra behavior here.
+        pass    

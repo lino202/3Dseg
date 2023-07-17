@@ -1,9 +1,8 @@
 import torch
 from . import networks
 from torchsummary import summary
-from collections import OrderedDict
-from utils.util import getBaseMidApexImgs
 import os 
+import numpy as np
 
 class ModelTest():
     """ Interface for model Unet3D in test"""
@@ -20,9 +19,22 @@ class ModelTest():
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.save_dir = os.path.join(opt.results_dir, opt.name)
         self.visual_names = ['img', 'pred']
+
+        #Get Norm
+        if opt.norm == 'batch':
+            norm_layer = torch.nn.BatchNorm3d
+        elif opt.norm == 'instance':
+            norm_layer = torch.nn.InstanceNorm3d
+        else: raise ValueError("Wrong Normalization layer, use 'instance' or 'batch'")
+        
         
         # define network
-        self.net = networks.Unet3D(opt.input_nc, opt.output_nc, opt.num_downs, opt.nfl)
+        if opt.patch_size[0] != opt.patch_size[1]: raise ValueError("Height and Width are not the same")
+        is2D       = np.zeros(5 + opt.num_downs - 5).astype(bool)
+        n2DLayers  = int(np.abs(np.floor(np.log(opt.patch_size[0])/np.log(2)) - np.floor(np.log(opt.patch_size[2])/np.log(2))))
+        is2D[:n2DLayers] = True
+        
+        self.net = networks.Unet3D(opt.input_nc, opt.output_nc, opt.num_downs, is2D, opt.nfl, norm_layer=norm_layer)
         self.net.to(self.device)
 
     def setup(self, opt):
@@ -34,7 +46,7 @@ class ModelTest():
         
         # Print Network information
         try:
-            summary(self.net, (1, opt.load_size_d, opt.load_size_h, opt.load_size_w))
+            summary(self.net, (1, opt.patch_size[0], opt.patch_size[1], opt.patch_size[2]))
         except:
             print(self.net)
 
@@ -48,19 +60,6 @@ class ModelTest():
         print('Loading the model from {}'.format(load_path))
         state_dict = torch.load(load_path, map_location=self.device)
         self.net.load_state_dict(state_dict)
-
-
-    # def get_current_visuals(self):
-    #     """Return visualization images from 3D arrays. 
-    #     train.py will display these images with visdom, and save the images to a HTML
-    #     test.py  will save the images to a HTML"""
-    #     visual_ret = OrderedDict()
-    #     for name in self.visual_names:
-    #         if isinstance(name, str):
-    #             imgsDict = getBaseMidApexImgs(getattr(self, name), name)
-    #             for name in imgsDict.keys():
-    #                 visual_ret[name] = imgsDict[name]
-    #     return visual_ret
 
     def set_input(self, input): 
         """Unpack input data from the dataloader
