@@ -5,7 +5,7 @@ It will load a saved model from '--results_dir' and save the results there.
 """
 import os
 from utils.options import TestOptions
-from utils.util import mkdirs, mkdir, getStatistics
+from utils.util import mkdirs, mkdir, getStatistics, Logger
 from data import create_dataloader
 from models.model_unet import ModelUnet3D
 import monai
@@ -19,11 +19,11 @@ import pandas as pd
 import pickle
 import time
 import pathlib
+import sys
 
-
-# Set prior_CINE_MnMs: class 1 is LV; 2 is MY; 3 is RV
-# labelmap_CINE_MnMs = ['bg', 'lv', 'myo', 'rv']
-prior_CINE_MnMs = {
+# Set prior_CINE:
+# labelmap = 0 is 'bg', 1 is 'lv', 2 is 'myo', 3 is 'rv'
+prior_Cine = {
     (1,):   (1, 0, 0),
     (2,):   (1, 1, 0), #Here maybe let open? (1,1,0) or close (1,0,0)
     (3,):   (1, 0, 0),
@@ -32,28 +32,23 @@ prior_CINE_MnMs = {
     (2, 3): (1, 1, 0)  #Here maybe let open? (1,1,0) or close (1,0,0)
 }
 
-# Set prior_LGE: class 1 is entire LV as it is binary
-prior_roi = {(1,):   (1, 0, 0)}
+# Set prior_LGE: # labelmap = 0 is 'bg', 1 is 'lv'
+prior_Exvivo = {(1,):   (1, 0, 0)}
 
-# Set prior_LGE: N normal, P patological
-prior_LGE_emidec = {
-    "priorN" : {
-        (1,):   (1, 0, 0),
-        (2,):   (1, 1, 0),
-        (1, 2): (1, 0, 0),
-    },
-
-    "priorP" : {
-        (1,):   (1, 0, 0),
-        (2,):   (1, 1, 0),
-        (3,):   (1, 0, 0),
-        (1, 2): (1, 0, 0),
-        (1, 3): (1, 0, 0),
-        (2, 3): (1, 1, 0)
-    }
+# Set prior_LGE:
+# labelmap = 0 is 'bg', 1 is 'lv', 2 is 'myo', 3 is 'mi'
+prior_LGE = {
+    (1,):   (1, 0, 0),
+    (2,):   (1, 1, 0),
+    (3,):   (1, 0, 0),
+    (1, 2): (1, 0, 0),
+    (1, 3): (1, 0, 0),
+    (2, 3): (1, 1, 0)
 }
 
 def main():
+    start = time.time()
+    sys.stdout = Logger(os.path.join(opt.results_dir, opt.name, "test_output.out"))
     
     # Get test options
     opt = TestOptions().parser.parse_args()
@@ -62,8 +57,8 @@ def main():
     opt.gan        = False # 3DGAN cannot be used without a ground truth.
     
     #Add results folders for plots and volumes
-    plots_path    = os.path.join(opt.results_dir, opt.name, "plots")
-    vols_path     = os.path.join(opt.results_dir, opt.name, "volumes")
+    plots_path    = os.path.join(opt.results_dir, opt.name, "plots_{}_phconst{}".format('baseline' if not opt.ph else 'ph', opt.phConstruction))
+    vols_path     = os.path.join(opt.results_dir, opt.name, "volumes_{}_phconst{}".format('baseline' if not opt.ph else 'ph',  opt.phConstruction))
     mkdirs([plots_path, vols_path])
     
     #Get dataloader
@@ -77,7 +72,7 @@ def main():
     model.net.eval()               # affects layers like batchnorm and dropout.
     
     # Get prior
-    generalPrior = globals()[opt.priorName]
+    prior = globals()[opt.priorName]
     if opt.phThres < 0:
         phThres = None
     else: 
@@ -92,23 +87,14 @@ def main():
         start_iter = time.time()
         model.set_input(data)  # unpack data from data loader
         sample  = pathlib.PureWindowsPath(model.path[0]).as_posix().split('/')[-1]
-        
-        if 'emidec' in opt.priorName:
-            if 'P' in sample: 
-                prior = generalPrior["priorP"]
-            elif 'N' in sample:
-                prior = generalPrior["priorN"]
-            else: raise ValueError("Wrong prior name, should be normal or pato")
-        else:
-            prior = generalPrior
-        
+
         #Determine result pred and binarize (one-hot pred)
         if opt.ph: 
             # Run topological post-processing
             model_TP = topo.multi_class_topological_post_processing(
                 inputs=model.img, model=model.net, prior=prior,
                 lr=1e-5, mse_lambda=1000,
-                opt=torch.optim.Adam, num_its=100, construction='0', thresh=phThres, parallel=opt.phParallel
+                opt=torch.optim.Adam, num_its=100, construction=opt.phConstruction, thresh=phThres, parallel=opt.phParallel
             )
             pred = model_TP(model.img)
         else:
