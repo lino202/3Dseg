@@ -158,9 +158,9 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVSymlinks.py",
             "console": "externalTerminal",
             "args": [
-                "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/LGE/cv_5Fold.pickle",
-                "--rootPath",          "D:/Segmentation/Data_paper2/LGE/96x96x24",
-                "--resPath",           "D:/Segmentation/Data_paper2/LGE/96x96x24/CV_mvo",
+                "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/MnM/cv_5Fold.pickle",
+                "--rootPath",          "D:/Segmentation/Data_paper2/MnM",
+                "--resPath",           "D:/Segmentation/Data_paper2/MnM/CV",
             ]
         },
 
@@ -335,6 +335,62 @@
                 "--norm",            "instance",
                 "--dataaug",
             ]
+        },
+
+
+        //TEST-------------------------------------------
+        {
+            "name": "pred Exvivo",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/pred.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",            "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/CV/fold_0/val",
+                "--results_dir",          "D:/Segmentation/Results_paper2/Exvivo",
+                "--name",                 "fold_0",
+                "--phase",                "pred",
+                "--input_nc",             "1",
+                "--output_nc",            "2",
+                "--nfl",                  "64",
+                "--num_downs",            "5",
+                "--patch_size",           "128", "128", "128",
+                "--load_filename",        "latest_net", 
+                "--norm",                 "instance",
+                "--ph",     
+                "--phThres",              "0.5",
+                "--phParallel",
+                "--phConstruction",       "N",     
+                "--priorName",            "PRIOR_EXVIVO",            
+                
+            ] 
+        },
+
+        {
+            "name": "pred MnM",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/pred.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",            "D:/Segmentation/Data_paper2/MnM/CV/fold_0/val",
+                "--results_dir",          "D:/Segmentation/Results_paper2/MnM",
+                "--name",                 "fold_0",
+                "--phase",                "pred",
+                "--input_nc",             "1",
+                "--output_nc",            "4",
+                "--nfl",                  "64",
+                "--num_downs",            "5",
+                "--patch_size",           "160", "160", "20",
+                "--load_filename",        "latest_net", 
+                "--norm",                 "instance",
+                "--ph",     
+                "--phThres",              "0.5",
+                // "--phParallel",
+                "--phConstruction",       "N",     
+                "--priorName",            "PRIOR_CINE",            
+                
+            ] 
         },
 
     ]

@@ -13,8 +13,7 @@ def create(opt, phase):
 
     #Dataset
     if phase == "pred":
-        # dataset = Dataset3DPred(opt.root_path, opt.gan)
-        raise NotImplementedError
+        dataset = Dataset3DPred(opt.root_path, opt.gan)
     elif phase == "test" or phase == "val":
         dataset = Dataset3D(opt.root_path, phase, opt.gan, False)
     elif phase == "train":
@@ -91,33 +90,33 @@ class Dataset3D(Dataset):
         return self.nSamples
     
 
-# class Dataset3DPred(Dataset):
-#     ''' Prediction is use when only the net input is available and we are not going to 
-#     use the ground truth, this input can be the msk or img depending if we use the GANs
-#     generator or not (normal approach)'''
+class Dataset3DPred(Dataset):
+    ''' Prediction is use when only the net input is available and we are not going to 
+    use the ground truth, this input can be the msk or img depending if we use the GANs
+    generator or not (normal approach)'''
     
-#     def __init__(self, rootPath, isgan):
-#         self.dataPath  = os.path.join(rootPath)
-#         self.files     = [os.path.join(self.dataPath, x) for x in os.listdir(self.dataPath)]
-#         self.nSamples  = len(self.files)
-#         self.isgan     = isgan
+    def __init__(self, rootPath, isgan):
+        self.dataPath  = os.path.join(rootPath)
+        self.files     = [os.path.join(self.dataPath, x) for x in os.listdir(self.dataPath)]
+        self.nSamples  = len(self.files)
+        self.isgan     = isgan
 
-#     def __getitem__(self, index):
+    def __getitem__(self, index):
         
-#         if not self.isgan:
-#             self.img=tio.ScalarImage(os.path.join(self.files[index], "img.nii"))
-#         else:
-#             self.img=tio.LabelMap(os.path.join(self.files[index], "msk.nii"))
+        if not self.isgan:
+            self.img=tio.ScalarImage(os.path.join(self.files[index], "img.nii"))
+        else:
+            self.img=tio.LabelMap(os.path.join(self.files[index], "msk.nii"))
         
-#         self.affine = self.img.affine
-#         self.img    = self.img.data.numpy()[0]
+        self.affine = self.img.affine
+        self.img    = self.img.data.numpy()[0]
         
-#         if not self.isgan:
-#             self.img = customToTensor(self.img, "img", self.isgan)
-#         else:
-#             self.img = customToTensor(self.img, "msk", self.isgan)
+        if not self.isgan:
+            self.img = customToTensor(self.img, "img", self.isgan)
+        else:
+            self.img = customToTensor(self.img, "msk", self.isgan)
 
-#         return {"img": self.img, "path": self.files[index], "affine": self.affine}
+        return {"img": self.img, "path": self.files[index], "affine": self.affine}
 
-#     def __len__(self):
-#         return self.nSamples
+    def __len__(self):
+        return self.nSamples

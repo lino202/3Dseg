@@ -2,7 +2,7 @@ import os
 from utils.options import TestOptions
 from utils.util import mkdir
 from data import create_dataloader
-from models.model_test import ModelTest
+from models.model_pred import ModelPred
 import matplotlib.pyplot as plt
 import nibabel as nib
 import time
@@ -25,7 +25,7 @@ def main():
     print('Testing with {} samples grouped in {} batches'.format(nSamples, len(pred_dataloader)))
     
     #Get trained model
-    model = ModelTest(opt)       # create a Model
+    model = ModelPred(opt)       # create a Model
     model.setup(opt)             # regular setup: load and print networks; create schedulers
     model.net.eval()             # affects layers like batchnorm and dropout.
     

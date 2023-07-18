@@ -10,7 +10,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import copy
-from torch.optim import Adam
+import matplotlib.pyplot as plt
+import os
 
 def crip_wrapper(X, D):
     return crip.computePH(X, maxdim=D)
@@ -80,10 +81,6 @@ def BEmetric(pred, msk, prior, parallel, maxdim=2, construction='0'):
     #Get barcodes
     predBarcodes = getBarcodes(pred, prior, max_dims, ph, construction, parallel)
     mskBarcodes  = getBarcodes(msk, prior, max_dims, ph, construction, parallel) 
-    #TODO pay attention to the mask barcodes in the myo it is horrible in MnMs
-    #maybe we could make a dynamic modulation of the priors but we would need the mask
-    #so at least for testing it would be nice and in the evaluation of new samples we can leave it 
-    #fixed
     
     be = np.zeros(len(prior))
     for i in range(len(prior)):
@@ -92,7 +89,16 @@ def BEmetric(pred, msk, prior, parallel, maxdim=2, construction='0'):
     return np.sum(be)    
 
 
-def get_differentiable_barcode(tensor, barcode):
+def checkIndexing(indexes, shape):
+    shapeUpLimit = np.array(shape)[np.newaxis,:] - 1
+    shapeDownLimit = np.array((0,0,0))[np.newaxis,:]
+    idxsOut    = (indexes > shapeUpLimit).nonzero()
+    indexes[idxsOut] = shapeUpLimit[0,idxsOut[1]]
+    idxsOut    = (indexes < shapeDownLimit).nonzero()
+    indexes[idxsOut] = shapeDownLimit[0,idxsOut[1]]
+
+
+def get_differentiable_barcode(tensor, barcode, shape):
     '''Makes the barcode returned by CubicalRipser differentiable using PyTorch.
     Note that the critical points of the CubicalRipser filtration reveal changes in sub-level set topology.
     
@@ -100,17 +106,28 @@ def get_differentiable_barcode(tensor, barcode):
         REQUIRED
         tensor  - PyTorch tensor w.r.t. which the barcode must be differentiable
         barcode - Barcode returned by using CubicalRipser to compute the PH of tensor.numpy() 
+        shape   - The shape of the tensor that was obtained from combo_arr in order to avoid bad indexing due to ph N constructor overpassing tensor size
     '''
     # Identify connected component of ininite persistence (the essential feature)
     inf = barcode[barcode[:, 2] == np.finfo(barcode.dtype).max]
     fin = barcode[barcode[:, 2] < np.finfo(barcode.dtype).max]
     
     # Get birth of infinite feature
-    inf_birth = tensor[tuple(inf[:, 3:3+tensor.ndim].astype(np.int64).T)]
+    # with construction N sometimes the tensor is indexed out of range which causes 
+    # IndexKernel.cu:91: block: [0,0,0], thread: [0,0,0] Assertion `index >= -sizes[i] && index < sizes[i] && "index out of bounds"` failed.
+    # This is because the barcode gives indexes (xyz birth or death) out of range so we checked and adjusted to the boundaries. I saw this for the 
+    # inf entity but I applied it to the others as well just in case
+    indexes = inf[:, 3:3+tensor.ndim].astype(np.int64)
+    checkIndexing(indexes, shape)
+    inf_birth = tensor[tuple(indexes.T)]
     
     # Calculate lifetimes of finite features
-    births = tensor[tuple(fin[:, 3:3+tensor.ndim].astype(np.int64).T)]
-    deaths = tensor[tuple(fin[:, 6:6+tensor.ndim].astype(np.int64).T)]
+    indexes = fin[:, 3:3+tensor.ndim].astype(np.int64)
+    checkIndexing(indexes, shape)
+    births = tensor[tuple(indexes.T)]
+    indexes = fin[:, 6:6+tensor.ndim].astype(np.int64)
+    checkIndexing(indexes, shape)
+    deaths = tensor[tuple(indexes.T)]
     delta_p = (deaths - births)
     
     # Split finite features by dimension
@@ -124,7 +141,8 @@ def get_differentiable_barcode(tensor, barcode):
 def multi_class_topological_post_processing(
     inputs, model, prior,
     lr, mse_lambda,
-    opt=torch.optim.Adam, num_its=100, construction='0', thresh=None, parallel=True):
+    opt=torch.optim.Adam, num_its=100, 
+    construction='0', thresh=None, parallel=True, saveCombosPath=None):
     '''Performs topological post-processing.
     
     Arguments:
@@ -162,7 +180,7 @@ def multi_class_topological_post_processing(
     
     # Initialise topological model and optimiser
     model_topo = copy.deepcopy(model)
-    model_topo.eval()
+    model_topo.train()                              #Error in original?
     optimiser = opt(model_topo.parameters(), lr=lr)
     
     # Inspect prior and convert to tensor
@@ -193,11 +211,33 @@ def multi_class_topological_post_processing(
                 raise ValueError("Wrong dim")
         combos = torch.stack(tmp)
 
+        if it%25==0 or it==99:
+            if saveCombosPath:
+                combosArr = combos.cpu().detach().numpy()
+                nImgs = combosArr.shape[0]+1
+                shown_slice = int(combosArr.shape[3]/2)
+                ncols=3
+                nrows = int(np.ceil(nImgs/ncols))
+                _, a = plt.subplots(nrows, ncols)
+                j=0
+                i=0
+                for nImg in range(nImgs-1):
+                    a[j,i].imshow(combosArr[nImg,:,:,shown_slice])
+                    a[j,i].axis('off')
+                    i+=1
+                    if i % ncols == 0: 
+                        j += 1
+                        i = 0
+                a[j,i].imshow(inputs[0][roi].cpu().numpy()[0,:,:,shown_slice])
+                plt.savefig(os.path.join(saveCombosPath, "it_{}.png".format(it)), dpi=300)
+                plt.close()
+
         # Invert probababilistic fields for consistency with cripser sub-level set persistence
         combos = 1 - combos
 
         # Get barcodes using cripser in parallel without autograd            
         combos_arr = combos.detach().cpu().numpy().astype(np.float64)
+        combo_shape = combos_arr.shape[1:]
         if parallel:
             with torch.no_grad():
                 with Pool(len(prior)) as p:
@@ -210,21 +250,33 @@ def multi_class_topological_post_processing(
         max_features = max([bcode_arr.shape[0] for bcode_arr in bcodes_arr])
         bcodes = torch.zeros([len(prior), max(max_dims), max_features], requires_grad=False, device=device)
         for c, (combo, bcode) in enumerate(zip(combos, bcodes_arr)):
-            _, fin = get_differentiable_barcode(combo, bcode)
+            _, fin = get_differentiable_barcode(combo, bcode, combo_shape)
             for dim in range(len(spatial_xyz)):
                 bcodes[c, dim, :len(fin[dim])] = fin[dim]
 
         # Select features for the construction of the topological loss
         stacked_prior = torch.stack(list(prior.values()))
         stacked_prior.T[0] -= 1 # Since fundamental 0D component has infinite persistence
-        matching = torch.zeros_like(bcodes).detach().bool()
+        matching = torch.zeros_like(bcodes, dtype=torch.uint8).detach()
+
+        #Do not touch the ones I am not certain about the topo
+        #matching is not bool anymore, now it is: 
+        #0 = not matched/incorrect
+        #1 = correct
+        #2 = I do not know (so neither correct neither incorrect in loss)
+        bcodes_arr = bcodes.detach().cpu().numpy()
         for c, combo in enumerate(stacked_prior):
             for dim in range(len(combo)):
-                matching[c, dim, slice(None, stacked_prior[c, dim])] = True
+                if stacked_prior[c, dim] >= 0: # If user put a certain topology
+                    matching[c, dim, slice(None, stacked_prior[c, dim])] = 1
+                else: # If user put -1 (dubious topo)
+                    nTopos = np.count_nonzero(bcodes_arr[c,dim,:])
+                    matching[c, dim, slice(None, nTopos)] = 2
+        
 
         # Find total persistence of features which match (A) / violate (Z) the prior
-        A = (1 - bcodes[matching]).sum()
-        Z = bcodes[~matching].sum()
+        A = (1 - bcodes[matching==1]).sum()
+        Z = bcodes[matching==0].sum()
 
         # Get similarity constraint
         mse = F.mse_loss(outputs, pred_unet)

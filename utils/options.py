@@ -58,12 +58,9 @@ class TestOptions():
 
     def __init__(self):
         self.parser = BaseOptions().parser
-        self.parser.add_argument('--load_filename',   type=str,             help='file name of trained parameters')
-        self.parser.add_argument('--ph',              action='store_true',  help='use topo loss for adjusting results')
-        self.parser.add_argument('--priorName',       type=str,             help='prior as a global var must be defined in test.py')
-        self.parser.add_argument('--phParallel',      action='store_true',  help='use parallel calculation of PH')
-        self.parser.add_argument('--phConstruction',      type=str,             help='Either 0 (4 (2D) or 6 (3D) connectivity) or N (8 (2D) or 26 (3D) connectivity)', default='N')
-        self.parser.add_argument('--res_excel',       type=str,             help='excel file where to save results')
-        self.parser.add_argument('--res_params_name', type=str,             help='name for the pickle file where per volume gsdc,hd,be and ts will be')
-        self.parser.add_argument('--phThres',         type=float,           help='threshold for cutting a roi in ph post-ptocessing')
-        self.parser.add_argument('--res_excel_indexs',type=str, nargs='+',  help='indexes for saving params results in the excel file and saving labels to the results CAREFUL!')
+        self.parser.add_argument('--load_filename',         type=str,             help='file name of trained parameters')
+        self.parser.add_argument('--ph',                    action='store_true',  help='use topo loss for adjusting results')
+        self.parser.add_argument('--priorName',             type=str,             help='prior as a global var must be defined in utils/priors.py')
+        self.parser.add_argument('--phParallel',            action='store_true',  help='use parallel calculation of PH')
+        self.parser.add_argument('--phConstruction',        type=str,             help='Either 0 (4 (2D) or 6 (3D) connectivity) or N (8 (2D) or 26 (3D) connectivity)', default='N')
+        self.parser.add_argument('--phThres',               type=float,           help='threshold for cutting a roi in ph post-ptocessing')

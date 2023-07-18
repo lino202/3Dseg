@@ -32,24 +32,18 @@ def main():
         if not os.path.exists(valPath): pathlib.Path(valPath).mkdir(parents=True, exist_ok=True)
 
         for item in cvFolds['train']['fold_{}'.format(i)]:
-            # if "mvo" in item:
+            # if "mi" in item:
             srcPath = os.path.join(vols_preprocessed, item)
             dstPath = os.path.join(trainPath, item)
             os.symlink(srcPath, dstPath, target_is_directory=True)
             print("Making link src: {}, dst {}".format(srcPath, dstPath))
 
         for item in cvFolds['val']['fold_{}'.format(i)]:
-            # if "mvo" in item:
+            # if "mi" in item:
             srcPath = os.path.join(vols_preprocessed, item)
             dstPath = os.path.join(valPath, item)
             os.symlink(srcPath, dstPath, target_is_directory=True)
             print("Making link src: {}, dst {}".format(srcPath, dstPath))
-
-
-
-
-
-        
 
 if __name__ == '__main__':
     main()

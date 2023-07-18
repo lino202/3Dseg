@@ -4,7 +4,7 @@ from torchsummary import summary
 import os 
 import numpy as np
 
-class ModelTest():
+class ModelPred():
     """ Interface for model Unet3D in test"""
     
     def __init__(self, opt):
