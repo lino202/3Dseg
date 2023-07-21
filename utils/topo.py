@@ -69,7 +69,7 @@ def BEmetric(pred, msk, prior, parallel, maxdim=2, construction='0'):
         maxdim       - max dimension for PH calculation [2] as we are working with 3D samples
         construction - Either '0' (4 (2D) or 6 (3D) connectivity) or 'N' (8 (2D) or 26 (3D) connectivity) ['0']'''
     
-    #Cheack for shape
+    #Check for shape
     assert(pred.shape==msk.shape)
      
     # Inspect prior and convert to tensor

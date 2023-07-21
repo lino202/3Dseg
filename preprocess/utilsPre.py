@@ -1,9 +1,6 @@
 
 
 import numpy as np
-import os
-from utilsROI import getROICINE, getROIMsk
-
 import torchio as tio    
 from torchio.transforms.augmentation import RandomTransform
 from torchio.transforms import SpatialTransform, ElasticDeformation
@@ -108,6 +105,8 @@ def crop(arr, roi):
     
 def cropSubjectPred(subject, pred):
     ''' This code takes a subject from torchio and perform cropping on both with a cardiac ROI''' 
+
+    from utilsROI import getROIMsk
     imgArr  = subject.img.data.numpy()
     mskArr  = subject.msk.data.numpy()
     predArr = pred.data.numpy()[0,:,:,:]
@@ -125,6 +124,8 @@ def cropSubjectPred(subject, pred):
 
 def cropSubjectCINE(subject, edes, widthHeight, plotPath=None):
     ''' This code takes a subject from torchio and perform cropping on both with a cardiac ROI''' 
+    
+    from utilsROI import getROICINE
     imgArr = subject.img.data.numpy()
     mskArr = subject.msk.data.numpy()
     roi = getROICINE(imgArr, plotPath=plotPath) 
@@ -168,23 +169,3 @@ def getEXFromMask(msk, sample):
             return edesIdx[1], edesIdx[0]
     else:
         raise ValueError("Control the mask of sample {} in time, different than 2 (ED and ES)".format(sample))
-
-        
-
-# def getBiV(arr, dilaIteractions, RVBPClass=3, LVMClass=2, kernel=(2,2)):
-#     '''This function dilate the RVBP for generating a BiV segmentation''' 
-#     kernel = scipy.ndimage.generate_binary_structure(kernel[0],kernel[1])
-#     rows, cols, slices = arr.shape
-#     arrBiVent = np.zeros(arr.shape)
-#     for s in range(slices):
-#         mskTmp = copy.deepcopy(arr[:,:,s])
-#         if np.max(mskTmp) != 0:
-#             mskTmp[mskTmp!=RVBPClass] = 0
-#             mskDila = scipy.ndimage.binary_dilation(mskTmp, structure=kernel, iterations=dilaIteractions).astype(mskTmp.dtype)
-#             RVmyo=mskDila*3-mskTmp
-#             LVmyo = copy.deepcopy(arr[:,:,s])
-#             LVmyo[LVmyo!=LVMClass] = 0
-#             newMsk = LVmyo + RVmyo
-#             newMsk[newMsk!=0]=1
-#             arrBiVent[:,:,s] = newMsk
-#     return arrBiVent
