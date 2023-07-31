@@ -104,6 +104,19 @@
         },
 
         {
+            "name": "getTopoStatistics MnMs",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/getTopoStatistics.py",
+            "console": "externalTerminal",
+            "args": [
+                "--dataPath", "D:/Segmentation/Data_paper2/MnM/topo/topology_MnM_phconstN.pickle",
+                "--resPath",  "D:/Segmentation/Data_paper2/MnM/topo/statistics2.xlsx",
+                "--labels",   "lv", "myo", "rv", "lv-myo", "lv-rv",  "myo-rv"
+            ]
+        },
+
+        {
             "name": "exploreTopo Exvivo",
             "type": "python",
             "request": "launch",
@@ -119,17 +132,44 @@
         },
 
         {
+            "name": "getTopoStatistics Exvivo",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/getTopoStatistics.py",
+            "console": "externalTerminal",
+            "args": [
+                "--dataPath", "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/topo/topology_Exvivo_nophchecked_phconstN.pickle",
+                "--resPath",  "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/topo/statistics2.xlsx",
+                "--labels",   "myo"
+            ]
+        },
+
+        {
             "name": "exploreTopo LGE",
             "type": "python",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/exploreTopo.py",
             "console": "externalTerminal",
             "args": [
-                "--dataPath", "D:/Segmentation/Data_paper2/LGE/96x96x24/vols_preprocessed",
+                "--dataPath", "D:/Segmentation/Data_paper2/LGE/96x96x24/vols_preprocessed_mi",
                 "--resPath",  "D:/Segmentation/Data_paper2/LGE/96x96x24/topo",
-                "--resName",  "topology_LGE_phconstN",
+                "--resName",  "topology_LGE_mi_phconstN",
                 "--phType",   "N",  //N or 0
                 "--labels",   "lv", "myo", "mi", "lv-myo", "lv-mi", "myo-mi",
+            ]
+        },
+
+
+        {
+            "name": "getTopoStatistics LGE",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/getTopoStatistics.py",
+            "console": "externalTerminal",
+            "args": [
+                "--dataPath", "D:/Segmentation/Data_paper2/LGE/96x96x24/topo/topology_LGE_mi_phconstN.pickle",
+                "--resPath",  "D:/Segmentation/Data_paper2/LGE/96x96x24/topo/statistics2.xlsx",
+                "--labels",   "lv", "myo", "mi", "lv-myo", "lv-mi",  "myo-mi"
             ]
         },
 
