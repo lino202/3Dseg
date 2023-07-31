@@ -59,12 +59,12 @@ def main():
       
         f, ax = plt.subplots(2,3)
         s = int(np.round(msk.shape[-1]/2))
-        ax[0,0].imshow(msk.data.numpy()[0,:,:,s], vmin=0, vmax=3)
-        ax[0,1].imshow(msk.data.numpy()[0,:,s,:], vmin=0, vmax=3)
-        ax[0,2].imshow(msk.data.numpy()[0,s,:,:], vmin=0, vmax=3)
-        ax[1,0].imshow(mskTrans.data.numpy()[0,:,:,s], vmin=0, vmax=3)
-        ax[1,1].imshow(mskTrans.data.numpy()[0,:,s,:], vmin=0, vmax=3)
-        ax[1,2].imshow(mskTrans.data.numpy()[0,s,:,:], vmin=0, vmax=3)
+        ax[0,0].imshow(msk.data.numpy()[0,:,:,s], vmin=0, vmax=3, interpolation='none')
+        ax[0,1].imshow(msk.data.numpy()[0,:,s,:], vmin=0, vmax=3, interpolation='none')
+        ax[0,2].imshow(msk.data.numpy()[0,s,:,:], vmin=0, vmax=3, interpolation='none')
+        ax[1,0].imshow(mskTrans.data.numpy()[0,:,:,s], vmin=0, vmax=3, interpolation='none')
+        ax[1,1].imshow(mskTrans.data.numpy()[0,:,s,:], vmin=0, vmax=3, interpolation='none')
+        ax[1,2].imshow(mskTrans.data.numpy()[0,s,:,:], vmin=0, vmax=3, interpolation='none')
         plt.savefig(os.path.join(args.plotPath, "{}.png".format(sample))) if args.plotPath else plt.show()
         plt.close()
         

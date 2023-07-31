@@ -219,16 +219,17 @@ def multi_class_topological_post_processing(
                 ncols=3
                 nrows = int(np.ceil(nImgs/ncols))
                 _, a = plt.subplots(nrows, ncols)
+                if a.ndim == 1 : a = a[np.newaxis,:]
                 j=0
                 i=0
                 for nImg in range(nImgs-1):
-                    a[j,i].imshow(combosArr[nImg,:,:,shown_slice])
+                    a[j,i].imshow(combosArr[nImg,:,:,shown_slice], interpolation='none')
                     a[j,i].axis('off')
                     i+=1
                     if i % ncols == 0: 
                         j += 1
                         i = 0
-                a[j,i].imshow(inputs[0][roi].cpu().numpy()[0,:,:,shown_slice])
+                a[j,i].imshow(inputs[0][roi].cpu().numpy()[0,:,:,shown_slice], interpolation='none')
                 plt.savefig(os.path.join(saveCombosPath, "it_{}.png".format(it)), dpi=300)
                 plt.close()
 

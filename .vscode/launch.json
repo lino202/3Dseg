@@ -399,7 +399,6 @@
                 "--norm",                 "instance",
                 "--ph",     
                 "--phThres",              "0.5",
-                "--phParallel",
                 "--phConstruction",       "N",     
                 "--priorName",            "PRIOR_EXVIVO",            
                 
@@ -424,7 +423,7 @@
                 "--patch_size",           "160", "160", "20",
                 "--load_filename",        "latest_net", 
                 "--norm",                 "instance",
-                // "--ph",     
+                "--ph",     
                 "--phThres",              "0.5",
                 // "--phParallel",
                 "--phConstruction",       "N",     

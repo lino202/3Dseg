@@ -66,7 +66,7 @@ def getROICINE(imgArr, plotPath=None):
         # plt.figure(),plt.subplot(131),plt.imshow(h1Sum, cmap='gray')
         # plt.subplot(132),plt.imshow(h1[:,:,6], cmap='gray')
         # plt.subplot(133),plt.imshow(imgArr[:,:,6,0], cmap='gray'), plt.show()
-        plt.figure(),plt.imshow(h1Sum, cmap='gray')
+        plt.figure(),plt.imshow(h1Sum, cmap='gray', interpolation='none')
 
     params = fitgaussian(h1Sum)
     fit = gaussian(*params)

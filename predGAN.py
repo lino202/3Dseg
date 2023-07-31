@@ -49,8 +49,8 @@ def main():
         sliceIdxs = np.linspace(0,img.shape[-1]-1,nImgs+2)
         sliceIdxs = np.round(sliceIdxs[1:-1]).astype(int)
         for j, s in enumerate(sliceIdxs):       
-            ax[0,j].imshow(img[:,:,s], vmin=0, vmax=1)
-            ax[1,j].imshow(pred[:,:,s], vmin=0, vmax=1)
+            ax[0,j].imshow(img[:,:,s], vmin=0, vmax=1, interpolation='none')
+            ax[1,j].imshow(pred[:,:,s], vmin=0, vmax=1, interpolation='none')
         plt.savefig(os.path.join(plots_path, "{}.png".format(sample)))
         plt.close()
         
