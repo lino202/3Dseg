@@ -8,7 +8,7 @@ import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-font = {'family' : "Times New Roman",
+font = {#'family' : "Times New Roman",
         'weight' : 'normal',
         'size'   : 15}
 plt.rc('font', **font)
