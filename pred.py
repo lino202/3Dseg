@@ -24,7 +24,7 @@ def main():
     opt.batch_size = 1    # test code only supports batch_size = 1
     opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
     opt.gan        = False # 3DGAN cannot be used without a ground truth.
-    sys.stdout = Logger(os.path.join(opt.results_dir, opt.name, "pred_output.out"))
+    sys.stdout = Logger(os.path.join(opt.results_dir, opt.name, "pred_output_{}.out".format('baseline' if not opt.ph else 'ph')))
 
     #Add results folders for plots and volumes
     vols_path     = os.path.join(opt.results_dir, opt.name, "volumes_{}_phconst{}".format('baseline' if not opt.ph else 'ph',  opt.phConstruction))
