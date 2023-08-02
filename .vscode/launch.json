@@ -87,6 +87,53 @@
             ] 
         },
 
+        {
+            "name": "deform LGE",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/deform.py",
+            "console": "externalTerminal",
+            "justMyCode": false,
+            "args": [
+                "--rootPath",  "D:/Segmentation/Data_paper2/LGE/96x96x24/vols_preprocessed_mi",
+                "--resPath",   "D:/Segmentation/Data_paper2/LGE/96x96x24/vols_preprocessed_mi_deform",
+                "--plotPath",  "D:/Segmentation/Data_paper2/LGE/96x96x24/plots_preprocessed_mi_deform",
+                "--maxDisp",   "2.5"   
+            ]
+        },
+
+
+        {
+            "name": "deform Exvivo",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/deform.py",
+            "console": "externalTerminal",
+            "justMyCode": false,
+            "args": [
+                "--rootPath",  "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/vols_preprocessed",
+                "--resPath",   "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/vols_preprocessed_deform",
+                "--plotPath",  "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/plots_preprocessed_deform",
+                "--maxDisp",   "3.9"   
+            ]
+        },
+
+        {
+            "name": "deform MnM",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/deform.py",
+            "console": "externalTerminal",
+            "justMyCode": false,
+            "args": [
+                "--rootPath",  "D:/Segmentation/Data_paper2/MnM/vols_preprocessed",
+                "--resPath",   "D:/Segmentation/Data_paper2/MnM/vols_preprocessed_deform",
+                "--plotPath",  "D:/Segmentation/Data_paper2/MnM/plots_preprocessed_deform",
+                "--maxDisp",   "3.12"   
+            ]
+        },
+
+
         //TOPO-------------------------------------------
         {
             "name": "exploreTopo MnMs",
@@ -200,7 +247,20 @@
             "args": [
                 "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/MnM/cv_5Fold.pickle",
                 "--rootPath",          "D:/Segmentation/Data_paper2/MnM",
-                "--resPath",           "D:/Segmentation/Data_paper2/MnM/CV",
+                "--resPath",           "D:/Segmentation/Data_paper2/MnM/CV_deform",
+            ]
+        },
+
+        {
+            "name": "getCVSymlinksDeform",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVSymlinksDeform.py",
+            "console": "externalTerminal",
+            "args": [
+                "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/MnM/cv_5Fold.pickle",
+                "--rootPath",          "D:/Segmentation/Data_paper2/MnM",
+                "--resPath",           "D:/Segmentation/Data_paper2/MnM/CV_deform",
             ]
         },
 
