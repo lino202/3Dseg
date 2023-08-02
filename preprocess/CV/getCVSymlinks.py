@@ -20,8 +20,7 @@ def main():
     with open(args.cvPickleFilePath, 'rb') as handle:
         cvFolds = pickle.load(handle)
 
-    rootPath = args.rootPath
-    vols_preprocessed = os.path.join(rootPath, 'vols_preprocessed')
+    vols_preprocessed = args.rootPath
     if os.path.exists(args.resPath): shutil.rmtree(args.resPath)
     NFOLD = int(list(cvFolds['train'].keys())[-1].split("_")[-1])+1
 

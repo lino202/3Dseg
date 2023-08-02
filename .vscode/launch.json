@@ -258,9 +258,9 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVSymlinksDeform.py",
             "console": "externalTerminal",
             "args": [
-                "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/MnM/cv_5Fold.pickle",
-                "--rootPath",          "D:/Segmentation/Data_paper2/MnM",
-                "--resPath",           "D:/Segmentation/Data_paper2/MnM/CV_deform",
+                "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/LGE/cv_5Fold.pickle",
+                "--rootPath",          "D:/Segmentation/Data_paper2/LGE/96x96x24/vols_preprocessed_mi_deform",
+                "--resPath",           "D:/Segmentation/Data_paper2/LGE/96x96x24/CV_deform",
             ]
         },
 
@@ -516,6 +516,48 @@
                 "--phConstruction",       "N",     
                 "--priorName",            "PRIOR_LGE",            
                 
+            ] 
+        },
+
+
+        {
+            "name": "pred MnM GANs",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/predGAN.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "D:/Segmentation/Data_paper2/MnM/CV_deform/fold_0/train",
+                "--results_dir",     "D:/Segmentation/Results_paper2/MnM_GAN",
+                "--name",            "fold_0",
+                "--phase",           "pred",
+                "--input_nc",        "1",
+                "--output_nc",       "1",
+                "--nfl",             "64",
+                "--num_downs",       "5",
+                "--patch_size",      "160", "160", "20",
+                "--load_filename",   "latest_net_G",  
+            ] 
+        },
+
+
+        {
+            "name": "pred LGE GANs",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/predGAN.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",       "D:/Segmentation/Data_paper2/LGE/96x96x24/CV_deform/fold_0/train",
+                "--results_dir",     "D:/Segmentation/Results_paper2/LGE_GAN",
+                "--name",            "fold_0",
+                "--phase",           "pred",
+                "--input_nc",        "1",
+                "--output_nc",       "1",
+                "--nfl",             "64",
+                "--num_downs",       "5",
+                "--patch_size",      "96", "96", "24",
+                "--load_filename",   "latest_net_G",  
             ] 
         },
 

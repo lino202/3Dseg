@@ -20,9 +20,8 @@ def main():
     with open(args.cvPickleFilePath, 'rb') as handle:
         cvFolds = pickle.load(handle)
 
-    rootPath = args.rootPath
-    vols_preprocessed = os.path.join(rootPath, 'vols_preprocessed_deform')
-    #if os.path.exists(args.resPath): shutil.rmtree(args.resPath)
+    vols_preprocessed = args.rootPath
+    if os.path.exists(args.resPath): shutil.rmtree(args.resPath)
     NFOLD = int(list(cvFolds['train'].keys())[-1].split("_")[-1])+1
 
     for i in range(NFOLD):
@@ -30,11 +29,11 @@ def main():
         if not os.path.exists(trainPath): pathlib.Path(trainPath).mkdir(parents=True, exist_ok=True)
 
         for item in cvFolds['train']['fold_{}'.format(i)]:
-            # if "mi" in item:
-            srcPath = os.path.join(vols_preprocessed, "{}_deform".format(item))
-            dstPath = os.path.join(trainPath, "{}_deform".format(item))
-            os.symlink(srcPath, dstPath, target_is_directory=True)
-            print("Making link src: {}, dst {}".format(srcPath, dstPath))
+            if "mi" in item:
+                srcPath = os.path.join(vols_preprocessed, "{}_deform".format(item))
+                dstPath = os.path.join(trainPath, "{}_deform".format(item))
+                os.symlink(srcPath, dstPath, target_is_directory=True)
+                print("Making link src: {}, dst {}".format(srcPath, dstPath))
 
 if __name__ == '__main__':
     main()

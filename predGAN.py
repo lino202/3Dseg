@@ -2,6 +2,7 @@ import os
 from utils.options import TestOptions
 from utils.util import mkdir
 from data import create_dataloader
+from data.utils import unitNorm
 from models.model_pred import ModelPred
 import matplotlib.pyplot as plt
 import nibabel as nib
@@ -38,8 +39,8 @@ def main():
         model.test()           # run inference
         pred = model.pred.to('cpu').numpy()
         img  = model.img.to('cpu').numpy()    # this is the msk
-        pred = create_dataloader.unitNorm(np.squeeze(pred))
-        img  = create_dataloader.unitNorm(np.squeeze(img))
+        pred = unitNorm(np.squeeze(pred))
+        img  = unitNorm(np.squeeze(img))
         affine  = model.affine.numpy()[0,:,:]
         
         #We have 3D arrays [0,1] we save the img.nii and save the plots (msk.nii is not resaved)
