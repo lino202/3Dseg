@@ -17,6 +17,7 @@ def main():
     mkdir(os.path.join(opt.results_dir, opt.name))
     sys.stdout = Logger(os.path.join(opt.results_dir, opt.name, "train_output.out"))
 
+    print('Reading data from {}'.format(opt.root_path))
     train_dataloader = create_dataloader.create(opt, opt.phase)     # create a dataloader with given options
     print('Training with {} samples grouped in {} batches'.format(len(train_dataloader.dataset),len(train_dataloader)))
     val_dataloader = create_dataloader.create(opt, 'val')  # create a create a dataloader with given options
