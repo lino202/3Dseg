@@ -570,9 +570,9 @@
             "console": "externalTerminal",
             "args": [
                 "--msksFolder",   "D:/Segmentation/Data_paper2/LGE/baseline/labels",
-                "--predsFolder",  "D:/Segmentation/Results_paper2/LGE/96x96x24_mi/fold_0/volumes_baseline_phconstN",
+                "--predsFolder",  "D:/Segmentation/Results_paper2/LGE/96x96x24_mi/base_deform_fold_0/volumes_baseline_phconstN",
                 "--subPreFolder", "D:/Segmentation/Data_paper2/LGE/96x96x24/subjects_preprocessed",
-                "--resPath",      "D:/Segmentation/Results_paper2/LGE/96x96x24_mi/fold_0/volumes_baseline_phconstN_originalSpace"       
+                "--resPath",      "D:/Segmentation/Results_paper2/LGE/96x96x24_mi/base_deform_fold_0/volumes_baseline_phconstN_originalSpace"       
             ] 
         },
 
@@ -585,27 +585,27 @@
             "console": "externalTerminal",
             "args": [
                 "--msksFolder",   "D:/Data/RM/MnM/OpenDataset/all",
-                "--predsFolder",  "D:/Segmentation/Results_paper2/MnM/fold_1/volumes_baseline_phconstN",
+                "--predsFolder",  "D:/Segmentation/Results_paper2/MnM/base_deform_fold_0/volumes_baseline_phconstN",
                 "--subPreFolder", "D:/Segmentation/Data_paper2/MnM/subjects_preprocessed",
-                "--resPath",      "D:/Segmentation/Results_paper2/MnM/fold_1/volumes_baseline_phconstN_originalSpace"       
+                "--resPath",      "D:/Segmentation/Results_paper2/MnM/base_deform_fold_0/volumes_baseline_phconstN_originalSpace"       
             ] 
         },
 
         {
-            "name": "compute Metrics",
+            "name": "compute Metrics MnM",
             "type": "python",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/computeMetrics.py",
             "console": "externalTerminal",
             "args": [
 
-                "--predsFolder",           "D:/Segmentation/Results_paper2/MnM/fold_1/volumes_baseline_phconstN_originalSpace", 
+                "--predsFolder",           "D:/Segmentation/Results_paper2/MnM/base_deform_fold_0/volumes_baseline_phconstN_originalSpace", 
                 "--msksFolder",            "D:/Data/RM/MnM/OpenDataset/all",
                 "--imgsFolder",            "D:/Data/RM/MnM/OpenDataset/all",
                 "--nClasses",              "4",
                 "--priorName",             "PRIOR_CINE",   
                 "--phThres",               "0.5",
-                "--resPath",               "D:/Segmentation/Results_paper2/MnM/fold_1/metrics/volumes_baseline_phconstN_originalSpace",
+                "--resPath",               "D:/Segmentation/Results_paper2/MnM/base_deform_fold_0/metrics/volumes_baseline_phconstN_originalSpace",
                 "--res_excel_indexs",      "gdsc_bg", "gdsc_lv", "gdsc_myo", "gdsc_rv", 
                                            "hd_bg", "hd_lv", "hd_myo", "hd_rv",                           
                                            "assd_bg", "assd_lv", "assd_myo", "assd_rv",
@@ -614,7 +614,99 @@
             ] 
         },
 
+        {
+            "name": "compute Metrics Exvivo",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/postprocess/computeMetrics.py",
+            "console": "externalTerminal",
+            "args": [
 
+                "--predsFolder",           "D:/Segmentation/Results_paper2/Exvivo/fold_0/volumes_baseline_phconstN", 
+                "--msksFolder",            "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/all",
+                "--imgsFolder",            "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/all",
+                "--nClasses",              "2",
+                "--priorName",             "PRIOR_EXVIVO",   
+                "--phThres",               "0.5",
+                "--resPath",               "D:/Segmentation/Results_paper2/Exvivo/fold_0/metrics/volumes_baseline_phconstN_originalSpace",
+                "--res_excel_indexs",      "gdsc_bg", "gdsc_myo",
+                                           "hd_bg",   "hd_myo",                           
+                                           "assd_bg", "assd_myo",
+                                           "be",      "ts",
+    
+            ] 
+        },
+
+
+        {
+            "name": "compute Metrics LGE",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/postprocess/computeMetrics.py",
+            "console": "externalTerminal",
+            "args": [
+
+                "--predsFolder",           "D:/Segmentation/Results_paper2/LGE/96x96x24_mi/fold_0/volumes_baseline_phconstN_originalSpace", 
+                "--msksFolder",            "D:/Segmentation/Data_paper2/LGE/baseline/labels",
+                "--imgsFolder",            "D:/Segmentation/Data_paper2/LGE/baseline/images",
+                "--nClasses",              "4",
+                "--priorName",             "PRIOR_LGE",   
+                "--phThres",               "0.5",
+                "--resPath",               "D:/Segmentation/Results_paper2/LGE/96x96x24_mi/fold_0/metrics/volumes_baseline_phconstN_originalSpace",
+                "--res_excel_indexs",      "gdsc_bg", "gdsc_lv", "gdsc_myo", "gdsc_mi", 
+                                           "hd_bg", "hd_lv", "hd_myo", "hd_mi",                           
+                                           "assd_bg", "assd_lv", "assd_myo", "assd_mi",
+                                           "be", "ts",
+    
+            ] 
+        },
+
+
+        {
+            "name": "readPlotPickle Exvivo",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
+            "console": "externalTerminal",
+            "args": [
+
+                "--filePath",     "D:/Segmentation/Results_paper2/Exvivo", 
+                "--nFold",        "7",
+                "--resPath",      "D:/Segmentation/Results_paper2/Exvivo",
+    
+            ] 
+        },
    
+
+        {
+            "name": "readPlotPickle LGE",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
+            "console": "externalTerminal",
+            "args": [
+
+                "--filePath",     "D:/Segmentation/Results_paper2/LGE/96x96x24_mi", 
+                "--nFold",        "5",
+                "--resPath",      "D:/Segmentation/Results_paper2/LGE/96x96x24_mi",
+    
+            ] 
+        },
+
+
+        {
+            "name": "readPlotPickle MnM",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
+            "console": "externalTerminal",
+            "args": [
+
+                "--filePath",     "D:/Segmentation/Results_paper2/MnM", 
+                "--nFold",        "5",
+                "--resPath",      "D:/Segmentation/Results_paper2/MnM",
+    
+            ] 
+        },
     ]
 }

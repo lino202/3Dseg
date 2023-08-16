@@ -55,8 +55,9 @@ def getSubjectImgMsk(imgsFolder, msksFolder, sample):
                         subject.img.set_data(subject.img.data[edes[0]][np.newaxis, :])
                 
                 elif "Myosaiq" in imgsFolder or "LGE" in imgsFolder:
-                        imgPath = os.path.join(imgsFolder, "{}.nii.gz".format(sample))
-                        mskPath = os.path.join(msksFolder, "{}.nii.gz".format(sample))
+                        origSampleName = "_".join(sample.split('_')[:-1])
+                        imgPath = os.path.join(imgsFolder, "{}.nii.gz".format(origSampleName))
+                        mskPath = os.path.join(msksFolder, "{}.nii.gz".format(origSampleName))
                         subject = tio.Subject(img=tio.ScalarImage(imgPath), msk=tio.LabelMap(mskPath))
                         subject.msk.data[subject.msk.data>3] = 3  #This is only done for this datasets
 
