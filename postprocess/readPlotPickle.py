@@ -59,10 +59,15 @@ def main():
     args = parser.parse_args()
     
     #Collectand group data from all folds
-    gan_baseline = [os.path.join(args.filePath, "base_deform_fold_{}".format(i), "metrics", "volumes_baseline_phconstN_originalSpace") for i in range(args.nFold)]
-    gan_ph       = [os.path.join(args.filePath, "base_deform_fold_{}".format(i), "metrics", "volumes_ph_phconstN_originalSpace") for i in range(args.nFold)]
-    baseline     = [os.path.join(args.filePath, "fold_{}".format(i), "metrics", "volumes_baseline_phconstN_originalSpace") for i in range(args.nFold)]
-    ph           = [os.path.join(args.filePath, "fold_{}".format(i), "metrics", "volumes_ph_phconstN_originalSpace") for i in range(args.nFold)]
+    # gan_baseline = [os.path.join(args.filePath, "base_deform_fold_{}".format(i), "metrics", "volumes_baseline_phconstN_originalSpace") for i in range(args.nFold)]
+    # gan_ph       = [os.path.join(args.filePath, "base_deform_fold_{}".format(i), "metrics", "volumes_ph_phconstN_originalSpace") for i in range(args.nFold)]
+    # baseline     = [os.path.join(args.filePath, "fold_{}".format(i), "metrics", "volumes_baseline_phconstN_originalSpace") for i in range(args.nFold)]
+    # ph           = [os.path.join(args.filePath, "fold_{}".format(i), "metrics", "volumes_ph_phconstN_originalSpace") for i in range(args.nFold)]
+
+    gan_baseline = [os.path.join(args.filePath, "base_deform_fold_{}".format(i), "metrics", "volumes_baseline_phconstN") for i in range(args.nFold)]
+    gan_ph       = [os.path.join(args.filePath, "base_deform_fold_{}".format(i), "metrics", "volumes_ph_phconstN") for i in range(args.nFold)]
+    baseline     = [os.path.join(args.filePath, "fold_{}".format(i), "metrics", "volumes_baseline_phconstN") for i in range(args.nFold)]
+    ph           = [os.path.join(args.filePath, "fold_{}".format(i), "metrics", "volumes_ph_phconstN") for i in range(args.nFold)]
     
     data_gan_baseline = groupFoldResults(gan_baseline)
     data_gan_ph       = groupFoldResults(gan_ph)

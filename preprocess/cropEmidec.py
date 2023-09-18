@@ -74,9 +74,9 @@ def proccess(dataPath, space, resPath=None, save=False):
             sOri = int(np.round(results["img_Ori"].shape[-1]/2))
             s = int(np.round(results["img"].shape[-1]/2))
             ax[0,0].imshow(results["img_Ori"][:,:,sOri], vmin=results["img_Ori"].min(), vmax = results["img_Ori"].max(), interpolation='none')
-            ax[0,1].imshow(results["msk_Ori"][:,:,sOri], vmin=0, vmax=4, interpolation='none')
+            ax[0,1].imshow(results["msk_Ori"][:,:,sOri], vmin=0, vmax=results["msk_Ori"][:,:,sOri].max(), interpolation='none')
             ax[1,0].imshow(results["img"][:,:,s], vmin=results["img"].min(), vmax = results["img"].max(), interpolation='none')
-            ax[1,1].imshow(results["msk"][:,:,s], vmin=0, vmax=4, interpolation='none')
+            ax[1,1].imshow(results["msk"][:,:,s], vmin=0, vmax=results["msk"][:,:,s].max(), interpolation='none')
             plt.savefig(os.path.join(plotPath, "{}.png".format(sample)))
             plt.close()
 
@@ -99,7 +99,7 @@ def main():
     parser.add_argument('--resPath',      type=str)
     args = parser.parse_args()
 
-    space = [120, 120] # space in SA plane of 120x120mm as LV is centered 
+    space = [120, 120] # space in SA plane of 120x120 pixels as LV is centered 
     proccess(args.filePath, space, resPath=args.resPath, save=True)
 
 if __name__ == '__main__':
