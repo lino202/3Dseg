@@ -21,7 +21,7 @@ def main():
     
     font = {'family' : "Times New Roman",
         'weight' : 'normal',
-        'size'   : 10}
+        'size'   : 20}
     plt.rc('font', **font)
     plt.rcParams.update({'mathtext.default':  'regular' })
     # plt.rcParams['figure.figsize'] = [15, 12]
@@ -29,9 +29,9 @@ def main():
     x = np.arange(results.shape[1]) + 1
     for n,label in enumerate(labels):
         f, ax = plt.subplots(3,1, tight_layout=True)
-        ax[0].scatter(x,results[n,:,0].T, c=COLORS[n], label=label)
-        ax[1].scatter(x,results[n,:,1].T, c=COLORS[n], label=label)
-        ax[2].scatter(x,results[n,:,2].T, c=COLORS[n], label=label)
+        ax[0].scatter(x,results[n,:,0].T, c=COLORS[n], label=label.upper())
+        ax[1].scatter(x,results[n,:,1].T, c=COLORS[n], label=label.upper())
+        ax[2].scatter(x,results[n,:,2].T, c=COLORS[n], label=label.upper())
         ax[0].legend(loc="upper right")
         ax[1].legend(loc="upper right")
         ax[2].legend(loc="upper right")

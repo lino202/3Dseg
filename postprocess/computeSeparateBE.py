@@ -1,24 +1,20 @@
-'''This compute different metrics for assessing different approaches
+'''This compute BE for assessing different approaches
 between msk and preds, which could be or not on the original space
 If in the original space, you will use the msks before preprocessing 
 so be carefull to replicate the msks preprocessing that affected labels (not shaping)'''    
 
 import os
 import argparse
-import pathlib
 import time
 import torch.nn.functional as F
 import numpy as np
 import torchio as tio
 import sys
-import monai
-import torch
-import matplotlib.pyplot as plt
 import pickle
 sys.path.append(os.path.join('/'.join(sys.path[0].split("/")[:-1])))
 from preprocess.utilsPre import getEXFromMask
 from utils.priors import PRIOR_CINE, PRIOR_EXVIVO, PRIOR_LGE
-from utils.topo import BEmetric
+from utils.topo import BEmetricSeparated
 from utils.util import getStatistics
 import pandas as pd
 
@@ -103,9 +99,6 @@ def main():
         nSamples = len(samples)
         print('There are {} samples in total'.format(len(samples)))
 
-        plots_path     = os.path.join(args.resPath, "plots_vols")
-        if not os.path.exists(plots_path): pathlib.Path(plots_path).mkdir(parents=True, exist_ok=True)
-
         # Get prior, this important when using and not using PH as the BE metric needs this to compute the difference in 
         # Topo between the msks and preds
         if   "CINE"   in args.priorName: prior = PRIOR_CINE
@@ -116,11 +109,9 @@ def main():
         if args.phThres < 0: phThres = None
         else: phThres = args.phThres
 
-        gdsc = np.zeros((nSamples, args.nClasses))
-        hd   = np.zeros((nSamples, args.nClasses))
-        assd = np.zeros((nSamples, args.nClasses))
-        ts   = np.zeros(nSamples)
-        be   = np.zeros(nSamples)
+        be_0   = np.zeros((nSamples, len(prior)))
+        be_1   = np.zeros((nSamples, len(prior)))
+        be_2   = np.zeros((nSamples, len(prior)))
         for i, sample in enumerate(samples):
 
                 print('Processing sample = {}'.format(sample))
@@ -133,7 +124,7 @@ def main():
 
                 subject = tio.Subject(img=img, msk=msk, pred=pred)
                 subject.check_consistent_attribute('spacing') 
-                # subject.check_consistent_attribute('affine') # this might be give error due to rounding error
+                # subject.check_consistent_attribute('affine') # this might give error due to rounding error
                 subject.check_consistent_attribute('shape')
 
                 #Get msk and pred one-hot for compute metrics
@@ -143,69 +134,39 @@ def main():
                 one_hot = F.one_hot(msk.data.long(), num_classes=args.nClasses)
                 msk_one_hot = one_hot.permute(0, 4, 1, 2, 3).type(msk.data.type())
                 
-                #Get gDSC, HD, BE and TS
-                #there is an error on gDSC implementation as results has not shape [BxC]
-                #For this reason we permute CxB and get background value in order to have the right values
-                #Also it does not work when tensor are on cuda, they already submitted a PR.
-                #TODO This should be checked or an issue should be raisen in https://github.com/Project-MONAI/MONAI
-                gdsc[i,:] = monai.metrics.compute_generalized_dice(torch.permute(pred_one_hot, (1,0,2,3,4)), torch.permute(msk_one_hot, (1,0,2,3,4)), include_background=True)
-                hd[i,:]   = monai.metrics.compute_hausdorff_distance(pred_one_hot, msk_one_hot, include_background=True, spacing=pred.spacing) #monai 1.2.0 admits spacing
-                assd[i,:] = monai.metrics.compute_average_surface_distance(pred_one_hot, msk_one_hot, symmetric=True, include_background=True, spacing=pred.spacing)
-                be[i]     = BEmetric(pred_one_hot[0,:,:,:,:], msk_one_hot[0,:,:,:,:], prior, args.phParallel)
-                if be[i] == 0.: ts[i] = 1
-
-                #Get arrays for plottings
-                mskArr  = msk.data[0].numpy()
-                predArr = pred.data[0].numpy()
-                imgArr  = img.data[0].numpy()
-                
-                #Save per volume results
-                #Save images, we disregard the first and last image in the stack as usually are completly background
-                nImgs = 5
-                f, ax = plt.subplots(3,nImgs)
-                sliceIdxs = np.linspace(0,img.shape[-1]-1,nImgs+2)
-                sliceIdxs = np.round(sliceIdxs[1:-1]).astype(int)
-                for j, s in enumerate(sliceIdxs):       
-                    ax[0,j].imshow(imgArr[:,:,s],  vmin=0, vmax=imgArr.max(), interpolation='none')
-                    ax[0,j].axis('off')
-                    ax[1,j].imshow(mskArr[:,:,s],  vmin=0, vmax=args.nClasses-1, interpolation='none')
-                    ax[1,j].axis('off')
-                    ax[2,j].imshow(predArr[:,:,s], vmin=0, vmax=args.nClasses-1, interpolation='none')
-                    ax[2,j].axis('off')
-                plt.savefig(os.path.join(plots_path, "{}.png".format(sample)), dpi=300)
-                plt.close()
+                #Get BE separated
+                be_0[i,:], be_1[i,:], be_2[i,:] = BEmetricSeparated(pred_one_hot[0,:,:,:,:], msk_one_hot[0,:,:,:,:], prior, args.phParallel)
                 
                 #Print info
                 print("Processed sample {}/{} took {} s".format(i+1, nSamples, time.time() - start_iter))
 
 
         #Save general results ---------------------------------------------------------------------------
-
         #Save per volumes parameters results  
         print("Saving results -------------------------------")
 
-        res_params = np.vstack((gdsc.T, hd.T, assd.T, be, ts))
+        be = np.concatenate((be_0[:,np.newaxis], be_1[:,np.newaxis], be_2[:,np.newaxis]), axis=1)
         res_dict = {}
         for i, index_name in enumerate(args.res_excel_indexs):
-                res_dict[index_name] = res_params[i,:]
-        with open(os.path.join(args.resPath, "results.pickle"), 'wb') as f:
+                for j in range(3):
+                        res_dict["{}_{}".format(index_name,j)] = be[:,j,i]
+        with open(os.path.join(args.resPath, "results_separatedBE.pickle"), 'wb') as f:
                 pickle.dump(res_dict, f)
     
         #Save statiscal summary on excel with exp name
         exp_name = args.predsFolder.split('/')[-1]
-        res_excel = os.path.join(args.resPath, "stats.xlsx")
+        res_excel = os.path.join(args.resPath, "stats_separateBE.xlsx")
     
         res_dataframe = []
         for i, index_name in enumerate(args.res_excel_indexs):
-                if 'ts' != index_name:
-                        res_dataframe.append(getStatistics(res_params[i,:]))        
-                else:
-                        tmp = np.ones(9+1) * np.nan
-                        tmp[-1] = np.sum(ts) / nSamples
-                        res_dataframe.append(tmp)
+                for j in range(3):
+                        res_dataframe.append(getStatistics(be[:,j,i]))        
     
-        indexs  = ["{}_{}".format(exp_name, index) for index in args.res_excel_indexs] 
-        columns = ['mean', 'std', 'min', 'max', 'median', 'lowQuart', 'upQuart', 'lowWhisker', 'upWhisker', 'perc']
+        indexs = []
+        for index in args.res_excel_indexs:
+                for j in range(3):
+                        indexs.append("{}_{}_{}".format(exp_name, index, j)) 
+        columns = ['mean', 'std', 'min', 'max', 'median', 'lowQuart', 'upQuart', 'lowWhisker', 'upWhisker']
         df = pd.DataFrame(res_dataframe, index=indexs, columns=columns)
     
         if not os.path.exists(res_excel):

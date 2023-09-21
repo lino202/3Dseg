@@ -66,7 +66,8 @@ def main():
                 inputs=model.img, model=model.net, prior=prior,
                 lr=1e-5, mse_lambda=1000,
                 opt=torch.optim.Adam, num_its=100, construction=opt.phConstruction, 
-                thresh=phThres, parallel=opt.phParallel, saveCombosPath=os.path.join(sample_vol_path)
+                thresh=phThres, parallel=opt.phParallel, saveCombosPath=sample_vol_path,
+                saveLogitsPath=sample_vol_path
             )
             pred = model_TP(model.img)
         else:

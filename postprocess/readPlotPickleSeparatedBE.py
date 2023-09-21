@@ -11,13 +11,13 @@ from utils.util import getStatistics
 sns.set(style='whitegrid')
 font = {'family' : "Times New Roman",
     'weight' : 'bold',
-    'size'   : 22}
+    'size'   : 30}
 plt.rc('font', **font)
 plt.rcParams.update({'mathtext.default':  'regular' })
 
 def groupFoldResults(paths):
     for i, foldPath in enumerate(paths):
-        tmpData = pd.read_pickle(os.path.join(foldPath, "results.pickle"))
+        tmpData = pd.read_pickle(os.path.join(foldPath, "results_separatedBE.pickle"))
         if i==0: 
             classes = tmpData.keys()
             groupData = tmpData
@@ -30,9 +30,9 @@ def groupFoldResults(paths):
 def map2DF(data, label):
     # This work as long as all keys have array associated with the same length
     label_change = {"lv": "LV", "myo": "MYO", "rv": "RV", 
-                "lvmyo": "LV-MYO", "lvrv": "LV-RV", "lvmi": "LV-MI", 
-                "myorv": "MYO-RV", "myomi": "MYO-MI",
-                "mi": "MI", "be": "BE", "ts": "TS"} 
+                    "lvmyo": "LV-MYO", "lvrv": "LV-RV", "lvmi": "LV-MI", 
+                    "myorv": "MYO-RV", "myomi": "MYO-MI",
+                    "mi": "MI"} 
     tmpkey = list(data.keys())[0]
     n = data[tmpkey][list(data[tmpkey].keys())[0]].shape[0]
     mydict = {}
@@ -44,20 +44,26 @@ def map2DF(data, label):
             if label.split(' ')[0].lower() in key and not 'bg' in key:
                 # tmp = np.concatenate((dataBaseline[key], dataPH[key]))
                 mydict[label] = np.concatenate((mydict[label], data[approach][key])) if mydict[label].size else data[approach][key]
-                classe = label_change[key.split('_')[-1]]
-                tmp = [classe] * n
+                classe = key.split('be_')[-1].split('_')[0]
+                betti  = key.split('be_')[-1].split('_')[1]
+                tmp = ["{} $B_{}$".format(label_change[classe.lower()], betti)] * n
                 mydict['Class'] = [*mydict['Class'], *tmp]
                 tmp = [approach] * n
                 mydict['Approach'] = [*mydict['Approach'], *tmp]
     return mydict
 
-def plot(data, label, resPath, fontsize=20):
-    plt.figure(figsize=(8, 6), dpi=80)
+def plot(data, label, resPath, fontsize=30):
+    if not "Exvivo" in resPath:
+        plt.figure(figsize=(36, 10))
+    else:
+        plt.figure(figsize=(8, 6), dpi=80)
     boxplot = sns.boxplot(data=data, x='Class', y=label, hue='Approach')
-    # boxplot.set_ylabel(label, fontsize=fontsize)
     boxplot.tick_params(labelsize=fontsize)
+    boxplot.set_xticklabels(boxplot.get_xticklabels(), fontsize=30)
+    plt.xticks(rotation=60)
+    plt.tight_layout()
     if resPath:
-        plt.savefig(os.path.join(resPath, "{}.png".format(label)))
+        plt.savefig(os.path.join(resPath, "separated{}.pdf".format(label)))
     else:
         plt.show()
     plt.close()
@@ -83,43 +89,26 @@ def main():
     data = {"B": data_baseline, "TA": data_ph, "SA": data_gan_baseline, "SATA": data_gan_ph}
     
     #REMAP into DF--------------------------------------------
-    gdsc = map2DF(data, 'gDSC')
-    hd   = map2DF(data, 'HD (mm)')
-    assd = map2DF(data, 'ASSD (mm)')
     be   = map2DF(data, 'BE')
-    ts   = map2DF(data, 'TS')
-            
-    gdsc = pd.DataFrame(gdsc)
-    hd   = pd.DataFrame(hd)
-    assd = pd.DataFrame(assd)
     be   = pd.DataFrame(be)
-    ts   = pd.DataFrame(ts)
     
     #Save or plot ----------------------------------
-    plot(gdsc, 'gDSC', args.resPath)
-    plot(hd,   'HD (mm)', args.resPath)
-    plot(assd, 'ASSD (mm)', args.resPath)
-    plot(be,   'BE', args.resPath)
-    plot(ts,   'TS', args.resPath)
+    plot(be, 'BE', args.resPath)
+
     
     # Get overall statistics
     # res_dataframe = []
     # res_excel_indexs = []
-    # nSamples = data_baseline['ts'].shape[0]
     # for approach in data.keys():
     #     for metric_class in data[approach].keys():
     #         res_excel_indexs.append("{}_{}".format(approach, metric_class)) 
-    #         if 'ts' != metric_class:
-    #                 res_dataframe.append(getStatistics(data[approach][metric_class]))        
-    #         else:
-    #                 tmp = np.ones(9+1) * np.nan
-    #                 tmp[-1] = np.sum(data[approach][metric_class]) / nSamples
-    #                 res_dataframe.append(tmp)
+    #         res_dataframe.append(getStatistics(data[approach][metric_class]))        
 
-    # columns = ['mean', 'std', 'min', 'max', 'median', 'lowQuart', 'upQuart', 'lowWhisker', 'upWhisker', 'perc']
+
+    # columns = ['mean', 'std', 'min', 'max', 'median', 'lowQuart', 'upQuart', 'lowWhisker', 'upWhisker']
     # df = pd.DataFrame(res_dataframe, index=res_excel_indexs, columns=columns)
 
-    # res_excel = os.path.join(args.resPath, "stats.xlsx")
+    # res_excel = os.path.join(args.resPath, "stats_separatedBE.xlsx")
     # if not os.path.exists(res_excel):
     #         df.to_excel(res_excel, sheet_name='sheet1')
     # else:   

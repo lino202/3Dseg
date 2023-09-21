@@ -12,6 +12,7 @@ import torch.nn.functional as F
 import copy
 import matplotlib.pyplot as plt
 import os
+import pickle
 
 def crip_wrapper(X, D):
     return crip.computePH(X, maxdim=D)
@@ -27,7 +28,7 @@ def get_roi(X, thresh=0.01):
     return roi
 
 def getBarcodes(tensor, prior, max_dims, ph, construction, parallel=True):
-    #tensor must be ont-hot encoded
+    #tensor must be one-hot encoded
 
     # Build class/combination-wise (c-wise) image tensor for prior
     tmp = []
@@ -89,6 +90,53 @@ def BEmetric(pred, msk, prior, parallel, maxdim=2, construction='0'):
     return np.sum(be)    
 
 
+def BEmetricSeparated(pred, msk, prior, parallel, maxdim=2, construction='0'):
+    '''Performs Get Betti error as defined in the Byrne et al, paper.
+    
+    Arguments:
+        REQUIRED
+        pred         - PyTorch tensor with shape [1, number of classes, H,W,[D]]
+        msk          - PyTorch tensor with shape [1, number of classes, H,W,[D]]
+        prior        - Topological prior as dictionary:
+                        keys are tuples specifying the channel(s) of inputs
+                        values are tuples specifying the desired Betti numbers
+ 
+        OPTIONAL [default]
+        maxdim       - max dimension for PH calculation [2] as we are working with 3D samples
+        construction - Either '0' (4 (2D) or 6 (3D) connectivity) or 'N' (8 (2D) or 26 (3D) connectivity) ['0']'''
+    
+    #Check for shape
+    assert(pred.shape==msk.shape)
+     
+    # Inspect prior and convert to tensor
+    max_dims = [len(b) for b in prior.values()]
+    prior = {torch.tensor(c): torch.tensor(b) for c, b in prior.items()}
+    
+    ph = {'0': crip_wrapper, 'N': trip_wrapper}
+    
+    #Get barcodes
+    predBarcodes = getBarcodes(pred, prior, max_dims, ph, construction, parallel)
+    mskBarcodes  = getBarcodes(msk, prior, max_dims, ph, construction, parallel) 
+    
+    be_0 = np.zeros(len(prior))
+    be_1 = np.zeros(len(prior))
+    be_2 = np.zeros(len(prior))
+    for i in range(len(prior)):
+        predEntities = np.array([0,0,0])
+        idxs , count = np.unique(predBarcodes[i][:,0], return_counts=True)
+        predEntities[idxs.astype(int)] = count
+
+        mskEntities  = np.array([0,0,0])
+        idxs , count = np.unique(mskBarcodes[i][:,0], return_counts=True)
+        mskEntities[idxs.astype(int)] = count
+
+        be_0[i] = abs(predEntities[0] - mskEntities[0])
+        be_1[i] = abs(predEntities[1] - mskEntities[1])
+        be_2[i] = abs(predEntities[2] - mskEntities[2])
+    
+    return be_0, be_1, be_2 
+
+
 def checkIndexing(indexes, shape):
     shapeUpLimit = np.array(shape)[np.newaxis,:] - 1
     shapeDownLimit = np.array((0,0,0))[np.newaxis,:]
@@ -142,7 +190,7 @@ def multi_class_topological_post_processing(
     inputs, model, prior,
     lr, mse_lambda,
     opt=torch.optim.Adam, num_its=100, 
-    construction='0', thresh=None, parallel=True, saveCombosPath=None):
+    construction='0', thresh=None, parallel=True, saveCombosPath=None, saveLogitsPath=None):
     '''Performs topological post-processing.
     
     Arguments:
@@ -171,10 +219,13 @@ def multi_class_topological_post_processing(
     model.eval()
     with torch.no_grad():
         pred_unet = torch.softmax(model(inputs), 1).detach().squeeze()
-        
+
     # If appropriate, choose ROI for topological consideration
     if thresh:
         roi = get_roi(pred_unet[1:].sum(0).squeeze(), thresh)
+        if saveLogitsPath:
+            with open(os.path.join(saveLogitsPath, "roi.pickle"), 'wb') as f:
+                pickle.dump(roi, f)
     else:
         roi = [slice(None, None)] + [slice(None, None) for dim in range(len(spatial_xyz))]
     
@@ -211,7 +262,7 @@ def multi_class_topological_post_processing(
                 raise ValueError("Wrong dim")
         combos = torch.stack(tmp)
 
-        if it%25==0 or it==99:
+        if it%25==0 or it==num_its-1:
             if saveCombosPath:
                 combosArr = combos.cpu().detach().numpy()
                 nImgs = combosArr.shape[0]+1
@@ -246,6 +297,15 @@ def multi_class_topological_post_processing(
         else:
             with torch.no_grad():
                 bcodes_arr = [ph[construction](combo, max_dim) for combo, max_dim in zip(combos_arr, max_dims)]
+
+        #Save bcodes, we save here as we need to know where it starts and ends, bcodes only have the lifetime
+        if (it==0 or it==num_its-1) and saveLogitsPath:
+            with open(os.path.join(saveLogitsPath, "bcodes_{}.pickle".format(it)), 'wb') as f:
+                pickle.dump(bcodes_arr, f)
+            with open(os.path.join(saveLogitsPath, "logits_{}.pickle".format(it)), 'wb') as f:
+                pickle.dump(combos_arr, f)
+            with open(os.path.join(saveLogitsPath, "roi_{}.pickle".format(it)), 'wb') as f:
+                pickle.dump(roi, f)
 
         # Get differentiable barcodes using autograd
         max_features = max([bcode_arr.shape[0] for bcode_arr in bcodes_arr])
