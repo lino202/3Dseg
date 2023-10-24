@@ -848,6 +848,20 @@
             ] 
         },
 
+        {
+            "name": "plotTopology MnM Small",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/paper/plotTopologySmall.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--samplePath",     "D:/Segmentation/Data_paper2/MnM/topo/topology_MnM_phconstN.pickle", 
+                "--outPath",        "C:/Maxi/Documents/PhD_Main/Papers/CMR_PH_GAN/images/image3/topo/MnM/",
+                "--labels",         "LV", "MYO", "RV", "LV-MYO", "LV-RV",  "MYO-RV",
+                "--ticks",          "5"
+            ]
+        },
+
 
         {
             "name": "plotTopology LGE",
@@ -864,6 +878,21 @@
             ] 
         },
 
+
+        {
+            "name": "plotTopology LGE Small",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/paper/plotTopologySmall.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--samplePath",     "D:/Segmentation/Data_paper2/LGE/96x96x24/topo/topology_LGE_mi_phconstN.pickle", 
+                "--outPath",        "C:/Maxi/Documents/PhD_Main/Papers/CMR_PH_GAN/images/image3/topo/LGE/",
+                "--labels",          "LV", "MYO", "MI", "LV-MYO", "LV-MI",  "MYO-MI",
+                "--ticks",           "5"
+            ]
+        },
+
         {
             "name": "plotTopology Exvivo",
             "type": "python",
@@ -878,6 +907,21 @@
                 "--ticks",           "5"
     
             ] 
+        },
+
+        {
+            "name": "plotTopology Exvivo Small",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/paper/plotTopologySmallExvivo.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--samplePath",     "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/topo/topology_Exvivo_nophchecked_phconst0.pickle",
+                                    "D:/Segmentation/Data_paper2/Exvivo/noph_checked_onlyStandfor/topo/topology_Exvivo_nophchecked_phconstN.pickle",
+                "--outPath",        "C:/Maxi/Documents/PhD_Main/Papers/CMR_PH_GAN/images/image3/topo/Exvivo/",
+                "--labels",          "MYO",
+                "--ticks",           "5"
+            ]
         },
 
 

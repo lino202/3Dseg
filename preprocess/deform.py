@@ -38,6 +38,15 @@ def main():
         translation=(10.,10.,0.),
         image_interpolation='nearest'
     )
+
+    # We only deform a 10% of the LV diameter (more or less 55mm in ED), so 
+    # if we want a maximum defomartion of 5.5 mm then the displacement for axis needs to be 5.5/math.sqrt(2) = 3.9 mm maximum displacement per axis. 
+    # Then we use the following displacements in pixels in the 3 directions (as max_displacements parameter seems to be in pixels):
+    # LGE = 2.5, 2.5, 0   ==> 2.5*1.5625  = 3.90625     max dis in pixels * spacing in mm/pixel would give the displacement per axis in mm which has to be 3.9 mm to have a max dis of 0.1*55mm
+    # MnM = 3.12,3.12,0   ==> 3.12*1.25   = 3.9
+    # Exvivo = 3.9, 3.9, 0 ==> 3.9*1      = 3.9
+
+    # Then the final max displacement is math.sqrt(2*3.9**2) = 5.51 mm
     
     transElastic = tio.RandomElasticDeformation(
         num_control_points=(5,5,5), 
