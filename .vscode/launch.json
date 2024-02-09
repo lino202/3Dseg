@@ -967,5 +967,110 @@
                 
             ] 
         },
+
+
+        // ---------------------------------- NEW NOT seen SAMPLE----------------------------------------
+        {
+            "name": "NEW_SAMPLE preProccess cine",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/newSample/preProcess.py",
+            "console": "externalTerminal",
+            "args": [
+                "--filePath",      "D:/Paper3/Models/invivo/he/sample1/init/cropped.nii",
+                "--resPath",       "D:/Paper3/Models/invivo/he/sample1/segmentation",
+                "--spacAfterCrop", "D:/Segmentation/Data_paper2/MnM/shapes_spacing_after_resampling.pickle",
+                "--dataType",      "Cine"
+            ]
+        },
+
+        {
+            "name": "NEW_SAMPLE preProccess lge",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/newSample/preProcess.py",
+            "console": "externalTerminal",
+            "args": [
+                "--filePath",      "D:/Paper3/Models/invivo/mi/cx/sample4/init/cropped.nii",
+                "--resPath",       "D:/Paper3/Models/invivo/mi/cx/sample4/segmentation",
+                "--spacAfterCrop", "D:/Segmentation/Data_paper2/LGE/shapes_spacing_after_resampling.pickle",
+                "--dataType",      "LGE"
+            ]
+        },
+
+
+
+
+        {
+            "name": "NEW_SAMPLE pred Cine",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/newSample/pred.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",            "D:/Paper3/Models/invivo/he/sample1/segmentation/for_net",
+                "--results_dir",          "D:/Segmentation/Results_paper2/MnM",
+                "--name",                 "base_deform_fold",
+                "--phase",                "pred",
+                "--input_nc",             "1",
+                "--output_nc",            "4",
+                "--nfl",                  "64",
+                "--num_downs",            "5",
+                "--patch_size",           "160", "160", "20",
+                "--load_filename",        "latest_net", 
+                "--norm",                 "instance",
+                "--ph",     
+                "--phThres",              "0.5",
+                // "--phParallel",
+                "--phConstruction",       "N",     
+                "--priorName",            "PRIOR_CINE",            
+                
+            ] 
+        },
+
+
+        {
+            "name": "NEW_SAMPLE pred LGE",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/newSample/pred.py",
+            "console": "externalTerminal",
+            "args": [
+                "--root_path",            "D:/Paper3/Models/invivo/mi/cx/sample4/segmentation/for_net",
+                "--results_dir",          "D:/Segmentation/Results_paper2/LGE/96x96x24_mi",
+                "--name",                 "base_deform_fold",
+                "--phase",                "pred",
+                "--input_nc",             "1",
+                "--output_nc",            "4",
+                "--nfl",                  "64",
+                "--num_downs",            "5",
+                "--patch_size",           "96", "96", "24",
+                "--load_filename",        "latest_net", 
+                "--norm",                 "instance",
+                "--ph",     
+                "--phThres",              "0.5",
+                // "--phParallel",
+                "--phConstruction",       "N",     
+                "--priorName",            "PRIOR_LGE",            
+                
+            ] 
+        },
+
+
+        {
+            "name": "NEW_SAMPLE posProccess Cine",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/newSample/posProcess.py",
+            "console": "externalTerminal",
+            "args": [
+                "--predPath",    "D:/Paper3/Models/invivo/he/sample1/segmentation/pred_total.nii",
+                "--imgOriPath",  "D:/Paper3/Models/invivo/he/sample1/init/cropped.nii",
+                "--subjectPath", "D:/Paper3/Models/invivo/he/sample1/segmentation/auxiliar/subject.pickle",
+                "--resPath",     "D:/Paper3/Models/invivo/he/sample1/init/pred_final.nii"
+            ]
+        },
+
+
     ]
 }
