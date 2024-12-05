@@ -45,6 +45,7 @@ def main():
     # LGE = 2.5, 2.5, 0   ==> 2.5*1.5625  = 3.90625     max dis in pixels * spacing in mm/pixel would give the displacement per axis in mm which has to be 3.9 mm to have a max dis of 0.1*55mm
     # MnM = 3.12,3.12,0   ==> 3.12*1.25   = 3.9
     # Exvivo = 3.9, 3.9, 0 ==> 3.9*1      = 3.9
+    # Myosaiq = 2.35, 2.35, 0 ==> 2.35*1.66 = 3.9
 
     # Then the final max displacement is math.sqrt(2*3.9**2) = 5.51 mm
     
@@ -71,12 +72,12 @@ def main():
         s2 = int(np.round(msk.shape[-1]/2))
         s1 = int(np.round(msk.shape[-2]/2))
         s0 = int(np.round(msk.shape[-3]/2))
-        ax[0,0].imshow(msk.data.numpy()[0,:,:,s2], vmin=0, vmax=3, interpolation='none')
-        ax[0,1].imshow(msk.data.numpy()[0,:,s1,:], vmin=0, vmax=3, interpolation='none')
-        ax[0,2].imshow(msk.data.numpy()[0,s0,:,:], vmin=0, vmax=3, interpolation='none')
-        ax[1,0].imshow(mskTrans.data.numpy()[0,:,:,s2], vmin=0, vmax=3, interpolation='none')
-        ax[1,1].imshow(mskTrans.data.numpy()[0,:,s1,:], vmin=0, vmax=3, interpolation='none')
-        ax[1,2].imshow(mskTrans.data.numpy()[0,s0,:,:], vmin=0, vmax=3, interpolation='none')
+        ax[0,0].imshow(msk.data.numpy()[0,:,:,s2], vmin=0, vmax=msk.data.max(), interpolation='none')
+        ax[0,1].imshow(msk.data.numpy()[0,:,s1,:], vmin=0, vmax=msk.data.max(), interpolation='none')
+        ax[0,2].imshow(msk.data.numpy()[0,s0,:,:], vmin=0, vmax=msk.data.max(), interpolation='none')
+        ax[1,0].imshow(mskTrans.data.numpy()[0,:,:,s2], vmin=0, vmax=mskTrans.data.max(), interpolation='none')
+        ax[1,1].imshow(mskTrans.data.numpy()[0,:,s1,:], vmin=0, vmax=mskTrans.data.max(), interpolation='none')
+        ax[1,2].imshow(mskTrans.data.numpy()[0,s0,:,:], vmin=0, vmax=mskTrans.data.max(), interpolation='none')
         plt.savefig(os.path.join(args.plotPath, "{}.png".format(sample))) if args.plotPath else plt.show()
         plt.close()
         
