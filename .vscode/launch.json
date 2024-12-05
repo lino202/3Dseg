@@ -9,7 +9,7 @@
         //PREPROCESS-------------------------------------------
         {
             "name": "getSpacingsShapes",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/getSpacingsShapes.py",
             "console": "externalTerminal",
@@ -21,7 +21,7 @@
 
         {
             "name": "preProccess MnMs",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/preMnMs.py",
             "console": "externalTerminal",
@@ -35,7 +35,7 @@
 
         {
             "name": "preProccess ExVivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/preExVivo.py",
             "console": "externalTerminal",
@@ -47,7 +47,7 @@
 
         {
             "name": "preProccess Myosaiq",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/preCroppedLGE.py",
             "console": "externalTerminal",
@@ -62,7 +62,7 @@
 
         {
             "name": "cropEmidec",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/cropEmidec.py",
             "console": "externalTerminal",
@@ -74,7 +74,7 @@
 
         {
             "name": "preProccess croppedLGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/preCroppedLGE.py",
             "console": "externalTerminal",
@@ -89,7 +89,7 @@
 
         {
             "name": "deform LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/deform.py",
             "console": "externalTerminal",
@@ -105,7 +105,7 @@
 
         {
             "name": "deform Exvivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/deform.py",
             "console": "externalTerminal",
@@ -120,7 +120,7 @@
 
         {
             "name": "deform MnM",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/deform.py",
             "console": "externalTerminal",
@@ -137,7 +137,7 @@
         //TOPO-------------------------------------------
         {
             "name": "exploreTopo MnMs",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/exploreTopo.py",
             "console": "externalTerminal",
@@ -152,7 +152,7 @@
 
         {
             "name": "getTopoStatistics MnMs",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/getTopoStatistics.py",
             "console": "externalTerminal",
@@ -165,7 +165,7 @@
 
         {
             "name": "exploreTopo Exvivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/exploreTopo.py",
             "console": "externalTerminal",
@@ -180,7 +180,7 @@
 
         {
             "name": "getTopoStatistics Exvivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/getTopoStatistics.py",
             "console": "externalTerminal",
@@ -193,7 +193,7 @@
 
         {
             "name": "exploreTopo LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/exploreTopo.py",
             "console": "externalTerminal",
@@ -209,7 +209,7 @@
 
         {
             "name": "getTopoStatistics LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/getTopoStatistics.py",
             "console": "externalTerminal",
@@ -223,7 +223,7 @@
         //CV-------------------------------------------
         {
             "name": "getCVDistribution",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVDistribution.py",
             "console": "externalTerminal",
@@ -240,7 +240,7 @@
 
         {
             "name": "getCVSymlinks",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVSymlinks.py",
             "console": "externalTerminal",
@@ -253,7 +253,7 @@
 
         {
             "name": "getCVSymlinksDeform",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVSymlinksDeform.py",
             "console": "externalTerminal",
@@ -267,7 +267,7 @@
         //TRAIN-------------------------------------------
         {
             "name": "train Exvivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/train.py",
             "console": "externalTerminal",
@@ -294,7 +294,7 @@
 
         {
             "name": "train Exvivo GAN",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/trainGAN.py",
             "console": "externalTerminal",
@@ -324,7 +324,7 @@
 
         {
             "name": "train MnM",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/train.py",
             "console": "externalTerminal",
@@ -351,7 +351,7 @@
 
         {
             "name": "train MnM GAN",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/trainGAN.py",
             "console": "externalTerminal",
@@ -382,7 +382,7 @@
 
         {
             "name": "train LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/train.py",
             "console": "externalTerminal",
@@ -409,7 +409,7 @@
 
         {
             "name": "train LGE GAN",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/trainGAN.py",
             "console": "externalTerminal",
@@ -441,7 +441,7 @@
         //TEST-------------------------------------------
         {
             "name": "pred Exvivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/pred.py",
             "console": "externalTerminal",
@@ -467,7 +467,7 @@
 
         {
             "name": "pred MnM",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/pred.py",
             "console": "externalTerminal",
@@ -494,7 +494,7 @@
 
         {
             "name": "pred LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/pred.py",
             "console": "externalTerminal",
@@ -522,7 +522,7 @@
 
         {
             "name": "pred MnM GANs",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/predGAN.py",
             "console": "externalTerminal",
@@ -543,7 +543,7 @@
 
         {
             "name": "pred LGE GANs",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/predGAN.py",
             "console": "externalTerminal",
@@ -564,7 +564,7 @@
         //POSTPROCESSING-------------------------------------------
         {
             "name": "getOriginalSpace LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/getOriginalSpace.py",
             "console": "externalTerminal",
@@ -579,7 +579,7 @@
 
         {
             "name": "getOriginalSpace MnM",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/getOriginalSpace.py",
             "console": "externalTerminal",
@@ -593,7 +593,7 @@
 
         {
             "name": "compute Metrics MnM",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/computeMetrics.py",
             "console": "externalTerminal",
@@ -617,7 +617,7 @@
 
         {
             "name": "compute Separated BE MnM",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/computeSeparateBE.py",
             "console": "externalTerminal",
@@ -636,7 +636,7 @@
 
         {
             "name": "compute Metrics Exvivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/computeMetrics.py",
             "console": "externalTerminal",
@@ -660,7 +660,7 @@
 
         {
             "name": "compute Separated BE Exvivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/computeSeparateBE.py",
             "console": "externalTerminal",
@@ -679,7 +679,7 @@
 
         {
             "name": "compute Metrics LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/computeMetrics.py",
             "console": "externalTerminal",
@@ -703,7 +703,7 @@
 
         {
             "name": "compute Separated BE LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/computeSeparateBE.py",
             "console": "externalTerminal",
@@ -723,7 +723,7 @@
 
         {
             "name": "readPlotPickle Exvivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
             "console": "externalTerminal",
@@ -739,7 +739,7 @@
 
         {
             "name": "readPlotPickleSparatedBE Exvivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/readPlotPickleSeparatedBE.py",
             "console": "integratedTerminal",
@@ -755,7 +755,7 @@
 
         {
             "name": "readPlotPickle LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
             "console": "externalTerminal",
@@ -771,7 +771,7 @@
 
         {
             "name": "readPlotPickleSparatedBE LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/readPlotPickleSeparatedBE.py",
             "console": "integratedTerminal",
@@ -787,7 +787,7 @@
 
         {
             "name": "readPlotPickle MnM",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/readPlotPickle.py",
             "console": "externalTerminal",
@@ -803,7 +803,7 @@
 
         {
             "name": "readPlotPickleSparatedBE MnM",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/readPlotPickleSeparatedBE.py",
             "console": "integratedTerminal",
@@ -820,7 +820,7 @@
         //PAPER-------------------------------------------------------------------------------------------------
         {
             "name": "getVolumeImages",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/paper/getVolumeImages.py",
             "console": "integratedTerminal",
@@ -835,7 +835,7 @@
 
         {
             "name": "plotTopology MnM",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/paper/plotTopology.py",
             "console": "integratedTerminal",
@@ -850,7 +850,7 @@
 
         {
             "name": "plotTopology MnM Small",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/paper/plotTopologySmall.py",
             "console": "integratedTerminal",
@@ -865,7 +865,7 @@
 
         {
             "name": "plotTopology LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/paper/plotTopology.py",
             "console": "integratedTerminal",
@@ -881,7 +881,7 @@
 
         {
             "name": "plotTopology LGE Small",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/paper/plotTopologySmall.py",
             "console": "integratedTerminal",
@@ -895,7 +895,7 @@
 
         {
             "name": "plotTopology Exvivo",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/paper/plotTopology.py",
             "console": "integratedTerminal",
@@ -911,7 +911,7 @@
 
         {
             "name": "plotTopology Exvivo Small",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/paper/plotTopologySmallExvivo.py",
             "console": "integratedTerminal",
@@ -927,7 +927,7 @@
 
         {
             "name": "Rerun pred for saving Logits",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/pred.py",
             "console": "externalTerminal",
@@ -954,7 +954,7 @@
 
         {
             "name": "plotBarcodeImage",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/paper/plotBarcodeImage.py",
             "console": "externalTerminal",
@@ -972,7 +972,7 @@
         // ---------------------------------- NEW NOT seen SAMPLE----------------------------------------
         {
             "name": "NEW_SAMPLE preProccess cine",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/newSample/preProcess.py",
             "console": "externalTerminal",
@@ -986,7 +986,7 @@
 
         {
             "name": "NEW_SAMPLE preProccess lge",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/newSample/preProcess.py",
             "console": "externalTerminal",
@@ -1003,7 +1003,7 @@
 
         {
             "name": "NEW_SAMPLE pred Cine",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/newSample/pred.py",
             "console": "externalTerminal",
@@ -1031,7 +1031,7 @@
 
         {
             "name": "NEW_SAMPLE pred LGE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/newSample/pred.py",
             "console": "externalTerminal",
@@ -1059,7 +1059,7 @@
 
         {
             "name": "NEW_SAMPLE posProccess Cine",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/newSample/posProcess.py",
             "console": "externalTerminal",
