@@ -99,7 +99,7 @@ def main():
     parser.add_argument('--resPath',      type=str)
     args = parser.parse_args()
 
-    space = [120, 120] # space in SA plane of 120x120 pixels as LV is centered 
+    space = [120, 120] # space in SA plane of 120x120 mm as LV is centered, THIS IS mm CHECKED! as we divided by the spacing it gives the shape in pixels that is needed by tio.CropOrPad
     proccess(args.filePath, space, resPath=args.resPath, save=True)
 
 if __name__ == '__main__':

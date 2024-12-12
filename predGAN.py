@@ -52,8 +52,9 @@ def main():
         for j, s in enumerate(sliceIdxs):       
             ax[0,j].imshow(img[:,:,s], vmin=0, vmax=1, interpolation='none')
             ax[1,j].imshow(pred[:,:,s], vmin=0, vmax=1, interpolation='none')
-        plt.axis('off')
-        plt.savefig(os.path.join(plots_path, "{}.png".format(sample)))
+            ax[0,j].set_axis_off()
+            ax[1,j].set_axis_off()
+        plt.savefig(os.path.join(plots_path, "{}.png".format(sample)), dpi=300)
         plt.close()
         
         #Save .nii 

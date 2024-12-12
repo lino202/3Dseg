@@ -1,10 +1,10 @@
-import sys 
 import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import sys 
 sys.path.append(os.path.join('/'.join(sys.path[0].split("/")[:-1])))
 from utils.util import getStatistics
 
@@ -53,11 +53,11 @@ def map2DF(data, label):
 
 def plot(data, label, resPath, fontsize=20):
     plt.figure(figsize=(8, 6), dpi=80)
-    boxplot = sns.boxplot(data=data, x='Class', y=label, hue='Approach')
+    boxplot = sns.boxplot(data=data, x='Class', y=label, hue='Approach') #flierprops={'marker': 'd', 'markeredgecolor': 'none', 'markerfacecolor':'gray'}
     # boxplot.set_ylabel(label, fontsize=fontsize)
     boxplot.tick_params(labelsize=fontsize)
     if resPath:
-        plt.savefig(os.path.join(resPath, "{}.png".format(label)))
+        plt.savefig(os.path.join(resPath, "{}.pdf".format(label)))
     else:
         plt.show()
     plt.close()
@@ -70,8 +70,8 @@ def main():
     args = parser.parse_args()
     
     #Collectand group data from all folds
-    gan_baseline = [os.path.join(args.filePath, "base_deform_fold_{}".format(i), "metrics", "volumes_baseline_phconstN_originalSpace") for i in range(args.nFold)]
-    gan_ph       = [os.path.join(args.filePath, "base_deform_fold_{}".format(i), "metrics", "volumes_ph_phconstN_originalSpace") for i in range(args.nFold)]
+    gan_baseline = [os.path.join(args.filePath, "fold_deform_{}".format(i), "metrics", "volumes_baseline_phconstN_originalSpace") for i in range(args.nFold)]
+    gan_ph       = [os.path.join(args.filePath, "fold_deform_{}".format(i), "metrics", "volumes_ph_phconstN_originalSpace") for i in range(args.nFold)]
     baseline     = [os.path.join(args.filePath, "fold_{}".format(i), "metrics", "volumes_baseline_phconstN_originalSpace") for i in range(args.nFold)]
     ph           = [os.path.join(args.filePath, "fold_{}".format(i), "metrics", "volumes_ph_phconstN_originalSpace") for i in range(args.nFold)]
     
@@ -103,29 +103,29 @@ def main():
     plot(ts,   'TS', args.resPath)
     
     # Get overall statistics
-    # res_dataframe = []
-    # res_excel_indexs = []
-    # nSamples = data_baseline['ts'].shape[0]
-    # for approach in data.keys():
-    #     for metric_class in data[approach].keys():
-    #         res_excel_indexs.append("{}_{}".format(approach, metric_class)) 
-    #         if 'ts' != metric_class:
-    #                 res_dataframe.append(getStatistics(data[approach][metric_class]))        
-    #         else:
-    #                 tmp = np.ones(9+1) * np.nan
-    #                 tmp[-1] = np.sum(data[approach][metric_class]) / nSamples
-    #                 res_dataframe.append(tmp)
+    res_dataframe = []
+    res_excel_indexs = []
+    nSamples = data_baseline['ts'].shape[0]
+    for approach in data.keys():
+        for metric_class in data[approach].keys():
+            res_excel_indexs.append("{}_{}".format(approach, metric_class)) 
+            if 'ts' != metric_class:
+                    res_dataframe.append(getStatistics(data[approach][metric_class]))        
+            else:
+                    tmp = np.ones(9+1) * np.nan
+                    tmp[-1] = np.sum(data[approach][metric_class]) / nSamples
+                    res_dataframe.append(tmp)
 
-    # columns = ['mean', 'std', 'min', 'max', 'median', 'lowQuart', 'upQuart', 'lowWhisker', 'upWhisker', 'perc']
-    # df = pd.DataFrame(res_dataframe, index=res_excel_indexs, columns=columns)
+    columns = ['mean', 'std', 'min', 'max', 'median', 'lowQuart', 'upQuart', 'lowWhisker', 'upWhisker', 'perc']
+    df = pd.DataFrame(res_dataframe, index=res_excel_indexs, columns=columns)
 
-    # res_excel = os.path.join(args.resPath, "stats.xlsx")
-    # if not os.path.exists(res_excel):
-    #         df.to_excel(res_excel, sheet_name='sheet1')
-    # else:   
-    #         with pd.ExcelWriter(res_excel, engine="openpyxl", mode='a',if_sheet_exists="overlay") as writer:
-    #                 startrow = writer.sheets['sheet1'].max_row
-    #                 df.to_excel(writer, sheet_name='sheet1', startrow=startrow, header=False)
+    res_excel = os.path.join(args.resPath, "stats.xlsx")
+    if not os.path.exists(res_excel):
+            df.to_excel(res_excel, sheet_name='sheet1')
+    else:   
+            with pd.ExcelWriter(res_excel, engine="openpyxl", mode='a',if_sheet_exists="overlay") as writer:
+                    startrow = writer.sheets['sheet1'].max_row
+                    df.to_excel(writer, sheet_name='sheet1', startrow=startrow, header=False)
     
 
 if __name__ == '__main__':

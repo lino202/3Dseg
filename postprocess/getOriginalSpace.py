@@ -12,8 +12,7 @@ import time
 import pathlib
 import torchio as tio
 import sys
-sys.path.append(os.path.join('/'.join(sys.path[0].split("/")[:-1])))
-from preprocess.utilsPre import getEXFromMask
+
 
 def main():
     parser = argparse.ArgumentParser(description="Options")
@@ -21,7 +20,11 @@ def main():
     parser.add_argument('--predsFolder',  type=str, required=True)
     parser.add_argument('--subPreFolder', type=str, required=True)
     parser.add_argument('--resPath',      type=str)
+    parser.add_argument('--rootCodePath', type=str)
     args = parser.parse_args()
+
+    sys.path.append(args.rootCodePath)
+    from preprocess.utilsPre import getEXFromMask
 
     samples = sorted([x for x in os.listdir(args.predsFolder)])
     print('There are {} samples in total'.format(len(samples)))

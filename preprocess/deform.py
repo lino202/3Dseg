@@ -33,9 +33,9 @@ def main():
     print('There are {} samples in total'.format(len(samples)))
     
     transAffine = tio.RandomAffine(
-        scales=0.2,
+        scales=0.1,                # LGE 0.1 , MnM and Exvivo 0.2
         degrees=(0.,0.,180.),
-        translation=(10.,10.,0.),
+        translation=(5.,5.,0.),    # LGE 5. , MnM and Exvivo 10.
         image_interpolation='nearest'
     )
 

@@ -16,34 +16,50 @@ Resampled Min [1.25       1.25       8.80000019], Median [1.25       1.25       
 Total duration of processing: 694.8011491298676 s
 
 
-LGE:------------------------------------------------------------------------------
-Processing samples at D:/Segmentation/Data_paper2/LGE/baseline/images
-There are 440 samples in total
-Original Min [44. 46.  5.], Median [72. 73. 20.], Max [112. 114.  26.] shapes
-Original Min [0.9375     0.9375     3.49999571], Median [1.5625 1.5625 5.    ], Max [ 2.77777767  2.77777767 13.03999996] spacings
-Max classes: [3. 4.] count: [335 105]  WE TOOK THE 109_D8 OUT AS IT IS NOT MI
-Total duration of processing: 2.1709442138671875 s
-Processing samples at D:/Segmentation/Data_paper2/LGE/baseline/images
+LGE (ONLY MI):------------------------------------------------------------------------------
+Processing samples at D:/Segmentation/Data_paper2/LGE/all/images
+There are 315 samples in total  (WE TOOK OUT SAMPLE 244_M1 AS CROP WITH 64X64X24 FOR THE FIXED SPACING RESAMPLING WAS CUTTING THE MASK)
+Original Min [44. 46.  5.], Median [72. 74. 20.], Max [109. 114.  26.] shapes
+Original Min [0.9375     0.9375     3.49999571], Median [1.5625 1.5625 5.    ], Max [ 2.60416675  2.60416675 13.        ] spacings
+Max classes: [3.] count: [315]
+Total duration of processing: 1.6099753379821777 s
+Processing samples at D:/Segmentation/Data_paper2/LGE/all/images
 Using th 10th percentile for axis 2 and mean for others:
  sw: 1.5625, sh: 1.5625, sd: 5.0
 
-Resampled Min [59. 60. 10.], Median [71. 72. 20.], Max [96. 95. 24.] shapes
+Resampled Min [59. 60. 10.], Median [70. 71. 20.], Max [83. 86. 24.] shapes
 Resampled Min [1.5625 1.5625 5.    ], Median [1.5625 1.5625 5.    ], Max [1.5625 1.5625 5.    ] spacings
+Total duration of processing: 1.9002878665924072 s
 
 Myosaiq:------------------------------------------------------------------------------------
-Processing samples at D:/Data/RM/Myosaiq/database/training/all/images
-There are 374 samples in total
-Original Min [44. 46.  8.], Median [70. 71. 20.], Max [112. 114.  26.] shapes
+Processing samples at D:/Segmentation/Data_paper2/Myosaiq/all/images
+There are 358 samples in total
+Original Min [44. 46.  8.], Median [70. 70. 20.], Max [109. 114.  26.] shapes
 Original Min [0.9375     0.9375     3.49999571], Median [1.5625 1.5625 5.    ], Max [ 2.77777767  2.77777767 11.        ] spacings
-Max classes: [2. 3. 4.] count: [  1 308  65]
-Total duration of processing: 1.8654167652130127 s
-Processing samples at D:/Data/RM/Myosaiq/database/training/all/images
+Max classes: [2. 3. 4.] count: [  4 289  65]
+Total duration of processing: 3.3184170722961426 s
+Processing samples at D:/Segmentation/Data_paper2/Myosaiq/all/images
 Using th 10th percentile for axis 2 and mean for others:
  sw: 1.5625, sh: 1.5625, sd: 5.0
 
 Resampled Min [59. 60. 12.], Median [70. 71. 20.], Max [96. 95. 24.] shapes
 Resampled Min [1.5625 1.5625 5.    ], Median [1.5625 1.5625 5.    ], Max [1.5625 1.5625 5.    ] spacings
-Total duration of processing: 2.090601921081543 s
+Total duration of processing: 1.962785005569458 s
+
+Emidec:--------------------------------------------------------------------------------------
+Processing samples at D:/Segmentation/Data_paper2/Emidec/original_pato
+There are 67 samples in total
+Original Min [141. 120.   5.], Median [241. 257.   7.], Max [305. 308.  10.] shapes
+Original Min [1.3671875 1.3671875 8.       ], Median [ 1.45833337  1.45833337 10.        ], Max [ 1.875       1.875      13.03999996] spacings
+Max classes: [3. 4.] count: [27 40]
+Total duration of processing: 2.1155927181243896 s
+Processing samples at D:/Segmentation/Data_paper2/Emidec/original_pato
+Using th 10th percentile for axis 2 and mean for others:
+ sw: 1.4583333730697632, sh: 1.4583333730697632, sd: 10.0
+
+Resampled Min [141. 123.   5.], Median [241. 249.   8.], Max [337. 327.  10.] shapes
+Resampled Min [ 1.45833337  1.45833337 10.        ], Median [ 1.45833337  1.45833337 10.        ], Max [ 1.45833337  1.45833337 10.        ] spacings
+Total duration of processing: 1.3849704265594482 s
 
 Exvivo:----------------------------------------------------------------------------------------------
 Processing samples at D:/Segmentation/Data_paper2/Exvivo/ph_checked_onlyStandfor/all match noph_checked

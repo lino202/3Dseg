@@ -15,14 +15,9 @@ import monai
 import torch
 import matplotlib.pyplot as plt
 import pickle
-sys.path.append(os.path.join('/'.join(sys.path[0].split("/")[:-1])))
-from preprocess.utilsPre import getEXFromMask
-from utils.priors import PRIOR_CINE, PRIOR_EXVIVO, PRIOR_LGE
-from utils.topo import BEmetric
-from utils.util import getStatistics
 import pandas as pd
 
-def getSubjectImgMsk(imgsFolder, msksFolder, sample):
+def getSubjectImgMsk(getEXFromMask, imgsFolder, msksFolder, sample):
         """This function search for the the img and msk of the subject in the original space or in the preprocessed one
         Also, if we use the original msks we need to replicate the preprocessing applied to the labels, as some examples might have changed.
         For example, one example in the MnM dataset had two islands for the RV which was cleaned in preprocessing, the Mvo is delete it in LGE, and so on.. """
@@ -96,7 +91,14 @@ def main():
         parser.add_argument('--phParallel',   action='store_true',  help='use parallel calculation of PH')
         parser.add_argument('--resPath',      type=str)
         parser.add_argument('--res_excel_indexs', type=str, nargs='+', help='indexes for saving params results in the excel file and saving labels to the results CAREFUL!')
+        parser.add_argument('--rootCodePath', type=str)
         args = parser.parse_args()
+
+        sys.path.append(args.rootCodePath)
+        from preprocess.utilsPre import getEXFromMask
+        from utils.priors import PRIOR_CINE, PRIOR_EXVIVO, PRIOR_LGE
+        from utils.topo import BEmetric
+        from utils.util import getStatistics
 
         #Start
         samples = sorted([x for x in os.listdir(args.predsFolder)])
@@ -127,7 +129,7 @@ def main():
                 start_iter = time.time()
                 
                 #Get img, msk and pred in a subject and check consistency
-                img, msk  = getSubjectImgMsk(args.imgsFolder, args.msksFolder, sample)
+                img, msk  = getSubjectImgMsk(getEXFromMask, args.imgsFolder, args.msksFolder, sample)
                 predPath = os.path.join(args.predsFolder, sample, "pred.nii".format(sample))
                 pred     = tio.LabelMap(predPath)
 

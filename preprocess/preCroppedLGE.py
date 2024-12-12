@@ -6,32 +6,15 @@ We here follow the naming of the myosaiq dataset for simplicity
 but the output is my naming type -> sample/img.nii and sample/msk.nii.
 So, the emidec cropped must follow the myosaiq naming for being input together 
 
-
-Myosaiq Only--------------------------------------------------------------------------------------------------
-Processing samples at D:/Data/RM/Myosaiq/database/training/all/images
-There are 374 samples in total
+LGE MI only without sample 244_M1--------------------------------------------------------------------------------------------------
+Processing samples at D:/Segmentation/Data_paper2/LGE/all/images
+There are 315 samples in total
 Using th 10th percentile for axis 2 and mean for others:
  sw: 1.5625, sh: 1.5625, sd: 5.0
 
-Min [80. 80. 24.] Median [80. 80. 24.] Max [80. 80. 24.] shapes
+Min [64. 64. 24.] Median [64. 64. 24.] Max [64. 64. 24.] shapes
 Min [1.5625 1.5625 5.    ] Median [1.5625 1.5625 5.    ] Max [1.5625 1.5625 5.    ] spacings
-Total duration of processing: 130.8380298614502 s
-
-
-Myosaiq+Emidec--------------------------------------------------------------------------------------------------
-Processing samples at D:/Segmentation/Data_paper2/LGE/baseline/images
-There are 440 samples in total
-Using th 10th percentile for axis 2 and mean for others:
- sw: 1.5625, sh: 1.5625, sd: 5.0
-
-Min [80. 80. 24.] Median [80. 80. 24.] Max [80. 80. 24.] shapes
-Min [1.5625 1.5625 5.    ] Median [1.5625 1.5625 5.    ] Max [1.5625 1.5625 5.    ] spacings
-Total duration of processing: 259.20196056365967 s
-
-OR
-This allows more complex net without modifying conv3d too much
-Min [96. 96. 24.] Median [96. 96. 24.] Max [96. 96. 24.] shapes
-Min [1.5625 1.5625 5.    ] Median [1.5625 1.5625 5.    ] Max [1.5625 1.5625 5.    ] spacings
+Total duration of processing: 99.80687546730042 s
 '''
 
 import os
@@ -108,8 +91,14 @@ def proccess(dataPath, widthHeightDeep, spacings, maxLabel, resPath=None, save=F
         results["msk"] = subject.msk.data.numpy()[0]
 
 
-        if np.any(results["msk"]>3) : sample = sample + "_mvo"
-        else:                         sample = sample + "_mi"
+        if np.any(results["msk"]==4) : 
+            sample = sample + "_mvo"
+        elif np.any(results["msk"]== 3): 
+            sample = sample + "_mi"
+        elif np.any(results["msk"]== 2): 
+            sample = sample + "_he"
+        else:
+            raise ValueError("Weird sample {}, it does not have MVO, MI nor MYO".format(sample))
         results["msk"][results["msk"]>maxLabel] = maxLabel
         subject.msk.data[subject.msk.data>maxLabel] = maxLabel
 

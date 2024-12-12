@@ -14,7 +14,7 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/getSpacingsShapes.py",
             "console": "externalTerminal",
             "args": [
-                "--filePath",    "D:/Segmentation/Data_paper2/LGE/baseline/images",
+                "--filePath",    "D:/Segmentation/Data_paper2/LGE/all/images",
                 "--resPath",     "D:/Segmentation/Data_paper2/LGE",
             ]
         },
@@ -52,11 +52,11 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/preCroppedLGE.py",
             "console": "externalTerminal",
             "args": [
-                "--filePath",      "D:/Data/RM/Myosaiq/database/training/all/images",
+                "--filePath",      "D:/Segmentation/Data_paper2/Myosaiq/all/images",
                 "--resPath",       "D:/Segmentation/Data_paper2/Myosaiq",
                 "--spacAfterCrop", "D:/Segmentation/Data_paper2/Myosaiq/shapes_spacing_after_resampling.pickle",
                 "--maxLabel", "4",
-                "--size", "80", "80", "24"
+                "--size", "96", "96", "24"
             ] 
         },
 
@@ -68,8 +68,20 @@
             "console": "externalTerminal",
             "args": [
                 "--filePath",      "D:/Segmentation/Data_paper2/Emidec/original_pato",
-                "--resPath",       "D:/Segmentation/Data_paper2/Emidec/crop2",
+                "--resPath",       "D:/Segmentation/Data_paper2/Emidec/crop",
             ]
+        },
+
+
+        {
+            "name": "clean LGE: leave only MI",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/cleanLGEtoMI.py",
+            "console": "externalTerminal",
+            "args": [
+                "--filePath",      "D:/Segmentation/Data_paper2/LGE/all/images",
+            ] 
         },
 
         {
@@ -79,11 +91,11 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/preCroppedLGE.py",
             "console": "externalTerminal",
             "args": [
-                "--filePath",      "D:/Segmentation/Data_paper2/LGE/baseline/images",
-                "--resPath",       "D:/Segmentation/Data_paper2/LGE/96x96x24_2",
+                "--filePath",      "D:/Segmentation/Data_paper2/LGE/all/images",
+                "--resPath",       "D:/Segmentation/Data_paper2/LGE/64x64x24_forimages",
                 "--spacAfterCrop", "D:/Segmentation/Data_paper2/LGE/shapes_spacing_after_resampling.pickle",
                 "--maxLabel", "3",
-                "--size", "96", "96", "24"
+                "--size", "64", "64", "24"
             ] 
         },
 
@@ -95,9 +107,9 @@
             "console": "externalTerminal",
             "justMyCode": false,
             "args": [
-                "--rootPath",  "D:/Segmentation/Data_paper2/LGE/96x96x24/vols_preprocessed_mi",
-                "--resPath",   "D:/Segmentation/Data_paper2/LGE/96x96x24/vols_preprocessed_mi_deform",
-                "--plotPath",  "D:/Segmentation/Data_paper2/LGE/96x96x24/plots_preprocessed_mi_deform",
+                "--rootPath",  "D:/Segmentation/Data_paper2/LGE/64x64x24/vols_preprocessed",
+                "--resPath",   "D:/Segmentation/Data_paper2/LGE/64x64x24/vols_preprocessed_deform",
+                "--plotPath",  "D:/Segmentation/Data_paper2/LGE/64x64x24/plots_preprocessed_deform",
                 "--maxDisp",   "2.5"   
             ]
         },
@@ -198,10 +210,10 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/exploreTopo.py",
             "console": "externalTerminal",
             "args": [
-                "--dataPath", "D:/Segmentation/Data_paper2/LGE/96x96x24/vols_preprocessed_mi",
-                "--resPath",  "D:/Segmentation/Data_paper2/LGE/96x96x24/topo",
-                "--resName",  "topology_LGE_mi_phconstN",
-                "--phType",   "N",  //N or 0
+                "--dataPath", "D:/Segmentation/Data_paper2/LGE/64x64x24/vols_preprocessed",
+                "--resPath",  "D:/Segmentation/Data_paper2/LGE/64x64x24/topo",
+                "--resName",  "topology_LGE_mi_phconst0",
+                "--phType",   "0",  //N or 0
                 "--labels",   "lv", "myo", "mi", "lv-myo", "lv-mi", "myo-mi",
             ]
         },
@@ -214,8 +226,8 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/topo/getTopoStatistics.py",
             "console": "externalTerminal",
             "args": [
-                "--dataPath", "D:/Segmentation/Data_paper2/LGE/96x96x24/topo/topology_LGE_mi_phconstN.pickle",
-                "--resPath",  "D:/Segmentation/Data_paper2/LGE/96x96x24/topo/statistics2.xlsx",
+                "--dataPath", "D:/Segmentation/Data_paper2/LGE/64x64x24/topo/topology_LGE_mi_phconstN.pickle",
+                "--resPath",  "D:/Segmentation/Data_paper2/LGE/64x64x24/topo/statistics.xlsx",
                 "--labels",   "lv", "myo", "mi", "lv-myo", "lv-mi",  "myo-mi"
             ]
         },
@@ -228,9 +240,9 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVDistribution.py",
             "console": "externalTerminal",
             "args": [
-                "--filePath",      "D:/Segmentation/Data_paper2/LGE/vols_preprocessed",
-                "--resPath",       "D:/Segmentation/Data_paper2/LGE",
-                "--dataTypes",     "mvo", //"mi", //LGE
+                "--filePath",      "D:/Segmentation/Data_paper2/LGE/64x64x24/vols_preprocessed",
+                "--resPath",       "D:/Segmentation/Data_paper2/LGE/64x64x24",
+                "--dataTypes",     "mi", //"mi", or mvo //LGE
                 // "--dataTypes",     "normal", //MnM and Exvivo
                 "--NFOLD",     "5" //LGE and MnM
                 // "--NFOLD",     "7" //Exvivo
@@ -245,9 +257,9 @@
             "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVSymlinks.py",
             "console": "externalTerminal",
             "args": [
-                "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/MnM/cv_5Fold.pickle",
-                "--rootPath",          "D:/Segmentation/Data_paper2/MnM",
-                "--resPath",           "D:/Segmentation/Data_paper2/MnM/CV_deform",
+                "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/LGE/64x64x24/cv_5Fold.pickle",
+                "--rootPath",          "D:/Segmentation/Data_paper2/LGE/64x64x24/vols_preprocessed",
+                "--resPath",           "D:/Segmentation/Data_paper2/LGE/64x64x24/CV_deform",
             ]
         },
 
@@ -255,12 +267,12 @@
             "name": "getCVSymlinksDeform",
             "type": "debugpy",
             "request": "launch",
-            "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVSymlinksDeform.py",
+            "program": "D:/Segmentation/Code/3Dseg/preprocess/CV/getCVSymlinksDeformMsk.py",
             "console": "externalTerminal",
             "args": [
-                "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/LGE/cv_5Fold.pickle",
-                "--rootPath",          "D:/Segmentation/Data_paper2/LGE/96x96x24/vols_preprocessed_mi_deform",
-                "--resPath",           "D:/Segmentation/Data_paper2/LGE/96x96x24/CV_deform",
+                "--cvPickleFilePath",  "D:/Segmentation/Data_paper2/LGE/64x64x24/cv_5Fold.pickle",
+                "--rootPath",          "D:/Segmentation/Data_paper2/LGE/64x64x24/vols_preprocessed_deform",
+                "--resPath",           "D:/Segmentation/Data_paper2/LGE/64x64x24/CV_deform",
             ]
         },
 
@@ -569,10 +581,11 @@
             "program": "D:/Segmentation/Code/3Dseg/postprocess/getOriginalSpace.py",
             "console": "externalTerminal",
             "args": [
-                "--msksFolder",   "D:/Segmentation/Data_paper2/LGE/baseline/labels",
-                "--predsFolder",  "D:/Segmentation/Results_paper2/LGE/96x96x24_mi/base_deform_fold_0/volumes_baseline_phconstN",
-                "--subPreFolder", "D:/Segmentation/Data_paper2/LGE/96x96x24/subjects_preprocessed",
-                "--resPath",      "D:/Segmentation/Results_paper2/LGE/96x96x24_mi/base_deform_fold_0/volumes_baseline_phconstN_originalSpace"       
+                "--msksFolder",   "D:/Segmentation/Data_paper2/LGE/all/labels",
+                "--predsFolder",  "D:/Segmentation/Results_paper2/LGE/64x64x24/fold_0/volumes_baseline_phconstN",
+                "--subPreFolder", "D:/Segmentation/Data_paper2/LGE/64x64x24/subjects_preprocessed",
+                "--resPath",      "D:/Segmentation/Results_paper2/LGE/64x64x24/fold_0/volumes_baseline_phconstN_originalSpace",
+                "--rootCodePath", "D:/Segmentation/Code/3DSeg"     
             ] 
         },
 
@@ -761,9 +774,9 @@
             "console": "externalTerminal",
             "args": [
 
-                "--filePath",     "D:/Segmentation/Results_paper2/LGE/96x96x24_mi", 
+                "--filePath",     "D:/Segmentation/Results_paper2/LGE/64x64x24", 
                 "--nFold",        "5",
-                "--resPath",      "D:/Segmentation/Results_paper2/LGE/96x96x24_mi/results_originalSpace",
+                "--resPath",      "D:/Segmentation/Results_paper2/LGE/64x64x24/results_originalSpace",
     
             ] 
         },
@@ -774,12 +787,12 @@
             "type": "debugpy",
             "request": "launch",
             "program": "D:/Segmentation/Code/3Dseg/postprocess/readPlotPickleSeparatedBE.py",
-            "console": "integratedTerminal",
+            "console": "externalTerminal",
             "args": [
 
-                "--filePath",     "D:/Segmentation/Results_paper2/LGE/96x96x24_mi", 
+                "--filePath",     "D:/Segmentation/Results_paper2/LGE/64x64x24", 
                 "--nFold",        "5",
-                "--resPath",      "D:/Segmentation/Results_paper2/LGE/96x96x24_mi/results_originalSpace",
+                "--resPath",      "D:/Segmentation/Results_paper2/LGE/64x64x24/results_originalSpace",
     
             ] 
         },
@@ -826,9 +839,9 @@
             "console": "integratedTerminal",
             "args": [
 
-                "--samplePath",     "D:/Segmentation/Data_paper2/LGE/96x96x24/CV_mi_deform/fold_0/train/Case_P004_mi_deform/img.nii", 
-                "--outPath",        "C:/Maxi/Documents/PhD_Main/Papers/CMR_PH_GAN/images/image5/Case_P004_mi_deform_img_4.png",
-                "--slice",          "0", "-1", "-1", "4" 
+                "--samplePath",     "D:/Segmentation/Data_paper2/LGE/64x64x24/CV_deform/fold_0/train/062_M12_mi_deform/img.nii", 
+                "--outPath",        "C:/Maxi/Documents/PhD_Main/Papers/CMR_PH_GAN/images/image5/lge/062_M12_mi_deform_mi_deform_img_20.png",
+                "--slice",          "0", "-1", "-1", "20" 
     
             ] 
         },
@@ -871,7 +884,7 @@
             "console": "integratedTerminal",
             "args": [
 
-                "--samplePath",     "D:/Segmentation/Data_paper2/LGE/96x96x24/topo/topology_LGE_mi_phconstN.pickle", 
+                "--samplePath",     "D:/Segmentation/Data_paper2/LGE/64x64x24/topo/topology_LGE_mi_phconstN.pickle", 
                 "--outPath",        "C:/Maxi/Documents/PhD_Main/Papers/CMR_PH_GAN/images/image3/topo/LGE/",
                 "--labels",          "LV", "Myo", "MI", "LV-Myo", "LV-MI",  "Myo-MI",
                 "--ticks",           "5"
@@ -886,10 +899,10 @@
             "program": "D:/Segmentation/Code/3Dseg/paper/plotTopologySmall.py",
             "console": "integratedTerminal",
             "args": [
-                "--samplePath",     "D:/Segmentation/Data_paper2/LGE/96x96x24/topo/topology_LGE_mi_phconstN.pickle", 
+                "--samplePath",     "D:/Segmentation/Data_paper2/LGE/64x64x24/topo/topology_LGE_mi_phconstN.pickle", 
                 "--outPath",        "C:/Maxi/Documents/PhD_Main/Papers/CMR_PH_GAN/images/image3/topo/LGE/",
-                "--labels",          "LV", "MYO", "MI", "LV-MYO", "LV-MI",  "MYO-MI",
-                "--ticks",           "5"
+                "--labels",         "LV", "MYO", "MI", "LV-MYO", "LV-MI",  "MYO-MI",
+                "--ticks",          "5"
             ]
         },
 
