@@ -29,4 +29,4 @@ python -m visdom.server
 ```
 
 ## Acknowledgments
-Our code is inspired by [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix).
+Our code is inspired by [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) and [topological-losses](https://github.com/nick-byrne/topological-losses).
