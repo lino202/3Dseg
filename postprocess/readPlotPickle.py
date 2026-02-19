@@ -7,6 +7,7 @@ import os
 import sys 
 sys.path.append(os.path.join('/'.join(sys.path[0].split("/")[:-1])))
 from utils.util import getStatistics
+from scipy.io import savemat
 
 sns.set(style='whitegrid')
 font = {'family' : "Times New Roman",
@@ -82,6 +83,9 @@ def main():
 
     data = {"B": data_baseline, "TA": data_ph, "SA": data_gan_baseline, "SATA": data_gan_ph}
     
+    # Save data to mat file
+    savemat(os.path.join(args.resPath, "results.mat"), data) 
+
     #REMAP into DF--------------------------------------------
     gdsc = map2DF(data, 'gDSC')
     hd   = map2DF(data, 'HD (mm)')
