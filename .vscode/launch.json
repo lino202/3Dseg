@@ -1084,6 +1084,41 @@
             ]
         },
 
+        // ------------------------------------------------- nnUNet REVIEW -----------------------------------------------------------
+
+        {
+            "name": "generateDatasets_trainNoGAN",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/nnUNet/generateDatasets.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--inFolder",    "D:/Segmentation/Data_paper2/LGE/64x64x24/CV",
+                "--outFolder",   "D:/Segmentation/Data_paper2/LGE/nnUNet/nnUNet_raw",
+                "--dataset",     "B",  //B or SA
+                "--folds",       "5",
+                "--mode",        "train"
+            ] 
+        },
+
+
+        {
+            "name": "generateDatasets_trainGAN",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/nnUNet/generateDatasets.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--inFolder",    "D:/Segmentation/Data_paper2/LGE/64x64x24/CV_deform",
+                "--outFolder",   "D:/Segmentation/Data_paper2/LGE/nnUNet/nnUNet_raw",
+                "--dataset",     "SA",  //B or SA
+                "--folds",       "5",
+                "--mode",        "train"
+            ] 
+        },
+
 
     ]
 }
