@@ -1,19 +1,24 @@
-# Description
+# nnUNet with Topological Correction
 
-This folder contains the code used for applying to the nnUNet our methodology. The version of the nnUNet used with the implementation of temperature scaling and persistent homology is in XX
+This folder contains the code for integrating our methodology — persistent homology-based topological correction (TC) — into the nnUNet framework.
 
 ## Prerequisites
-- Install the nnUNet from XX and set the paths
-- Generate the dataset you are triying to use 
 
-## Getting Started
-### Installation
+1. Install the modified nnUNet with topological correction from our fork:
+```bash
+   pip install git+https://github.com/lino202/nnUNet
+```
+2. Set up the required nnUNet environment variables (`nnUNet_raw`, `nnUNet_preprocessed`, 
+   `nnUNet_results`) as described in the [original nnUNet documentation](https://github.com/MIC-DKFZ/nnUNet).
+3. Prepare your dataset in nnUNet format and install all dependencies.
+
+## Usage
+
+The scripts can/should be executed following the calling order defined in [launch.json](../.vscode/launch.json). 
+Look for the `# nnUNet REVIEW` marker as the entry point for the relevant pipeline steps.
 
 
+## Acknowledgements
 
-### Training
-
-
-
-## Acknowledgments
-Our code is inspired by [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) and [topological-losses](https://github.com/nick-byrne/topological-losses).
+This implementation builds on the original nnUNet framework:
+Original repository: [MIC-DKFZ/nnUNet](https://github.com/MIC-DKFZ/nnUNet).
