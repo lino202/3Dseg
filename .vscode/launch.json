@@ -1086,6 +1086,8 @@
 
         // ------------------------------------------------- nnUNet REVIEW -----------------------------------------------------------
 
+        // The scripts are in order of execution
+
         {
             "name": "generateDatasets_trainNoGAN",
             "type": "debugpy",
@@ -1095,7 +1097,7 @@
             "justMyCode": false,
             "args": [
                 "--inFolder",    "D:/Segmentation/Data_paper2/LGE/64x64x24/CV",
-                "--outFolder",   "D:/Segmentation/Data_paper2/LGE/nnUNet/nnUNet_raw",
+                "--outFolder",   "D:/Segmentation/Review_paper2/nnUNet/nnUNet_raw",
                 "--dataset",     "B",  //B or SA
                 "--folds",       "5",
                 "--mode",        "train"
@@ -1112,13 +1114,196 @@
             "justMyCode": false,
             "args": [
                 "--inFolder",    "D:/Segmentation/Data_paper2/LGE/64x64x24/CV_deform",
-                "--outFolder",   "D:/Segmentation/Data_paper2/LGE/nnUNet/nnUNet_raw",
+                "--outFolder",   "D:/Segmentation/Review_paper2/nnUNet/nnUNet_raw",
                 "--dataset",     "SA",  //B or SA
                 "--folds",       "5",
                 "--mode",        "train"
             ] 
         },
 
+        // From here you need to install nnunet from 'https://github.com/lino202/nnUNet', this is base in the last commit 'nerge' 2eaa371317c55e22bf5166428315076a1ba9b7af
+        // from 21/06/2024, and set up the paths nnUNet_raw, preprocessed and results. And add the dataset.json 
+        // An example for dataset2 with GAN-based augmentation is
+        // {
+        //     "channel_names": {
+        //         "0": "MRI"
+        // },
+        //     "labels": {
+        //         "background": 0,
+        //         "lv":  1,
+        //         "myo": 2,
+        //         "mi":  3
+        // },
+        //     "numTraining": 630,
+        //     "file_ending": ".nii.gz",
+        //     "overwrite_image_reader_writer": "SimpleITKIO"
+        // }
+
+        // Then you can run the preprocess and training scripts of nnUNet.
+
+        {
+            "name": "nnUNetPreprocess",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/nnUNet/nnUNetPreprocess.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-d",    "2",
+                "--verify_dataset_integrity",
+                "-c", "3d_fullres",
+            ]
+        },
+
+        {
+            "name": "generateSplits",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/nnUNet/generateSplits.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--input_folder",    "/mnt/d/Segmentation/Data_paper2/LGE/64x64x24/CV_deform",
+                "--dataset_id",       "2",
+            ]
+        },
+
+        // For training you can use a script like 
+        // # B 250 epochs
+        // nnUNetv2_train 1 3d_fullres 0 -tr nnUNetTrainer_250epochs --npz
+        // nnUNetv2_train 1 3d_fullres 1 -tr nnUNetTrainer_250epochs --npz
+        // nnUNetv2_train 1 3d_fullres 2 -tr nnUNetTrainer_250epochs --npz
+        // nnUNetv2_train 1 3d_fullres 3 -tr nnUNetTrainer_250epochs --npz
+        // nnUNetv2_train 1 3d_fullres 4 -tr nnUNetTrainer_250epochs --npz
+
+
+        // # SA 250 epochs
+        // nnUNetv2_train 2 3d_fullres 0 -tr nnUNetTrainer_250epochs --npz
+        // nnUNetv2_train 2 3d_fullres 1 -tr nnUNetTrainer_250epochs --npz
+        // nnUNetv2_train 2 3d_fullres 2 -tr nnUNetTrainer_250epochs --npz
+        // nnUNetv2_train 2 3d_fullres 3 -tr nnUNetTrainer_250epochs --npz
+        // nnUNetv2_train 2 3d_fullres 4 -tr nnUNetTrainer_250epochs --npz
+
+        {
+            "name": "nnUNetPredict",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/nnUNet/nnUNetPredict.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--dataset_name",    "Dataset001_B",
+                "--checkpoint",      "checkpoint_final",
+                "--resFolderName",   "results_B",
+                // "--ph",
+            ] 
+        },
+
+        {
+            "name": "nnUNet_getOriginalSpace_LGE",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/postprocess/getOriginalSpace.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--msksFolder",   "D:/Segmentation/Data_paper2/LGE/all/labels", //This should be the ones with original shape and spacing
+                "--predsFolder",  "D:/Segmentation/Review_paper2/nnUNet/nnUNet_results/results_SATC",
+                "--subPreFolder", "D:/Segmentation/Data_paper2/LGE/64x64x24/subjects_preprocessed",
+                "--resPath",      "D:/Segmentation/Review_paper2/nnUNet/nnUNet_results/results_SATC_originalSpace",
+                "--rootCodePath", "D:/Segmentation/Code/3DSeg"     
+            ] 
+        },
+
+
+        {
+            "name": "nnUNet_computeMetrics_LGE",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/postprocess/computeMetrics.py",
+            "console": "integratedTerminal",
+            "args": [
+
+                "--predsFolder",           "D:/Segmentation/Review_paper2/nnUNet/nnUNet_results/results_TC_originalSpace", 
+                "--msksFolder",            "D:/Segmentation/Data_paper2/LGE/all/labels",
+                "--imgsFolder",            "D:/Segmentation/Data_paper2/LGE/all/images",
+                "--nClasses",              "4",
+                "--priorName",             "PRIOR_LGE",   
+                "--phThres",               "0.5",
+                "--resPath",               "D:/Segmentation/Review_paper2/nnUNet/nnUNet_results/results_TC_originalSpace_metrics",
+                "--res_excel_indexs",      "gdsc_bg", "gdsc_lv", "gdsc_myo", "gdsc_mi", 
+                                           "hd_bg", "hd_lv", "hd_myo", "hd_mi",                           
+                                           "assd_bg", "assd_lv", "assd_myo", "assd_mi",
+                                           "be", "ts",
+                "--rootCodePath", "D:/Segmentation/Code/3DSeg"
+    
+            ] 
+        },
+
+
+        {
+            "name": "nnUNet_computeSeparated_BE_LGE",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/postprocess/computeSeparateBE.py",
+            "console": "integratedTerminal",
+            "args": [
+
+                "--predsFolder",           "D:/Segmentation/Review_paper2/nnUNet/nnUNet_results/results_B_originalSpace", 
+                "--msksFolder",            "D:/Segmentation/Data_paper2/LGE/all/labels",
+                "--imgsFolder",            "D:/Segmentation/Data_paper2/LGE/all/images",
+                "--nClasses",              "4",
+                "--priorName",             "PRIOR_LGE",   
+                "--phThres",               "0.5",
+                "--resPath",               "D:/Segmentation/Review_paper2/nnUNet/nnUNet_results/results_B_originalSpace_metrics",
+                "--res_excel_indexs",      "be_lv", "be_myo", "be_mi", "be_lvmyo", "be_lvmi", "be_myomi",
+                "--rootCodePath",          "D:/Segmentation/Code/3DSeg"
+            ] 
+        },
+   
+
+        {
+            "name": "nnUNet_newPlotPvalue_LGE",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/paper/review/newPlotPvalueLGE.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--filePath",     "D:/Segmentation/Review_paper2/nnUNet/nnUNet_results/", 
+            ] 
+        },
+
+
+        {
+            "name": "review newPlotPvalue LGE",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/paper/review/newPlotPvalueLGE.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--filePath",     "D:/Segmentation/Results_paper2/LGE/64x64x24/results_originalSpace", 
+            ] 
+        },
+
+
+        {
+            "name": "review newPlotPvalue Exvivo",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/paper/review/newPlotPvalueExvivo.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--filePath",     "D:/Segmentation/Results_paper2/Exvivo/results", 
+            ] 
+        },
+
+        {
+            "name": "review newPlotPvalue MnM",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/paper/review/newPlotPvalueMnM.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--filePath",     "D:/Segmentation/Results_paper2/MnM/results_originalSpace", 
+            ] 
+        },
 
     ]
 }

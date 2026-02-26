@@ -7,6 +7,8 @@ import os
 import sys 
 sys.path.append(os.path.join('/'.join(sys.path[0].split("/")[:-1])))
 from utils.util import getStatistics
+from scipy.io import savemat
+import pickle
 
 sns.set(style='whitegrid')
 font = {'family' : "Times New Roman",
@@ -76,8 +78,8 @@ def main():
     args = parser.parse_args()
     
     #Collectand group data from all folds
-    gan_baseline = [os.path.join(args.filePath, "base_deform_fold_{}".format(i), "metrics", "volumes_baseline_phconstN_originalSpace") for i in range(args.nFold)]
-    gan_ph       = [os.path.join(args.filePath, "base_deform_fold_{}".format(i), "metrics", "volumes_ph_phconstN_originalSpace") for i in range(args.nFold)]
+    gan_baseline = [os.path.join(args.filePath, "fold_deform_{}".format(i), "metrics", "volumes_baseline_phconstN_originalSpace") for i in range(args.nFold)]
+    gan_ph       = [os.path.join(args.filePath, "fold_deform_{}".format(i), "metrics", "volumes_ph_phconstN_originalSpace") for i in range(args.nFold)]
     baseline     = [os.path.join(args.filePath, "fold_{}".format(i), "metrics", "volumes_baseline_phconstN_originalSpace") for i in range(args.nFold)]
     ph           = [os.path.join(args.filePath, "fold_{}".format(i), "metrics", "volumes_ph_phconstN_originalSpace") for i in range(args.nFold)]
     
@@ -86,14 +88,19 @@ def main():
     data_baseline     = groupFoldResults(baseline)
     data_ph           = groupFoldResults(ph)
 
-    data = {"B": data_baseline, "TA": data_ph, "SA": data_gan_baseline, "SATA": data_gan_ph}
+    data = {"B": data_baseline, "TC": data_ph, "SA": data_gan_baseline, "SATC": data_gan_ph}
+
+    # Save data to mat file and pickle file for later use
+    savemat(os.path.join(args.resPath, "results_separatedBE.mat"), data) 
+    with open(os.path.join(args.resPath, "results_separatedBE.pickle"), "wb") as f:
+        pickle.dump(data, f)
     
-    #REMAP into DF--------------------------------------------
-    be   = map2DF(data, 'BE')
-    be   = pd.DataFrame(be)
+    # #REMAP into DF--------------------------------------------
+    # be   = map2DF(data, 'BE')
+    # be   = pd.DataFrame(be)
     
-    #Save or plot ----------------------------------
-    plot(be, 'BE', args.resPath)
+    # #Save or plot ----------------------------------
+    # plot(be, 'BE', args.resPath)
 
     
     # Get overall statistics

@@ -8,6 +8,7 @@ import sys
 sys.path.append(os.path.join('/'.join(sys.path[0].split("/")[:-1])))
 from utils.util import getStatistics
 from scipy.io import savemat
+import pickle
 
 sns.set(style='whitegrid')
 font = {'family' : "Times New Roman",
@@ -81,55 +82,57 @@ def main():
     data_baseline     = groupFoldResults(baseline)
     data_ph           = groupFoldResults(ph)
 
-    data = {"B": data_baseline, "TA": data_ph, "SA": data_gan_baseline, "SATA": data_gan_ph}
+    data = {"B": data_baseline, "TC": data_ph, "SA": data_gan_baseline, "SATC": data_gan_ph}
     
-    # Save data to mat file
+    # Save data to mat file and pickle file for later use
     savemat(os.path.join(args.resPath, "results.mat"), data) 
+    with open(os.path.join(args.resPath, "results.pickle"), "wb") as f:
+        pickle.dump(data, f)
 
-    #REMAP into DF--------------------------------------------
-    gdsc = map2DF(data, 'gDSC')
-    hd   = map2DF(data, 'HD (mm)')
-    assd = map2DF(data, 'ASSD (mm)')
-    be   = map2DF(data, 'BE')
-    ts   = map2DF(data, 'TS')
+    # #REMAP into DF--------------------------------------------
+    # gdsc = map2DF(data, 'gDSC')
+    # hd   = map2DF(data, 'HD (mm)')
+    # assd = map2DF(data, 'ASSD (mm)')
+    # be   = map2DF(data, 'BE')
+    # ts   = map2DF(data, 'TS')
             
-    gdsc = pd.DataFrame(gdsc)
-    hd   = pd.DataFrame(hd)
-    assd = pd.DataFrame(assd)
-    be   = pd.DataFrame(be)
-    ts   = pd.DataFrame(ts)
+    # gdsc = pd.DataFrame(gdsc)
+    # hd   = pd.DataFrame(hd)
+    # assd = pd.DataFrame(assd)
+    # be   = pd.DataFrame(be)
+    # ts   = pd.DataFrame(ts)
     
-    #Save or plot ----------------------------------
-    plot(gdsc, 'gDSC', args.resPath)
-    plot(hd,   'HD (mm)', args.resPath)
-    plot(assd, 'ASSD (mm)', args.resPath)
-    plot(be,   'BE', args.resPath)
-    plot(ts,   'TS', args.resPath)
+    # #Save or plot ----------------------------------
+    # plot(gdsc, 'gDSC', args.resPath)
+    # plot(hd,   'HD (mm)', args.resPath)
+    # plot(assd, 'ASSD (mm)', args.resPath)
+    # plot(be,   'BE', args.resPath)
+    # plot(ts,   'TS', args.resPath)
     
-    # Get overall statistics
-    res_dataframe = []
-    res_excel_indexs = []
-    nSamples = data_baseline['ts'].shape[0]
-    for approach in data.keys():
-        for metric_class in data[approach].keys():
-            res_excel_indexs.append("{}_{}".format(approach, metric_class)) 
-            if 'ts' != metric_class:
-                    res_dataframe.append(getStatistics(data[approach][metric_class]))        
-            else:
-                    tmp = np.ones(9+1) * np.nan
-                    tmp[-1] = np.sum(data[approach][metric_class]) / nSamples
-                    res_dataframe.append(tmp)
+    # # Get overall statistics
+    # res_dataframe = []
+    # res_excel_indexs = []
+    # nSamples = data_baseline['ts'].shape[0]
+    # for approach in data.keys():
+    #     for metric_class in data[approach].keys():
+    #         res_excel_indexs.append("{}_{}".format(approach, metric_class)) 
+    #         if 'ts' != metric_class:
+    #                 res_dataframe.append(getStatistics(data[approach][metric_class]))        
+    #         else:
+    #                 tmp = np.ones(9+1) * np.nan
+    #                 tmp[-1] = np.sum(data[approach][metric_class]) / nSamples
+    #                 res_dataframe.append(tmp)
 
-    columns = ['mean', 'std', 'min', 'max', 'median', 'lowQuart', 'upQuart', 'lowWhisker', 'upWhisker', 'perc']
-    df = pd.DataFrame(res_dataframe, index=res_excel_indexs, columns=columns)
+    # columns = ['mean', 'std', 'min', 'max', 'median', 'lowQuart', 'upQuart', 'lowWhisker', 'upWhisker', 'perc']
+    # df = pd.DataFrame(res_dataframe, index=res_excel_indexs, columns=columns)
 
-    res_excel = os.path.join(args.resPath, "stats.xlsx")
-    if not os.path.exists(res_excel):
-            df.to_excel(res_excel, sheet_name='sheet1')
-    else:   
-            with pd.ExcelWriter(res_excel, engine="openpyxl", mode='a',if_sheet_exists="overlay") as writer:
-                    startrow = writer.sheets['sheet1'].max_row
-                    df.to_excel(writer, sheet_name='sheet1', startrow=startrow, header=False)
+    # res_excel = os.path.join(args.resPath, "stats.xlsx")
+    # if not os.path.exists(res_excel):
+    #         df.to_excel(res_excel, sheet_name='sheet1')
+    # else:   
+    #         with pd.ExcelWriter(res_excel, engine="openpyxl", mode='a',if_sheet_exists="overlay") as writer:
+    #                 startrow = writer.sheets['sheet1'].max_row
+    #                 df.to_excel(writer, sheet_name='sheet1', startrow=startrow, header=False)
     
 
 if __name__ == '__main__':

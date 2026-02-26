@@ -12,6 +12,7 @@ we will reconvert the validation dataset to the original space and resolution an
 import shutil
 import os
 import argparse
+import torchio as tio
 
 if __name__ == '__main__':
 
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     parser.add_argument('--mode', type=str, required=True)
     args = parser.parse_args()
 
-    out_folder = os.path.join(args.outFolder, "Dataset00{}_Myosaiq{}".format(1 if args.dataset!='SA' else 2, 'GAN' if args.dataset=='SA' else ''))
+    out_folder = os.path.join(args.outFolder, "Dataset00{}_{}".format(1 if args.dataset!='SA' else 2, 'SA' if args.dataset=='SA' else 'B'))
     if not os.path.exists(out_folder):
         os.makedirs(out_folder, exist_ok=True)
     if not os.path.exists(os.path.join(out_folder, 'imagesTr')):
@@ -36,9 +37,10 @@ if __name__ == '__main__':
     for fold in range(args.folds):
         foldPath = os.path.join(args.inFolder, "fold_{}".format(fold))
         
-        # First we get the data on train
+        # We only get the data on the val folder, otherwise we will be repeating the reading and rewritten of some data for each fold
+        # if we collect the vals for every fold we have the complete dataset
         files_train = os.listdir(os.path.join(foldPath,'train'))
-        files_train = [os.path.join(foldPath, 'train', file) for file in files_train]
+        files_train = [os.path.join(foldPath, 'train', file) for file in files_train if '_deform' in file]
         files_val = os.listdir(os.path.join(foldPath,'val'))
         files_val = [os.path.join(foldPath, 'val', file) for file in files_val]
         files = files_train + files_val
@@ -50,15 +52,18 @@ if __name__ == '__main__':
             fileName = os.path.basename(file)
 
             if args.mode == 'train':
-                dst_img = os.path.join(out_folder, 'imagesTr', "{}_0000.nii".format(fileName))
-                dst_msk = os.path.join(out_folder, 'labelsTr', "{}.nii".format(fileName))
+                dst_img = os.path.join(out_folder, 'imagesTr', "{}_0000.nii.gz".format(fileName))
+                dst_msk = os.path.join(out_folder, 'labelsTr', "{}.nii.gz".format(fileName))
             else:
-                dst_img = os.path.join(out_folder, 'imagesTs', "{}_0000.nii".format(fileName))
+                dst_img = os.path.join(out_folder, 'imagesTs', "{}_0000.nii.gz".format(fileName))
 
             print(src_img, dst_img)
-            shutil.copy(src_img, dst_img)
+            img = tio.ScalarImage(src_img)
+            img.save(dst_img, squeeze=True)
             if args.mode == 'train':
                 print(src_msk, dst_msk)
-                shutil.copy(src_msk, dst_msk)
+                msk = tio.LabelMap(src_msk)
+                msk.save(dst_msk, squeeze=True)
+                
         
         

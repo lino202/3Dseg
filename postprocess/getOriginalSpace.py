@@ -23,10 +23,13 @@ def main():
     parser.add_argument('--rootCodePath', type=str)
     args = parser.parse_args()
 
-    sys.path.append(args.rootCodePath)
+    sys.path.append(args.rootCodePath)   # This is ugly, I know
     from preprocess.utilsPre import getEXFromMask
 
-    samples = sorted([x for x in os.listdir(args.predsFolder)])
+    if "nnUNet" in args.predsFolder:
+        samples = sorted([x.split(".nii.gz")[0] for x in os.listdir(args.predsFolder) if ".nii.gz" in x])
+    else:
+        samples = sorted([x for x in os.listdir(args.predsFolder)])
     print('There are {} samples in total'.format(len(samples)))
 
     for i, sample in enumerate(samples):
@@ -34,7 +37,10 @@ def main():
         print('Processing sample = {}'.format(sample))
 
         # Get pred and mask volumes
-        predPath = os.path.join(args.predsFolder, sample, "pred.nii".format(sample))
+        if "nnUNet" in args.predsFolder:
+            predPath = os.path.join(args.predsFolder, "{}.nii.gz".format(sample))
+        else:
+            predPath = os.path.join(args.predsFolder, sample, "pred.nii")
         pred = tio.LabelMap(predPath)
         
         if "MnM" in args.msksFolder:
